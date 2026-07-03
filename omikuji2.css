@@ -8,17 +8,21 @@ body {
     background-position: center;
     background-size: cover;
     margin: 0;
-    padding: 20px;
+    padding: 10px;
     display: flex;
     justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    box-sizing: border-box;
 }
 .container {
     max-width: 800px;
     width: 100%;
     background: rgba(255,255,255,0.9);
-    padding: 30px;
+    padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
 }
 h1 {
     text-align: center;
@@ -221,4 +225,18 @@ h1 {
     line-height: 1.6;
     border-top: 1px dashed #ccc;
     padding-top: 20px;
+}
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 1.6rem !important;
+        padding: 15px 10px !important;
+    }
+    .catchphrase {
+        font-size: 1.1rem;
+    }
+    .enter-btn {
+        font-size: 1.1rem !important;
+        padding: 12px 20px !important;
+        width: 100%;
+    }
 }
