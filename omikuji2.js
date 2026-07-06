@@ -10,69 +10,102 @@ const omikujiImages = [
 
 let currentMoney = 10000;
 
-function playSE(id) {
-    const audio = document.querySelector("#" + id);
-    if (audio) {
-        try {
-            audio.currentTime = 0;
-            const playPromise = audio.play();
-
-            if (playPromise !== undefined) {
-                playPromise.catch(e => {
-                    console.log("スマホの制限により音の再生がブロックされました：", e);
-                });
-            }
-        } catch (error) {
-            console.log("オーディオ再生エラーを回避しました：", error);
+// 💡スマホの音声ブロックを解除（アンロック）するための関数
+function unlockAllAudio() {
+    const ids = ["se-coin", "se-shuffle", "se-win", "se-lose"];
+    ids.forEach(id => {
+        const audio = document.querySelector("#" + id);
+        if (audio) {
+            // 最初の一瞬だけ無音で再生して即停止させることで、スマホのロックを解除する
+            audio.play().then(() => {
+                audio.pause();
+                audio.currentTime = 0;
+            }).catch(() => {
+                // ブロックされてもエラーを出さずに無視する
+            });
         }
+    });
+}
+
+// 💡スマホで絶対にエラー落ちしない安全な音再生関数
+function playSE(id) {
+    try {
+        const audio = document.querySelector("#" + id);
+        if (!audio) return;
+        
+        // currentTimeの変更自体がエラーになるスマホ環境もあるため、ここもtryで囲む
+        try { audio.currentTime = 0; } catch(e) {}
+        
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(e => {
+                console.log("音声再生がブロックされましたが、ゲームは続行します。");
+            });
+        }
+    } catch (error) {
+        console.log("オーディオエラーを回避:", error);
     }
 }
 
 function startShuffleSE() {
-    const audio = document.querySelector("#se-shuffle");
-    if (audio) {
-        audio.currentTime = 0;
+    try {
+        const audio = document.querySelector("#se-shuffle");
+        if (!audio) return;
+        try { audio.currentTime = 0; } catch(e) {}
         audio.loop = true;
-        audio.play().catch(e => {});
-    }
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(e => {});
+        }
+    } catch (error) {}
 }
 
 function stopShuffleSE() {
-    const audio = document.querySelector("#se-shuffle");
-    if (audio) {
-        audio.pause();
-    }
+    try {
+        const audio = document.querySelector("#se-shuffle");
+        if (audio) audio.pause();
+    } catch (error) {}
 }
 
 function startConfetti() {
-    const overlay = document.querySelector("#confetti-overlay");
-    const colors = ["#f44336", "#e91e63", "#9c27b0", "#2196f3", "#4caf50", "#ffeb3b", "#ff9800", "#fff"];
+    try {
+        const overlay = document.querySelector("#confetti-overlay");
+        if (!overlay) return;
+        const colors = ["#f44336", "#e91e63", "#9c27b0", "#2196f3", "#4caf50", "#ffeb3b", "#ff9800", "#fff"];
 
-    for (let i = 0; i < 80; i++) {
-        const piece = document.createElement("div");
-        piece.classList.add("confetti-piece");
-
-        piece.style.left = Math.random() * 100 + "vw";
-        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        piece.style.animationDuration = (Math.random() * 2 + 2) + "s";
-        piece.style.animationDelay = Math.random() * 1 + "s";
-
-        overlay.appendChild(piece);
-
-        setTimeout(() => { piece.remove(); }, 5000);
-    }
+        for (let i = 0; i < 80; i++) {
+            const piece = document.createElement("div");
+            piece.classList.add("confetti-piece");
+            piece.style.left = Math.random() * 100 + "vw";
+            piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            piece.style.animationDuration = (Math.random() * 2 + 2) + "s";
+            piece.style.animationDelay = Math.random() * 1 + "s";
+            overlay.appendChild(piece);
+            setTimeout(() => { piece.remove(); }, 5000);
+        }
+    } catch(e) {}
 }
 
 function startDoomEffect() {
-    document.querySelector("#doom-overlay").style.opacity = "1";
-    document.body.classList.add("doom-shake");
+    try {
+        const overlay = document.querySelector("#doom-overlay");
+        if (overlay) overlay.style.opacity = "1";
+        document.body.classList.add("doom-shake");
+    } catch(e) {}
 }
+
 function stopDoomEffect() {
-    document.querySelector("#doom-overlay").style.opacity = "0";
-    document.body.classList.remove("doom-shake");
+    try {
+        const overlay = document.querySelector("#doom-overlay");
+        if (overlay) overlay.style.opacity = "0";
+        document.body.classList.remove("doom-shake");
+    } catch(e) {}
 }
 
 function omikuji() {
+    // 💡ボタンを押した「最初のこの瞬間」にスマホの全音声ロックを解除する
+    unlockAllAudio();
+
     const imgElement = document.querySelector("#image");
     const placeholder = document.querySelector("#placeholder-text");
     const submitBtn = document.querySelector("#submitBtn");
@@ -87,39 +120,43 @@ function omikuji() {
         return;
     }
 
+    // 💡金額の計算を「音を鳴らすより先」に最優先で実行する（絶対にフリーズさせない）
+    currentMoney -= 1000;
+    if (moneySpan) moneySpan.innerHTML = currentMoney;
+
+    // コイン音を鳴らす（スマホで拒否されても無視して次に進む）
     playSE("se-coin");
 
-    currentMoney -= 1000;
-    moneySpan.innerHTML = currentMoney;
-
-    drawBtn.disabled = true;
+    if (drawBtn) drawBtn.disabled = true;
     if (submitBtn) submitBtn.disabled = true;
 
     if (placeholder) placeholder.style.display = "none";
-    imgElement.classList.remove("hidden");
-    imgElement.classList.add("shaking");
+    if (imgElement) {
+        imgElement.classList.remove("hidden");
+        imgElement.classList.add("shaking");
+    }
 
     startShuffleSE();
 
     let shuffleCount = 0;
     const shuffleInterval = setInterval(() => {
-        const randomImg = omikujiImages[Math.floor(Math.random() * omikujiImages.length)];
-        imgElement.src = randomImg;
+        if (imgElement) {
+            const randomImg = omikujiImages[Math.floor(Math.random() * omikujiImages.length)];
+            imgElement.src = randomImg;
+        }
         shuffleCount++;
 
         if (shuffleCount >= 10) {
             clearInterval(shuffleInterval);
-            imgElement.classList.remove("shaking");
-
+            if (imgElement) imgElement.classList.remove("shaking");
             stopShuffleSE();
-
             determineResult();
         }
     }, 80);
     
     function determineResult(){
         let okj = Math.random();
-        randomNumSpan.innerHTML = okj.toFixed(4);
+        if (randomNumSpan) randomNumSpan.innerHTML = okj.toFixed(4);
 
         let resultName = "";
         let imgSrc = "";
@@ -155,19 +192,19 @@ function omikuji() {
             prizeMoney = -10000;
         }
 
-        imgElement.src = imgSrc;
+        if (imgElement) imgElement.src = imgSrc;
         if (hiddenResult) hiddenResult.value = resultName;
 
         currentMoney += prizeMoney;
-        moneySpan.innerHTML = currentMoney;
+        if (moneySpan) moneySpan.innerHTML = currentMoney;
 
-        drawBtn.disabled = false;
+        if (drawBtn) drawBtn.disabled = false;
         if (submitBtn) submitBtn.disabled = false;
 
         if (resultName === "大吉" || resultName === "吉" || resultName === "中吉") {
             playSE("se-win");
             if (resultName === "大吉") startConfetti();
-        }else if (resultName === "凶" || resultName === "大凶") {
+        } else if (resultName === "凶" || resultName === "大凶") {
             playSE("se-lose");
             if (resultName === "大凶") startDoomEffect();
         }
@@ -199,31 +236,36 @@ function omikuji() {
 }
 
 function omikuji10() {
+    // 💡10連ボタンを押した瞬間にも音声ロックを解除する
+    unlockAllAudio();
+
     const imgElement = document.querySelector("#image");
     const placeholder = document.querySelector("#placeholder-text");
     const submitBtn = document.querySelector("#submitBtn");
     const drawBtn = document.querySelector(".draw-btn");
     const draw10Btn = document.querySelector("#draw10Btn");
     const moneySpan = document.querySelector("#money");
-    const backToTopBtn = document.querySelector("#backToTopBtn");
 
     if (currentMoney < 10000) {
         alert("🙅 資金が足りません！\n10連おみくじを引くには【10,000円】必要です。");
         return;
     }
 
+    // 💡金額の計算を最優先で実行
+    currentMoney -= 10000;
+    if (moneySpan) moneySpan.innerHTML = currentMoney;
+
     playSE("se-coin");
 
-    drawBtn.disabled = true;
-    draw10Btn.disabled = true;
+    if (drawBtn) drawBtn.disabled = true;
+    if (draw10Btn) draw10Btn.disabled = true;
     if (submitBtn) submitBtn.disabled = true;
 
-    currentMoney -= 10000;
-    moneySpan.innerHTML = currentMoney;
-
     if (placeholder) placeholder.style.display = "none";
-    imgElement.classList.remove("hidden");
-    imgElement.classList.add("shaking");
+    if (imgElement) {
+        imgElement.classList.remove("hidden");
+        imgElement.classList.add("shaking");
+    }
 
     startShuffleSE();
 
@@ -232,14 +274,15 @@ function omikuji10() {
 
     let shuffleCount = 0;
     const shuffleInterval = setInterval(() => {
-        const randomImg = omikujiImages[Math.floor(Math.random() * omikujiImages.length)];
-        imgElement.src = randomImg;
+        if (imgElement) {
+            const randomImg = omikujiImages[Math.floor(Math.random() * omikujiImages.length)];
+            imgElement.src = randomImg;
+        }
         shuffleCount++;
 
         if (shuffleCount >= 15) {
             clearInterval(shuffleInterval);
-            imgElement.classList.remove("shaking");
-
+            if (imgElement) imgElement.classList.remove("shaking");
             stopShuffleSE();
 
             for (let i = 0; i < 10; i++) {
@@ -269,14 +312,16 @@ function omikuji10() {
                 }
             }
 
-            const lastRandomImg = omikujiImages[Math.floor(Math.random() * omikujiImages.length)];
-            imgElement.src = lastRandomImg;
+            if (imgElement) {
+                const lastRandomImg = omikujiImages[Math.floor(Math.random() * omikujiImages.length)];
+                imgElement.src = lastRandomImg;
+            }
 
             currentMoney += totalPrize;
-            moneySpan.innerHTML = currentMoney;
+            if (moneySpan) moneySpan.innerHTML = currentMoney;
 
-            drawBtn.disabled = false;
-            draw10Btn.disabled = false;
+            if (drawBtn) drawBtn.disabled = false;
+            if (draw10Btn) draw10Btn.disabled = false;
             if (submitBtn) submitBtn.disabled = false;
 
             if (totalPrize > 0) {
