@@ -13,8 +13,18 @@ let currentMoney = 10000;
 function playSE(id) {
     const audio = document.querySelector("#" + id);
     if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch(e => console.log("オーディオ再生エラー(スマホの仕様制限など)：", e));
+        try {
+            audio.currentTime = 0;
+            const playPromise = audio.play();
+
+            if (playPromise !== undefined) {
+                playPromise.catch(e => {
+                    console.log("スマホの制限により音の再生がブロックされました：", e);
+                });
+            }
+        } catch (error) {
+            console.log("オーディオ再生エラーを回避しました：", error);
+        }
     }
 }
 
