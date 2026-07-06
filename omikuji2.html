@@ -7,8 +7,20 @@
     <link rel="stylesheet" href="omikuji2.css">
 </head>
 <body>
+    <div id="confetti-overlay"></div>
+    <div id="doom-overlay"></div>
+
+    <audio id="se-coin" src="coin.mp3" preload="auto"></audio>
+    <audio id="se-shuffle" src="shuffle.mp3" preload="auto"></audio>
+    <audio id="se-win" src="win.mp3" preload="auto"></audio>
+    <audio id="se-lose" src="lose.mp3" preload="auto"></audio>
+
     <div class="container">
         <h1>おみくじ（1回 1,000円）</h1>
+
+        <div class="wallet-section" style="text-align: center; margin: 15px 0; font-size: 1.3rem; font-weight: bold; color: #4a3728;">
+            💰 あなたの所持金：<span id="money">10000</span>円
+        </div>
 
         <div class="main-layout">
             <div class="omikuji-box">
@@ -17,6 +29,9 @@
                     <p id="placeholder-text">おみくじを引いてね！</p>
                 </div>
                 <button onclick="omikuji()" class="btn draw-btn">おみくじを引く</button>
+
+                <button id="draw10Btn" onclick="omikuji10()" class="btn" style="background-color: #f0ad4e; color: white; box-shadow: 0 4px #cea235; margin-top: 5px;">🔥 10連おみくじ</button>
+                <a href="index.html" id="backToTopBtn" class="btn" style="display: none; background-color: #4a3728; color: white; text-align: center; text-decoration: none; line-height: 1.2;">トップページに戻る</a>
                 
                 <form action="#" method="POST" class="result-form">
                     <input type="hidden" id="hiddenResult" name="result" value="">
