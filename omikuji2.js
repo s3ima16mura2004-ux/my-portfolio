@@ -71,6 +71,28 @@ function checkBankruptcy() {
         if (bonusArea) bonusArea.style.display = "block";
 
         if (count >= 3) {
+            // alertでユーザーに通知し、OKを押した後に遷移する
+            alert("💸【ゲームオーバー】💸\nお財布が空っぽになり、本日の神様の救済も使い切りました。\nトップページに戻ります。");
+            
+            // ファイル名が正しいか必ず確認してください
+            window.location.href = "top.html"; 
+        } else {
+            // お祈り回数が残っている場合はそのまま留まる
+            if (bonusBtn) {
+                bonusBtn.disabled = false;
+                bonusBtn.innerHTML = "🙏 神様にお祈りして3,000円貰う(残り" + (3 - count) + "回)";
+                bonusBtn.style.backgroundColor = "#5bc0de";
+            }
+            alert("💸【破産寸前！】💸\nおみくじを引くお金がなくなりました。\n神様にお祈りするか、トップページに戻ってください。");
+        }
+    } else {
+        if (bonusArea) bonusArea.style.display = "none";
+    }
+
+    /*if (currentMoney < 1000) {
+        if (bonusArea) bonusArea.style.display = "block";
+
+        if (count >= 3) {
             if (bonusBtn) {
                 bonusBtn.disabled = true;
                 bonusBtn.innerHTML = "❌ 本日の救済は終了しました";
@@ -78,7 +100,7 @@ function checkBankruptcy() {
                 bonusBtn.style.boxShadow = "none";
             }
             alert("💸【ゲームオーバー】💸\nお財布が空っぽになり、本日の神様の救済（3回）も使い切ってしまいました。\n出直しましょう！");
-            window.location.href = "index.html";
+            window.location.href = "top.html";
         } else {
             if (bonusBtn) {
                 bonusBtn.disabled = false;
@@ -90,7 +112,7 @@ function checkBankruptcy() {
         }
     } else {
         if (bonusArea) bonusArea.style.display = "none";
-    }
+    }*/
 }
 
 // スマホの音声ミュート制限をまとめて解除する関数
