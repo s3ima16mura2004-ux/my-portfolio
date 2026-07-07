@@ -3,92 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>豪華おみくじ</title>
+    <title>おみくじ（1回 1,000円）</title>
     <link rel="stylesheet" href="omikuji2.css">
 </head>
 <body>
-    <div id="confetti-overlay"></div>
-    <div id="doom-overlay"></div>
-
-    <audio id="se-coin" src="coin.mp3" preload="auto"></audio>
-    <audio id="se-shuffle" src="shuffle.mp3" preload="auto"></audio>
-    <audio id="se-win" src="win.mp3" preload="auto"></audio>
-    <audio id="se-lose" src="lose.mp3" preload="auto"></audio>
 
     <div class="container">
+        <div class="user-info">
+            👤 参拝者：<span id="user-display">ゲスト参拝者</span>様
+        </div>
+
         <h1>おみくじ（1回 1,000円）</h1>
 
-        <div class="wallet-section" style="text-align: center; margin: 15px 0; font-size: 1.3rem; font-weight: bold; color: #4a3728;">
+        <div class="money-box">
             💰 あなたの所持金：<span id="money">10000</span>円
         </div>
 
-        <div class="main-layout">
-            <div class="omikuji-box">
-                <div class="image-wrapper">
-                    <img src="" alt="ここにおみくじの結果が出ます" id="image" class="hidden">
-                    <p id="placeholder-text">おみくじを引いてね！</p>
+        <div class="main-content">
+            
+            <div class="left-panel">
+                <div class="omikuji-box">
+                    <p id="placeholder-text">【ここに結果が表示されます】</p>
+                    <img id="fortune-image" class="hidden" src="" alt="おみくじ結果">
+                    <div id="cutin-element" class="hidden">🪘 ガサガサ…</div>
                 </div>
-                <button onclick="omikuji()" class="btn draw-btn">おみくじを引く</button>
 
-                <button id="draw10Btn" onclick="omikuji10()" class="btn" style="background-color: #f0ad4e; color: white; box-shadow: 0 4px #cea235; margin-top: 5px;">🔥 10連おみくじ</button>
-                <a href="index.html" id="backToTopBtn" class="btn" style="display: none; background-color: #4a3728; color: white; text-align: center; text-decoration: none; line-height: 1.2;">トップページに戻る</a>
-                
-                <form action="#" method="POST" class="result-form">
-                    <input type="hidden" id="hiddenResult" name="result" value="">
-                    <input type="submit" value="結果を送信する" class="btn submit-btn" id="submitBtn" disabled>
-                </form>
+                <div class="button-container">
+                    <button class="btn-draw" onclick="omikuji()">おみくじを引く</button>
+                    <button class="btn-draw10" id="draw10Btn" onclick="omikuji10()">🔥 10連おみくじ</button>
+                    
+                    <form action="index.html" method="get" style="width: 100%;">
+                        <input type="hidden" id="hiddenResult" name="result" value="未抽選">
+                        <button type="submit" id="submitBtn" class="btn-submit">結果を送信する</button>
+                    </form>
+                </div>
             </div>
 
-            <table class="prize-table">
-                <thead>
-                    <tr>
-                        <th colspan="3">景品・等級一覧</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1等</td>
-                        <td>大吉</td>
-                        <td>100,000円</td>
-                    </tr>
-                    <tr>
-                        <td>2等</td>
-                        <td>吉</td>
-                        <td>10,000円</td>
-                    </tr>
-                    <tr>
-                        <td>3等</td>
-                        <td>中吉</td>
-                        <td>2,000円</td>
-                    </tr>
-                    <tr>
-                        <td>4等</td>
-                        <td>小吉</td>
-                        <td>1,000円</td>
-                    </tr>
-                    <tr>
-                        <td>5等</td>
-                        <td>末吉</td>
-                        <td>500円</td>
-                    </tr>
-                    <tr class="kyou-row">
-                        <td>6等</td>
-                        <td>凶</td>
-                        <td>はずれ！</td>
-                    </tr>
-                    <tr class="daiyou-row">
-                        <td>7等</td>
-                        <td>大凶</td>
-                        <td>※お祓い料 10,000円徴収</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="right-panel">
+                <table class="prize-table">
+                    <thead>
+                        <tr>
+                            <th colspan="3" class="table-title">景品・等級一覧</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="rank">1等</td>
+                            <td class="fortune">大吉</td>
+                            <td class="prize">100,000円</td>
+                        </tr>
+                        <tr>
+                            <td class="rank">2等</td>
+                            <td class="fortune">吉</td>
+                            <td class="prize">10,000円</td>
+                        </tr>
+                        <tr>
+                            <td class="rank">3等</td>
+                            <td class="fortune">中吉</td>
+                            <td class="prize">2,000円</td>
+                        </tr>
+                        <tr>
+                            <td class="rank">4等</td>
+                            <td class="fortune">小吉</td>
+                            <td class="prize">1,000円</td>
+                        </tr>
+                        <tr>
+                            <td class="rank">5等</td>
+                            <td class="fortune">末吉</td>
+                            <td class="prize">500円</td>
+                        </tr>
+                        <tr class="row-kyo">
+                            <td class="rank">6等</td>
+                            <td class="fortune">凶</td>
+                            <td class="prize">はずれ！</td>
+                        </tr>
+                        <tr class="row-daikyo">
+                            <td class="rank">7等</td>
+                            <td class="fortune">大凶</td>
+                            <td class="prize">
+                                残金の半額(50%)徴収 ※20%で免除！<br>
+                                <span style="font-size: 0.75rem; font-weight: bold; color: #ff4d4d;">🔥引いた後は3回「大吉確率10倍」発動！</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
         </div>
 
-        <div class="debug-info">
-            <p>デバッグ用乱数：<span id="randomNumber"></span></p>
+        <div class="footer-debug">
+            ⚙️ デバッグ用乱数：<span id="randomNumber">まだ引いていません (通常モード)
         </div>
     </div>
+
+    <audio id="se-coin" src="coin2.mp3" preload="auto"></audio>
+    <audio id="se-shuffle" src="shuffle.mp3" preload="auto"></audio>
+    <audio id="se-win" src="win.mp3" preload="auto"></audio>
+    <audio id="se-lose" src="lose.mp3" preload="auto"></audio>
+    <audio id="se-doom" src="doom.mp3" preload="auto"></audio>
+    <div id="confetti-overlay"></div>
+    <div id="doom-overlay"></div>
+
     <script src="omikuji2.js"></script>
 </body>
 </html>
