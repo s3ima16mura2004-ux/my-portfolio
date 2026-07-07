@@ -19,7 +19,7 @@ body {
     padding: 10px;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     min-height: 100vh;
     box-sizing: border-box;
 }
@@ -31,276 +31,246 @@ body {
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    position: relative;
     box-sizing: border-box;
+    transition: background 0.5s ease;
+}
+
+.gold-fever {
+    background: linear-gradient(135deg, #fff7e6 0%, #ffd700 50%, #fff7e6 100%) !important;
+    box-shadow: 0 0 25px rgba(218, 165, 32, 0.6);
+}
+
+/* 👤 ゲスト参拝者を右上に絶対配置 */
+.user-info {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 0.9rem;
+    background: #f0f0f0;
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: #333;
+    font-weight: bold;
+    z-index: 10;
 }
 
 h1 {
-    text-align: center;
-    background-color: #f7d6b5;
     color: #4a3728;
-    padding: 15px;
-    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.8rem;
+    border-bottom: 2px solid #8b5a2b;
+    padding-bottom: 10px;
+    margin-top: 30px; /* 参拝者表示との被り防止 */
+}
+
+.money-box {
+    font-size: 1.2rem;
+    background: #fff8eb;
+    border: 1px solid #ffe3b3;
+    padding: 10px;
     border-radius: 5px;
-    font-size: 1.5rem;
+    margin-bottom: 15px;
+    font-weight: bold;
+    color: #d9534f;
 }
 
-.main-layout {
+/* メインコンテンツ（左右並び） */
+.main-content {
     display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 20px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.omikuji-box {
-    flex: 1;
-    min-width: 250px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     gap: 15px;
-    box-sizing: border-box;
-}
-
-.result-form {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    box-sizing: border-box;
-}
-
-.image-wrapper {
-    width: 200px;
-    height: 350px;
-    border: 3px dashed #f7d6b5;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #fff;
-    overflow: hidden;
-}
-
-.image-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.image-wrapper img.hidden {
-    display: none;
-}
-
-#placeholder-text {
-    color: #888;
-    font-weight: bold;
-}
-
-.btn {
-    width: 100%;
-    max-width: 200px;
-    padding: 12px;
-    font-size: 1rem;
-    font-weight: bold;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-sizing: border-box;
-    display: inline-block;
-}
-
-.draw-btn{
-    background-color: #d9534f;
-    color: white;
-    box-shadow: 0 4px #b92c28;
-}
-
-.draw-btn:active {
-    transform: translateY(4px);
-    box-shadow: 0 0 #b92c28;
-}
-
-.submit-btn {
-    background-color: #5cb85c;
-    color: white;
-}
-
-.submit-btn:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-.prize-table {
-    border-collapse: collapse;
-    flex: 1;
-    min-width: 260px;
-    width: 100%;
-    font-size: 0.95rem;
-    box-sizing: border-box;
-}
-
-.prize-table th {
-    background-color: #4a3728;
-    color: white;
-    padding: 10px;
-    font-size: 1rem;
-}
-
-.prize-table td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    text-align: center;
-}
-
-.prize-table tr:nth-child(even) {
-    background-color: #fdfaf6;
-}
-
-.kyou-row {
-    color: #c9302c;
-}
-
-.daikyou-row {
-    color: #ff0000;
-    font-weight: bold;
-    background-color: #f2dede !important;
-}
-
-.debug-info {
-    margin-top: 30px;
-    text-align: center;
-    font-size: 0.85rem;
-    color: #666;
-    border-top: 1px solid #eee;
-    padding-top: 15px;
-}
-
-.shaking {
-    animation: shake 0.1s infinite alternate;
-}
-
-@keyframes shake {
-    0% {transform: translate(2px, 1px) rotate(0deg);}
-    100% {transform: translate(-2px, -1px) rotate(-1deg);}
-}
-
-.draw-btn:disabled {
-    background-color: #aaa !important;
-    box-shadow: none !important;
-    transform: none !important;
-    cursor: not-allowed;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.top-welcome {
-    margin-bottom: 40px;
-}
-
-.sub-title {
-    color: #d9534f;
-    font-weight: bold;
-    font-size: 1.1rem;
-    letter-spacing: 2px;
-    margin-bottom: 5px;
-}
-
-.main-title {
-    font-size: 2.2rem !important;
-    background-color: #4a3728 !important;
-    color: #f7d6b5 !important;
-    padding: 20px !important;
-    border: 2px solid #f7d6b5;
-}
-
-.intro-section {
-    margin: 40px 0;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    border: 1px solid #f7d6b5;
-}
-
-.catchphrase {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: #d9534f;
+    align-items: flex-start;
     margin-bottom: 15px;
 }
 
-.description {
-    line-height: 1.8;
-    color: #4a3728;
-    font-size: 1rem;
-}
-
-.entrance-area {
-    margin: 40px 0;
-}
-
-.enter-btn {
-    display: inline-block;
-    text-align: center;
-    vertical-align: middle;
-    text-decoration: none;
-    background-color: #d9534f;
-    color: white;
-    font-size: 1.3rem !important;
-    padding: 15px 20px !important;
+.left-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
     width: 100%;
-    max-width: 400px !important;
+}
+
+.right-panel {
+    flex: 1;
+    width: 100%;
+}
+
+.omikuji-box {
+    background: #fff;
+    border: 2px dashed #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    min-height: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
     box-sizing: border-box;
-    border-radius: 50px !important;
-    box-shadow: 0 6px #b92c28;
-    transition: all 0.2s;
+    position: relative;
 }
 
-.enter-btn:hover {
-    background-color: #c9302c;
+.omikuji-box img {
+    max-width: 100%;
+    max-height: 220px;
+    object-fit: contain;
 }
 
-.enter-btn:active {
-    transform: translateY(6px);
-    box-shadow: 0 0 #b92c28;
+#cutin-element {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #8b5a2b;
+    background: rgba(255, 255, 255, 0.95);
+    border: 4px double #8b5a2b;
+    padding: 20px;
+    border-radius: 10px;
+    position: absolute;
+    z-index: 100;
+    animation: shake-box 0.1s infinite alternate;
 }
 
-.warning-notes {
-    margin-top: 50px;
+@keyframes shake-box {
+    0% { transform: translate(-4px, -2px) rotate(-2deg); }
+    100% { transform: translate(4px, 2px) rotate(2deg); }
+}
+
+/* 🔴 🟠 🟢 ボタンを縦一列に並べるコンテナの修正 */
+.button-container {
+    display: flex;
+    flex-direction: column; /* 縦並びに強制変更 */
+    gap: 12px;              /* ボタン同士の隙間 */
+    width: 50%;
+    box-sizing: border-box;
+}
+
+/* ボタンの共通基本スタイル（大きさを統一） */
+.button-container button,
+.button-container .btn-submit {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    transition: transform 0.1s, background-color 0.2s;
+    display: block;
+    box-sizing: border-box;
+}
+
+.button-container button:active,
+.button-container .btn-submit:active {
+    transform: scale(0.98);
+}
+
+/* 🔴 1回引くボタン：鮮やかな赤 */
+.btn-draw {
+    background-color: #e53935 !important;
+}
+.btn-draw:hover {
+    background-color: #d32f2f !important;
+}
+
+/* 🟠 10連ボタン：明るいオレンジ */
+.btn-draw10 {
+    background-color: #ff9800 !important;
+}
+.btn-draw10:hover {
+    background-color: #f57c00 !important;
+}
+
+/* 🟢 結果送信ボタン：綺麗な黄緑 */
+.btn-submit {
+    background-color: #7cb342 !important;
+}
+.btn-submit:hover {
+    background-color: #689f38 !important;
+}
+
+/* 📊 景品・等級一覧表のスタイル（罫線をクッキリ復活） */
+.prize-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.prize-table th, 
+.prize-table td {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+    border: 1px solid #e0d0c0; /* 罫線をしっかり表示 */
+    text-align: center;
+}
+
+.table-title {
+    background-color: #8b5a2b;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.row-secret-locked {
+    background: #e6e6e6;
+    color: #999;
+    font-style: italic;
+}
+
+.row-kamikichi-unlocked {
+    background: linear-gradient(90deg, #fff2cc, #ffd700, #fff2cc) !important;
+    font-weight: bold;
+    color: #d8860b;
+    animation: glow-row 1.5s infinite alternate;
+}
+
+@keyframes glow-row {
+    0% { box-shadow: inset 0 0 5px #ffd700; }
+    100% { box-shadow: inset 0 0 15px #ff8c00; }
+}
+
+.rank {
+    font-weight: bold;
+    color: #8b5a2b;
+    background: #fbf8f3;
+}
+
+.fortune {
+    font-weight: bold;
+}
+
+.prize {
+    text-align: right;
+}
+
+.row-kyo {
+    background-color: #fff0f0;
+}
+
+.row-daikyo {
+    background-color: #f5e6ff;
+}
+
+/* 下部デバッグ情報 */
+.footer-debug {
+    margin-top: 15px;
     font-size: 0.85rem;
-    color: #888;
-    line-height: 1.6;
-    border-top: 1px dashed #ccc;
-    padding-top: 20px;
+    color: #666;
+    background: #eee;
+    padding: 8px;
+    border-radius: 5px;
 }
 
-/* スマホ表示用の設定 */
-@media (max-width: 768px) {
-    .main-title {
-        font-size: 1.6rem !important;
-        padding: 15px 10px !important;
-    }
-    .catchphrase {
-        font-size: 0.95rem;
-        white-space: normal; /* 💡はみ出さずに自動折り返しさせる */
-    }
-    .enter-btn {
-        font-size: 1.1rem !important;
-        padding: 14px 10px !important;
-        width: 100% !important;
-        max-width: 100% !important;
-    }
-    .main-layout {
-        gap: 15px;
-    }
+.hidden {
+    display: none !important;
 }
 
-/* 特殊演出レイヤーの設定 */
+/* エフェクト用レイヤー */
 #confetti-overlay {
     position: fixed;
     top: 0;
@@ -309,21 +279,6 @@ h1 {
     height: 100vh;
     pointer-events: none;
     z-index: 9999;
-    overflow: hidden;
-}
-
-.confetti-piece {
-    position: absolute;
-    top: -20px;
-    width: 10px;
-    height: 10px;
-    opacity: 0.8;
-    animation: fall linear forwards;
-}
-
-@keyframes fall {
-    0% { transform: translateY(0) rotate(0deg); }
-    100% { transform: translateY(105vh) rotate(720deg); }
 }
 
 #doom-overlay {
@@ -332,22 +287,81 @@ h1 {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: radial-gradient(circle, rgba(74,0,110,0.9) 0%, rgba(0,0,0,0.95) 100%);
+    background: rgba(139, 0, 0, 0.4);
     pointer-events: none;
     z-index: 9998;
     opacity: 0;
-    transition: opacity 0.5s ease;
+    transition: opacity 0.3s ease;
 }
 
 .doom-shake {
-    animation: doom-quake 0.1s infinite;
+    animation: screen-shake 0.15s infinite;
 }
 
-@keyframes doom-quake {
-    0% { transform: translate(3px, 2px) rotate(0deg); }
-    20% { transform: translate(-3px, -2px) rotate(-1deg); }
-    40% { transform: translate(-1px, 3px) rotate(1deg); }
-    60% { transform: translate(2px, -3px) rotate(0deg); }
-    80% { transform: translate(-2px, 1px) rotate(1deg); }
-    100% { transform: translate(1px, 2px) rotate(-1deg); }
+@keyframes screen-shake {
+    0% { transform: translate(3px, 5px) rotate(0deg); }
+    20% { transform: translate(-5px, -3px) rotate(-1deg); }
+    40% { transform: translate(-4px, 3px) rotate(1deg); }
+    60% { transform: translate(4px, -2px) rotate(0deg); }
+    80% { transform: translate(-2px, 4px) rotate(1deg); }
+    100% { transform: translate(3px, -3px) rotate(-1deg); }
+}
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .left-panel, .right-panel {
+        width: 100%;
+    }
+    .user-info {
+        position: static;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+    h1 {
+        margin-top: 10px;
+    }
+}
+.enter-btn {
+    display: inline-block;
+    width: 100%;
+    max-width: 320px;
+    background-color: #d9534f;
+    color: white !important;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 5px 0 #b33c39;
+    box-sizing: border-box;
+    transition: all 0.1s ease;
+    margin: 10px auto;
+}
+
+/* ボタンを押したときのカチッとする演出 */
+.enter-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #b33c39;
+}
+/* 揺れるアニメーションの定義 */
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(3px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(3px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(1px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+/* 演出用のクラス */
+.is-shaking {
+  animation: shake 0.5s;
 }
