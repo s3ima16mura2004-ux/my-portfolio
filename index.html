@@ -3,32 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>豪華おみくじ神社 - トップ</title>
+    <title>金大黒 豪華おみくじ神社 - ログイン</title>
     <link rel="stylesheet" href="omikuji2.css">
+    <style>
+        .login-box {
+            max-width: 400px;
+            margin: 50px auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            border: 2px solid #d9534f;
+            text-align: center;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #4a3728;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .login-btn {
+            background-color: #d9534f;
+            color: white;
+            box-shadow: 0 4px #b94441;
+            font-weight: bold;
+            font-size: 1.2rem;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .login-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+        .error-message {
+            color: #d9534f;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <div class="container text-center">
-        <div class="top-welcome">
-            <p class="sub-title">\一攫千金の運試し/</p>
-            <h1 class="main-title">金大黒 豪華おみくじ神社</h1>
+    <audio id="se-coin" src="coin2.mp3" preload="auto"></audio>
+
+    <div class="login-box">
+        <h2 style="color: #4a3728; margin-bottom: 5px;">⛩️ 神社への参拝 ⛩️</h2>
+        <p style="font-size: 0.9rem; color: #777; margin-bottom: 25px;">ユーザー名と合言葉を入力してください</p>
+
+        <div id="error-txt" class="error-message">❌ 合言葉（パスワード）が違います！</div>
+
+        <div class="input-group">
+            <label for="username">👤 ユーザー名</label>
+            <input type="text" id="username" placeholder="お名前を入力（自由）" value="ゲスト参拝者">
         </div>
 
-        <div class="intro-section">
-            <p class="catchphrase">「1,000円の投資で、10万円の奇跡を起こせ。」</p>
-            <p class="description">
-                当神社のおみくじは、1回1,000円で引ける特別な運試しです。<br>
-                最高100,000円の現金景品から、<br>背筋が凍る「大凶（お祓い料徴収）」まで、<br>
-                あなたの今日の運命がすべて決まります。
-            </p>
+        <div class="input-group">
+            <label for="password">🔑 合言葉（パスワード）</label>
+            <input type="password" id="password" placeholder="合言葉を入力してください">
+            <p style="font-size: 0.8rem; color: #999; margin-top: 5px;">※ヒント：jinja777</p>
         </div>
-
-        <div class="entrance-area">
-            <a href="omikuji2.html" class="enter-btn">境内へ進む（おみくじを引く）</a>
-        </div>
-
-        <div class="warning-notes">
-            <p>※お賽銭（軍資金）がなくなると破産となります。計画的に参拝しましょう。</p>
-        </div>
+    
+        <button onclick="tryLogin()" class="login-btn">🙏 いざ、参拝する</button>
     </div>
+
+    <script>
+        function unlockAudio() {
+            const audio = document.querySelector("#se-coin");
+            if (audio) {
+                audio.play().then(() => {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }).catch(() => {});
+            }
+        }
+
+        function tryLogin() {
+            unlockAudio();
+
+            const userField = document.querySelector("#username").value;
+            const passField = document.querySelector("#password").value;
+            const errorTxt = document.querySelector("#error-txt");
+            const audio = document.querySelector("#se-coin");
+
+            if (passField === "jinja777") {
+                errorTxt.style.display = "none";
+                localStorage.setItem("logged_in_user", userField || "名無しの参拝者");
+
+                if (audio) {
+                    try {
+                        audio.currentTime = 0;
+                        audio.play();
+                    } catch(e) {}
+                }
+
+                alert("🎉 認証成功！\nようこそ、" + userField + "様。おみくじ神社へご案内します！");
+                window.location.href = "index.html"; // ログイン後はまずトップページへ移動
+            } else {
+                errorTxt.style.display = "block";
+                document.querySelector("#password").value = "";
+            }
+        }
+    </script>
 </body>
 </html>
