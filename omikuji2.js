@@ -63,7 +63,19 @@ function getBonusMoney() {
 
 // 所持金が足りなくなった時の破産チェック関数
 function checkBankruptcy() {
+
     const bonusArea = document.querySelector("#bonus-area");
+    
+    // 所持金が1,000円未満になったら強制的にトップへ移動
+    if (currentMoney < 1000) {
+        alert("💸【破産！】💸\nおみくじを引くお金がなくなりました。\nトップページに戻ります。");
+        window.location.href = "top.html"; 
+    } else {
+        // お金がある場合は救済エリアを隠す
+        if (bonusArea) bonusArea.style.display = "none";
+    }
+
+    /*const bonusArea = document.querySelector("#bonus-area");
     const bonusBtn = document.querySelector("#bonusBtn");
     const count = getTodayPrayCount();
 
