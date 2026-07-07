@@ -10,103 +10,187 @@ const omikujiImages = [
 
 let currentMoney = 10000;
 
-// 💡スマホの音声ブロックを解除（アンロック）するための関数
+// フィーバータイム（大吉確率UP）の残り回数を管理する変数
+let feverCount = 0;
+
+
+// おみくじ結果が出たときに呼ぶ関数
+function unlockCollection(fortune) {
+    if (collection[fortune] !== undefined && !collection[fortune]) {
+        collection[fortune] = true;
+        localStorage.setItem("omikuji_collection", JSON.stringify(collection));
+        updateCollectionUI();
+    }
+}
+
+// 今日お祈り（救済）した回数をスマホに保存・チェックする関数
+function getTodayPrayCount() {
+    const today = new Date().toLocaleDateString(); // 例: "2026/7/7"
+    const savedDate = localStorage.getItem("pray_date");
+
+    if (savedDate !== today) {
+        localStorage.setItem("pray_date", today);
+        localStorage.setItem("pray_count", "0");
+        return 0;
+    }
+    return parseInt(localStorage.getItem("pray_count") || "0", 10);
+}
+
+// 神様にお祈りして3,000円もらう関数（1日3回制限）
+function getBonusMoney() {
+    unlockAllAudio();
+
+    let count = getTodayPrayCount();
+    if (count >= 3) {
+        alert("🙅 神様「欲張ってはならぬ。本日の救済はこれでおしまいじゃ。」\n(また明日お祈りできるようになります)");
+        return;
+    }
+
+    count++;
+    localStorage.setItem("pray_count", count.toString());
+
+    currentMoney += 3000;
+    const moneySpan = document.querySelector("#money");
+    if (moneySpan) moneySpan.innerHTML = currentMoney;
+
+    playSE("se-coin");
+
+    const bonusArea = document.querySelector("#bonus-area");
+    if (bonusArea) bonusArea.style.display = "none";
+
+    alert("🙏 神様が哀れんで 3,000円 を授けてくれました！\n(今日のお祈り： " + count + " / 3回)");
+}
+
+// 所持金が足りなくなった時の破産チェック関数
+function checkBankruptcy() {
+    const bonusArea = document.querySelector("#bonus-area");
+    const bonusBtn = document.querySelector("#bonusBtn");
+    const count = getTodayPrayCount();
+
+    if (currentMoney < 1000) {
+        if (bonusArea) bonusArea.style.display = "block";
+
+        if (count >= 3) {
+            if (bonusBtn) {
+                bonusBtn.disabled = true;
+                bonusBtn.innerHTML = "❌ 本日の救済は終了しました";
+                bonusBtn.style.backgroundColor = "#aaa";
+                bonusBtn.style.boxShadow = "none";
+            }
+            alert("💸【ゲームオーバー】💸\nお財布が空っぽになり、本日の神様の救済（3回）も使い切ってしまいました。\n出直しましょう！");
+            window.location.href = "index.html";
+        } else {
+            if (bonusBtn) {
+                bonusBtn.disabled = false;
+                bonusBtn.innerHTML = "🙏 神様にお祈りして3,000円貰う(残り" + (3 - count) + "回)";
+                bonusBtn.style.backgroundColor = "#5bc0de";
+                bonusBtn.style.boxShadow = "0 4px #46b8da";
+            }
+            alert("💸【破産寸前！】💸\nおみくじを引くお金がなくなってしまいました。\n神様にお祈りするか、トップページに戻りましょう。");
+        }
+    } else {
+        if (bonusArea) bonusArea.style.display = "none";
+    }
+}
+
+// スマホの音声ミュート制限をまとめて解除する関数
 function unlockAllAudio() {
-    const ids = ["se-coin", "se-shuffle", "se-win", "se-lose"];
+    const ids = ["se-coin", "se-shuffle", "se-win", "se-lose", "se-doom"];
     ids.forEach(id => {
         const audio = document.querySelector("#" + id);
         if (audio) {
-            // 最初の一瞬だけ無音で再生して即停止させることで、スマホのロックを解除する
             audio.play().then(() => {
                 audio.pause();
                 audio.currentTime = 0;
-            }).catch(() => {
-                // ブロックされてもエラーを出さずに無視する
-            });
+            }).catch(() => {});
         }
     });
 }
 
-// 💡スマホで絶対にエラー落ちしない安全な音再生関数
+// 効果音を最初から再生する関数
 function playSE(id) {
-    try {
-        const audio = document.querySelector("#" + id);
-        if (!audio) return;
-        
-        // currentTimeの変更自体がエラーになるスマホ環境もあるため、ここもtryで囲む
-        try { audio.currentTime = 0; } catch(e) {}
-        
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(e => {
-                console.log("音声再生がブロックされましたが、ゲームは続行します。");
-            });
-        }
-    } catch (error) {
-        console.log("オーディオエラーを回避:", error);
+    const audio = document.querySelector("#" + id);
+    if (audio) {
+        try {
+            audio.currentTime = 0;
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(e => { console.log(e); });
+            }
+        } catch (error) { console.log(error); }
     }
 }
 
+// シャッフル音（ループ再生）
 function startShuffleSE() {
-    try {
-        const audio = document.querySelector("#se-shuffle");
-        if (!audio) return;
-        try { audio.currentTime = 0; } catch(e) {}
+    const audio = document.querySelector("#se-shuffle");
+    if (audio) {
+        audio.currentTime = 0;
         audio.loop = true;
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(e => {});
-        }
-    } catch (error) {}
+        audio.play().catch(e => {});
+    }
 }
 
 function stopShuffleSE() {
-    try {
-        const audio = document.querySelector("#se-shuffle");
-        if (audio) audio.pause();
-    } catch (error) {}
+    const audio = document.querySelector("#se-shuffle");
+    if (audio) { audio.pause(); }
 }
 
+// 大吉用の紙吹雪演出
 function startConfetti() {
-    try {
-        const overlay = document.querySelector("#confetti-overlay");
-        if (!overlay) return;
-        const colors = ["#f44336", "#e91e63", "#9c27b0", "#2196f3", "#4caf50", "#ffeb3b", "#ff9800", "#fff"];
+    const overlay = document.querySelector("#confetti-overlay");
+    if (!overlay) return;
+    const colors = ["#f44336", "#e91e63", "#9c27b0", "#2196f3", "#4caf50", "#ffeb3b", "#ff9800", "#fff"];
 
-        for (let i = 0; i < 80; i++) {
-            const piece = document.createElement("div");
-            piece.classList.add("confetti-piece");
-            piece.style.left = Math.random() * 100 + "vw";
-            piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            piece.style.animationDuration = (Math.random() * 2 + 2) + "s";
-            piece.style.animationDelay = Math.random() * 1 + "s";
-            overlay.appendChild(piece);
-            setTimeout(() => { piece.remove(); }, 5000);
-        }
-    } catch(e) {}
+    for (let i = 0; i < 80; i++) {
+        const piece = document.createElement("div");
+        piece.classList.add("confetti-piece");
+        piece.style.left = Math.random() * 100 + "vw";
+        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDuration = (Math.random() * 2 + 2) + "s";
+        piece.style.animationDelay = Math.random() * 1 + "s";
+        overlay.appendChild(piece);
+        setTimeout(() => { piece.remove(); }, 5000);
+    }
 }
 
+// 大凶用の画面赤フラッシュ・画面揺れ演出
 function startDoomEffect() {
-    try {
-        const overlay = document.querySelector("#doom-overlay");
-        if (overlay) overlay.style.opacity = "1";
-        document.body.classList.add("doom-shake");
-    } catch(e) {}
+    const overlay = document.querySelector("#doom-overlay");
+    if (overlay) overlay.style.opacity = "1";
+    document.body.classList.add("doom-shake");
 }
 
 function stopDoomEffect() {
-    try {
-        const overlay = document.querySelector("#doom-overlay");
-        if (overlay) overlay.style.opacity = "0";
-        document.body.classList.remove("doom-shake");
-    } catch(e) {}
+    const overlay = document.querySelector("#doom-overlay");
+    if (overlay) overlay.style.opacity = "0";
+    document.body.classList.remove("doom-shake");
 }
 
+// ゾロ目かどうか判定してボーナスを出す関数 (下4桁が同じ数字かチェック)
+function checkZoromeBonus(num) {
+    const str = num.toFixed(4);
+    const lastFour = str.split(".")[1];
+    
+    if (lastFour[0] === lastFour[1] && lastFour[1] === lastFour[2] && lastFour[2] === lastFour[3]) {
+        currentMoney += 5000;
+        const moneySpan = document.querySelector("#money");
+        if (moneySpan) moneySpan.innerHTML = currentMoney;
+        
+        playSE("se-win");
+        
+        setTimeout(() => {
+            alert("🌟【ゾロ目大吉ボーナス！】🌟\n奇跡が起きました！乱数の下4桁が「" + lastFour + "」のゾロ目です！\n神様から御祝儀として【5,000円】が支給されました！");
+        }, 600);
+    }
+}
+
+// 通常おみくじ（1回引き）のメイン処理
 function omikuji() {
-    // 💡ボタンを押した「最初のこの瞬間」にスマホの全音声ロックを解除する
+    
     unlockAllAudio();
 
-    const imgElement = document.querySelector("#image");
+    const imgElement = document.querySelector("#fortune-image");
     const placeholder = document.querySelector("#placeholder-text");
     const submitBtn = document.querySelector("#submitBtn");
     const drawBtn = document.querySelector(".draw-btn");
@@ -115,16 +199,16 @@ function omikuji() {
     const moneySpan = document.querySelector("#money");
 
     if (currentMoney < 1000) {
-        alert("🙅 料金が足りません！\nおみくじを引くには1,000円必要です。トップページに戻って出直しましょう！");
-        window.location.href = "index.html";
+        alert("🙅 料金が足りません！\n神様にお祈りして資金を分けてもらいましょう！");
+        checkBankruptcy();
         return;
     }
 
-    // 💡金額の計算を「音を鳴らすより先」に最優先で実行する（絶対にフリーズさせない）
     currentMoney -= 1000;
     if (moneySpan) moneySpan.innerHTML = currentMoney;
 
-    // コイン音を鳴らす（スマホで拒否されても無視して次に進む）
+    let result = "大吉";
+
     playSE("se-coin");
 
     if (drawBtn) drawBtn.disabled = true;
@@ -153,15 +237,33 @@ function omikuji() {
             determineResult();
         }
     }, 80);
-    
-    function determineResult(){
+
+    function determineResult() {
         let okj = Math.random();
-        if (randomNumSpan) randomNumSpan.innerHTML = okj.toFixed(4);
+        let isFeverActiveThisTurn = false;
+
+        if (feverCount > 0) {
+            isFeverActiveThisTurn = true;
+            feverCount--;
+            if (okj >= 0.90) {
+                okj = 0.995; 
+            }
+        }
+
+        if (randomNumSpan) {
+            let feverText = feverCount > 0 ? ` (🔥フィーバー残り: ${feverCount}回)` : " (通常モード)";
+            if (isFeverActiveThisTurn && feverCount === 0) feverText = " (🔥フィーバーラスト！)";
+            randomNumSpan.innerHTML = okj.toFixed(4) + feverText;
+        }
 
         let resultName = "";
         let imgSrc = "";
         let prizeMoney = 0;
         
+        // 💡【新仕様】大凶の免除・徴収額を計算するためのフラグ
+        let isDoomExempted = false; // 出世大凶（免除）になったか
+        let actualDoomTax = 0;     // 実際に取られる金額
+
         if (okj >= 0.99) {
             imgSrc = "omikuji_daikichi.png";
             resultName = "大吉";
@@ -189,7 +291,16 @@ function omikuji() {
         } else {
             imgSrc = "omikuji_daikyou.png";
             resultName = "大凶";
-            prizeMoney = -10000;
+            
+            // 💡 20%の確率(Math.random() < 0.2)で「出世大凶（お祓い料免除）」
+            if (Math.random() < 0.2) {
+                isDoomExempted = true;
+                actualDoomTax = 0;
+            } else {
+                // 💡 免除されなかったら、現在のお財布の「半分（50%）」を計算（端数切り捨て）
+                actualDoomTax = Math.floor(currentMoney * 0.5);
+            }
+            prizeMoney = -actualDoomTax; // マイナスとして計算
         }
 
         if (imgElement) imgElement.src = imgSrc;
@@ -204,9 +315,12 @@ function omikuji() {
         if (resultName === "大吉" || resultName === "吉" || resultName === "中吉") {
             playSE("se-win");
             if (resultName === "大吉") startConfetti();
-        } else if (resultName === "凶" || resultName === "大凶") {
+        } else if (resultName === "凶") {
             playSE("se-lose");
-            if (resultName === "大凶") startDoomEffect();
+        } else if (resultName === "大凶") {
+            playSE("se-doom");
+            startDoomEffect();
+            feverCount = 3; // 大凶なのでフィーバー確定
         }
 
         setTimeout(() => {
@@ -217,41 +331,43 @@ function omikuji() {
             } else if (resultName === "中吉") {
                 alert("♫ いいですね！【中吉】です！ ♫\n2,000円 が当選しました！");
             } else if (resultName === "小吉") {
-                alert("👍 堅実！【小吉】です！ 👍\n1,000円 が当選しました！（元取れた！）");
+                alert("👍 堅実！【小吉】です！ 👍\n1,000円 が当選しました！(元取れた！)");
             } else if (resultName === "末吉") {
                 alert("😄 ちょっぴりお小遣い！【末吉】です！ 😄\n500円 が当選しました！");
             } else if (resultName === "凶") {
                 alert("😢残念！【凶】です！ 😢\n景品はありません。はずれです！");
             } else if (resultName === "大凶") {
-                alert("😱 大凶を引いてしまいました…！ 😱\nお祓い料として【10,000円】を徴収いたします。");
+                if (isDoomExempted) {
+                    alert("😱【大凶】を引いてしまった…が！？\n\n🌟「出世大凶」発動！🌟\n神様「今回は特別にお祓い料（免除）にしてしんぜよう！」\nお祓い料はなんと【0円】です！\n\n🔥さらに！災い転じて福となす！次の単発おみくじ3回分は【大吉の確率が10倍(10%)】になります！");
+                } else {
+                    alert("😱 大凶を引いてしまいました…！ 😱\nお祓い料として、お財布の半額【" + actualDoomTax.toLocaleString() + "円】を徴収いたします。\n\n🔥しかし！災い転じて福となす！次の単発おみくじ3回分は【大吉の確率が10倍(10%)】に跳ね上がります！");
+                }
                 stopDoomEffect();
             }
 
-            if (currentMoney <= 0) {
-                alert("💸【破産してしまいました…】💸\nお財布が空っぽになりました。トップページに戻って出直しましょう！");
-                window.location.href = "index.html";
-            }
+            checkZoromeBonus(okj);
+            checkBankruptcy();
         }, 200);
     }
 }
 
+// 10連おみくじ処理
 function omikuji10() {
-    // 💡10連ボタンを押した瞬間にも音声ロックを解除する
     unlockAllAudio();
 
-    const imgElement = document.querySelector("#image");
+    const imgElement = document.querySelector("#fortune-image");
     const placeholder = document.querySelector("#placeholder-text");
     const submitBtn = document.querySelector("#submitBtn");
     const drawBtn = document.querySelector(".draw-btn");
     const draw10Btn = document.querySelector("#draw10Btn");
     const moneySpan = document.querySelector("#money");
+    const randomNumSpan = document.querySelector("#randomNumber");
 
     if (currentMoney < 10000) {
         alert("🙅 資金が足りません！\n10連おみくじを引くには【10,000円】必要です。");
         return;
     }
 
-    // 💡金額の計算を最優先で実行
     currentMoney -= 10000;
     if (moneySpan) moneySpan.innerHTML = currentMoney;
 
@@ -271,6 +387,10 @@ function omikuji10() {
 
     let resultsCount = {"大吉": 0, "吉": 0, "中吉": 0, "小吉": 0, "末吉": 0, "凶": 0, "大凶": 0};
     let totalPrize = 0;
+    let lastRandomNum = 0; 
+    let gotDaikyouIn10 = false; 
+    let totalDoomTax = 0; // 💡10連の中で取られた大凶お祓い料の合計
+    let exemptedCount = 0; // 💡10連の中で免除された大凶の数
 
     let shuffleCount = 0;
     const shuffleInterval = setInterval(() => {
@@ -287,6 +407,7 @@ function omikuji10() {
 
             for (let i = 0; i < 10; i++) {
                 let okj = Math.random();
+                if (i === 9) lastRandomNum = okj; 
 
                 if (okj >= 0.99) {
                     resultsCount["大吉"]++;
@@ -308,8 +429,29 @@ function omikuji10() {
                     totalPrize += 0;
                 } else {
                     resultsCount["大凶"]++;
-                    totalPrize -= 10000;
+                    gotDaikyouIn10 = true;
+                    
+                    // 💡10連おみくじの中での大凶も同じルールを適用
+                    if (Math.random() < 0.2) {
+                        exemptedCount++; // 免除！
+                    } else {
+                        // 半分持っていかれる（連続で大凶が出ると、その都度残り金額の半分が減っていきます）
+                        // ※10連全体の途中でリアルタイムに所持金を減らしながら計算
+                        let tax = Math.floor((currentMoney + totalPrize) * 0.5);
+                        totalDoomTax += tax;
+                        totalPrize -= tax;
+                    }
                 }
+                checkZoromeBonus(okj);
+            }
+
+            if (gotDaikyouIn10) {
+                feverCount = 3;
+            }
+
+            if (randomNumSpan) {
+                let feverText = feverCount > 0 ? ` (🔥フィーバーチャージ完了:残り ${feverCount}回)` : " (通常モード)";
+                randomNumSpan.innerHTML = lastRandomNum.toFixed(4) + feverText;
             }
 
             if (imgElement) {
@@ -327,14 +469,18 @@ function omikuji10() {
             if (totalPrize > 0) {
                 playSE("se-win");
             } else if (totalPrize < 0) {
-                playSE("se-lose");
+                if (resultsCount["大凶"] > 0) {
+                    playSE("se-doom");
+                } else {
+                    playSE("se-lose");
+                }
             }
 
             if (resultsCount["大吉"] > 0) startConfetti();
             if (resultsCount["大凶"] > 0) startDoomEffect();
 
             setTimeout(() => {
-                alert(
+                let alertMsg = 
                     "🔥【10連おみくじ結果発表】🔥\n" +
                     "--------------------------------\n" +
                     "🎉 大吉： " + resultsCount["大吉"] + "回\n" +
@@ -344,17 +490,39 @@ function omikuji10() {
                     "😄 末吉： " + resultsCount["末吉"] + "回\n" +
                     "😢 凶 ： " + resultsCount["凶"] + "回\n" +
                     "😱 大凶： " + resultsCount["大凶"] + "回\n" +
-                    "--------------------------------\n" +
-                    "💰 合計獲得賞金：" + totalPrize.toLocaleString() + "円！"
-                );
-
-                stopDoomEffect();
-
-                if (currentMoney < 1000) {
-                    alert("💸【ゲームオーバー】💸\nおみくじを引くお金が無くなりました。トップへ戻りましょう。");
-                    window.location.href = "index.html";
+                    "--------------------------------\n";
+                
+                if (totalDoomTax > 0) {
+                    alertMsg += "💸 大凶お祓い料(合計)：-" + totalDoomTax.toLocaleString() + "円\n";
                 }
+                if (exemptedCount > 0) {
+                    alertMsg += "🌟 出世大凶(免除)：" + exemptedCount + "回発生！(セーフ！)\n";
+                }
+                
+                alertMsg += "💰 合計損益：" + totalPrize.toLocaleString() + "円！";
+                
+                if (gotDaikyouIn10) {
+                    alertMsg += "\n\n🔥【厄落としフィーバー発動！】🔥\n大凶が含まれていたため、次の単発おみくじ3回は【大吉確率10倍(10%)】になります！";
+                }
+
+                alert(alertMsg);
+                stopDoomEffect();
+                checkBankruptcy();
             }, 200);
         }
     }, 80);
 }
+
+// 画面が開いた瞬間に名前を読み込んで表示するお出迎え処理
+window.addEventListener("DOMContentLoaded", () => {
+    const username = localStorage.getItem("logged_in_user") || "ゲスト参拝客";
+    const userDisplay = document.querySelector("#user-display");
+    if (userDisplay) {
+        userDisplay.innerHTML = username;
+    }
+    
+    const randomNumSpan = document.querySelector("#randomNumber");
+    if (randomNumSpan) {
+        randomNumSpan.innerHTML = "まだ引いていません (通常モード)";
+    }
+});
