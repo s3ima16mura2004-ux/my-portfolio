@@ -13,6 +13,20 @@ let currentMoney = 10000;
 // フィーバータイム（大吉確率UP）の残り回数を管理する変数
 let feverCount = 0;
 
+// 「結果を送信する」ボタンを押すまでの間、おみくじ結果を貯めておく配列
+let historyBuffer = [];
+
+// 1回分の結果を履歴バッファに追加する関数
+function recordHistory(resultName, prizeMoney, balanceAfter) {
+    historyBuffer.push({
+        date: new Date().toLocaleDateString("ja-JP"),
+        result: resultName,
+        prize: prizeMoney,
+        balance: balanceAfter,
+        timestamp: new Date()
+    });
+}
+
 
 // おみくじ結果が出たときに呼ぶ関数
 function unlockCollection(fortune) {
@@ -63,19 +77,7 @@ function getBonusMoney() {
 
 // 所持金が足りなくなった時の破産チェック関数
 function checkBankruptcy() {
-
     const bonusArea = document.querySelector("#bonus-area");
-    
-    // 所持金が1,000円未満になったら強制的にトップへ移動
-    if (currentMoney < 1000) {
-        alert("💸【破産！】💸\nおみくじを引くお金がなくなりました。\nトップページに戻ります。");
-        window.location.href = "top.html"; 
-    } else {
-        // お金がある場合は救済エリアを隠す
-        if (bonusArea) bonusArea.style.display = "none";
-    }
-
-    /*const bonusArea = document.querySelector("#bonus-area");
     const bonusBtn = document.querySelector("#bonusBtn");
     const count = getTodayPrayCount();
 
@@ -100,31 +102,6 @@ function checkBankruptcy() {
     } else {
         if (bonusArea) bonusArea.style.display = "none";
     }
-
-    /*if (currentMoney < 1000) {
-        if (bonusArea) bonusArea.style.display = "block";
-
-        if (count >= 3) {
-            if (bonusBtn) {
-                bonusBtn.disabled = true;
-                bonusBtn.innerHTML = "❌ 本日の救済は終了しました";
-                bonusBtn.style.backgroundColor = "#aaa";
-                bonusBtn.style.boxShadow = "none";
-            }
-            alert("💸【ゲームオーバー】💸\nお財布が空っぽになり、本日の神様の救済（3回）も使い切ってしまいました。\n出直しましょう！");
-            window.location.href = "top.html";
-        } else {
-            if (bonusBtn) {
-                bonusBtn.disabled = false;
-                bonusBtn.innerHTML = "🙏 神様にお祈りして3,000円貰う(残り" + (3 - count) + "回)";
-                bonusBtn.style.backgroundColor = "#5bc0de";
-                bonusBtn.style.boxShadow = "0 4px #46b8da";
-            }
-            alert("💸【破産寸前！】💸\nおみくじを引くお金がなくなってしまいました。\n神様にお祈りするか、トップページに戻りましょう。");
-        }
-    } else {
-        if (bonusArea) bonusArea.style.display = "none";
-    }*/
 }
 
 // スマホの音声ミュート制限をまとめて解除する関数
@@ -343,6 +320,8 @@ function omikuji() {
         currentMoney += prizeMoney;
         if (moneySpan) moneySpan.innerHTML = currentMoney;
 
+        recordHistory(resultName, prizeMoney, currentMoney);
+
         if (drawBtn) drawBtn.disabled = false;
         if (submitBtn) submitBtn.disabled = false;
 
@@ -496,6 +475,13 @@ function omikuji10() {
             currentMoney += totalPrize;
             if (moneySpan) moneySpan.innerHTML = currentMoney;
 
+            // 10連の内訳を1件の履歴としてまとめて記録（0回だったものは表示しない）
+            const breakdown = Object.entries(resultsCount)
+                .filter(([, count]) => count > 0)
+                .map(([name, count]) => name + "×" + count)
+                .join("、");
+            recordHistory("10連（" + breakdown + "）", totalPrize, currentMoney);
+
             if (drawBtn) drawBtn.disabled = false;
             if (draw10Btn) draw10Btn.disabled = false;
             if (submitBtn) submitBtn.disabled = false;
@@ -560,3 +546,48 @@ window.addEventListener("DOMContentLoaded", () => {
         randomNumSpan.innerHTML = "まだ引いていません (通常モード)";
     }
 });
+
+// 「結果を送信する」ボタンから呼ばれる関数
+// たまった履歴（historyBuffer）をFirebaseに書き込んでからtop.htmlへ移動する
+async function submitResults() {
+    const submitBtn = document.querySelector("#submitBtn");
+    const userName = localStorage.getItem("logged_in_user") || "名無しの参拝者";
+
+    if (historyBuffer.length === 0) {
+        alert("🙅 まだおみくじを引いていません！\nまずはおみくじを引いてから送信してください。");
+        return;
+    }
+
+    if (!window.omikujiDB || !window.omikujiAddDoc || !window.omikujiCollectionRef) {
+        alert("⚠️ データベースへの接続準備ができていません。少し待ってからもう一度お試しください。");
+        return;
+    }
+
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = "送信中…";
+    }
+
+    try {
+        for (const entry of historyBuffer) {
+            await window.omikujiAddDoc(window.omikujiCollectionRef, {
+                name: userName,
+                date: entry.date,
+                result: entry.result,
+                prize: entry.prize,
+                balance: entry.balance,
+                timestamp: entry.timestamp
+            });
+        }
+
+        historyBuffer = [];
+        window.location.href = "top.html";
+    } catch (e) {
+        console.error("Firebaseへの送信に失敗しました: ", e);
+        alert("❌ 結果の送信に失敗しました。通信環境をご確認の上、もう一度お試しください。");
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = "結果を送信する";
+        }
+    }
+}
