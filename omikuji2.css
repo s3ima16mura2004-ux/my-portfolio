@@ -266,6 +266,59 @@ h1 {
     border-radius: 5px;
 }
 
+/* 🙏 神様へのお祈りボタン（破産寸前に表示） */
+.btn-bonus {
+    display: block;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto 10px;
+    padding: 12px;
+    font-size: 1.05rem;
+    font-weight: bold;
+    color: white;
+    background-color: #5bc0de;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    transition: transform 0.1s, background-color 0.2s;
+    box-sizing: border-box;
+}
+
+.btn-bonus:hover {
+    background-color: #31b0d5;
+}
+
+.btn-bonus:active {
+    transform: scale(0.98);
+}
+
+.btn-bonus:disabled {
+    background-color: #ccc !important;
+    cursor: not-allowed;
+}
+
+.btn-bonus-back {
+    display: block;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    padding: 10px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #4a3728 !important;
+    background-color: #f0e6d8;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    box-sizing: border-box;
+    transition: background-color 0.2s;
+}
+
+.btn-bonus-back:hover {
+    background-color: #e6d8c3;
+}
+
 .hidden {
     display: none !important;
 }
@@ -364,4 +417,182 @@ h1 {
 /* 演出用のクラス */
 .is-shaking {
   animation: shake 0.5s;
+}
+/* =====================================================
+   top.html 専用スタイル（トップページ・おみくじ履歴）
+   ===================================================== */
+
+.text-center {
+    text-align: center;
+}
+
+.top-welcome {
+    margin-bottom: 10px;
+}
+
+.sub-title {
+    font-size: 1rem;
+    color: #b8860b;
+    letter-spacing: 3px;
+    margin: 0 0 5px;
+}
+
+.main-title {
+    font-size: 2rem;
+    color: #4a3728;
+    margin: 0 0 15px;
+    padding-bottom: 12px;
+    display: inline-block;
+    border-bottom: 3px double #8b5a2b;
+}
+
+.intro-section {
+    margin-bottom: 15px;
+}
+
+.catchphrase {
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: #d9534f;
+    margin-bottom: 10px;
+}
+
+.intro-section .description {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.8;
+}
+
+.entrance-area {
+    margin: 20px 0 30px;
+}
+
+.history-section {
+    margin-top: 25px;
+    text-align: left;
+}
+
+.history-section h2 {
+    text-align: center;
+    color: #4a3728;
+    font-size: 1.3rem;
+    border-bottom: 2px solid #8b5a2b;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+}
+
+/* 履歴が増えても画面に収まるようスクロール可能なラッパー */
+.table-scroll {
+    max-height: 420px;
+    overflow-y: auto;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* 履歴テーブル本体 */
+#history-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    font-size: 0.9rem;
+}
+
+#history-table thead th {
+    background-color: #8b5a2b;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px 8px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+#history-table tbody td {
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 1px solid #f0e6d8;
+    white-space: nowrap;
+}
+
+#history-table tbody tr:nth-child(even) {
+    background-color: #fbf8f3;
+}
+
+#history-table tbody tr:hover {
+    background-color: #fff2cc;
+    transition: background-color 0.2s ease;
+}
+
+#history-table tbody td:first-child,
+#history-table tbody th:first-child {
+    border-radius: 0;
+}
+
+/* データが空、または読み込み中のときの表示 */
+#history-table tbody tr td[colspan] {
+    padding: 20px;
+    color: #999;
+    font-style: italic;
+    white-space: normal;
+}
+
+/* 結果に応じた行の色分け（top.jsがtrにクラスを付与） */
+.hist-daikichi {
+    background: linear-gradient(90deg, #fff2cc, #ffe08a, #fff2cc) !important;
+    font-weight: bold;
+    color: #d8860b;
+}
+
+.hist-kichi,
+.hist-chuukichi,
+.hist-syoukichi,
+.hist-suekichi {
+    background-color: #f2fbee !important;
+}
+
+.hist-kyou {
+    background-color: #fff0f0 !important;
+}
+
+.hist-daikyou {
+    background-color: #f5e6ff !important;
+    color: #8b008b;
+    font-weight: bold;
+}
+
+/* 賞金のプラス／マイナスの色分け */
+.prize-plus {
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+.prize-minus {
+    color: #d9534f;
+    font-weight: bold;
+}
+
+.warning-notes {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: #999;
+    text-align: center;
+}
+
+/* スマホ表示の微調整 */
+@media (max-width: 600px) {
+    .main-title {
+        font-size: 1.5rem;
+    }
+    #history-table {
+        font-size: 0.78rem;
+    }
+    #history-table thead th,
+    #history-table tbody td {
+        padding: 6px 4px;
+        white-space: normal;
+    }
+    .table-scroll {
+        max-height: 320px;
+    }
 }
