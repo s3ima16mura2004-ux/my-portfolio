@@ -19,6 +19,14 @@
             💰 あなたの所持金：<span id="money">10000</span>円
         </div>
 
+        <div id="bonus-area" style="display: none; margin-bottom: 15px;">
+            <p style="font-size: 0.85rem; color: #d9534f; font-weight: bold; margin-bottom: 8px;">
+                😱 資金がピンチです…！神様にお祈りしますか？
+            </p>
+            <button id="bonusBtn" class="btn-bonus" onclick="getBonusMoney()">🙏 神様にお祈りして3,000円貰う</button>
+            <a href="top.html" class="btn-bonus-back">🏠 トップページに戻る</a>
+        </div>
+
         <div class="main-content">
             
             <div class="left-panel">
@@ -32,10 +40,10 @@
                     <button class="btn-draw" onclick="omikuji()">おみくじを引く</button>
                     <button class="btn-draw10" id="draw10Btn" onclick="omikuji10()">🔥 10連おみくじ</button>
                     
-                    <form action="index.html" method="get" style="width: 100%;">
+                    <div style="width: 100%;">
                         <input type="hidden" id="hiddenResult" name="result" value="未抽選">
-                        <button type="submit" id="submitBtn" class="btn-submit">結果を送信する</button>
-                    </form>
+                        <button type="button" id="submitBtn" class="btn-submit" onclick="submitResults()">結果を送信する</button>
+                    </div>
                 </div>
             </div>
 
@@ -103,6 +111,34 @@
     <audio id="se-doom" src="doom.mp3" preload="auto"></audio>
     <div id="confetti-overlay"></div>
     <div id="doom-overlay"></div>
+
+    <!-- Firebaseの初期化（top.htmlと同じプロジェクトを使用） -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+        import {
+            getFirestore,
+            collection,
+            addDoc
+        } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDKvro8iNDBPKVlTEXVp5A8r-OyEJoRgZk",
+            authDomain: "omikujisite.firebaseapp.com",
+            projectId: "omikujisite",
+            storageBucket: "omikujisite.firebasestorage.app",
+            messagingSenderId: "213364923898",
+            appId: "1:213364923898:web:b8a0a55eef1491bde15843",
+            measurementId: "G-BKVJTZKJBQ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 通常の<script>（omikuji2.js）から呼べるようにwindowへ公開
+        window.omikujiDB = db;
+        window.omikujiCollectionRef = collection(db, "history");
+        window.omikujiAddDoc = addDoc;
+    </script>
 
     <script src="omikuji2.js"></script>
 </body>
