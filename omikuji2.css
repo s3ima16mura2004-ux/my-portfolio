@@ -323,6 +323,193 @@ h1 {
     display: none !important;
 }
 
+/* 🎁 発動中アイテムの表示ボックス */
+.active-items-box {
+    background: #fff8ee;
+    border: 1px solid #ffd9a0;
+    padding: 8px 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #b8620b;
+    text-align: left;
+}
+.active-items-box p {
+    margin: 2px 0;
+}
+
+/* 🛍️🏆 右パネルのタブ切り替え */
+.tab-buttons {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px 6px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #8b5a2b;
+    background: #f0e6d8;
+    border: none;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.tab-btn.tab-active {
+    background: #8b5a2b;
+    color: #fff;
+}
+
+/* 🛍️ アイテムショップ */
+.shop-section {
+    background: #fff;
+    border: 1px solid #e0d0c0;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.shop-section-title {
+    font-size: 1rem;
+    color: #4a3728;
+    margin: 0 0 10px;
+    border-bottom: 1px solid #e0d0c0;
+    padding-bottom: 6px;
+}
+
+.shop-item-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: #fbf8f3;
+    border: 1px solid #e8dcc8;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+}
+
+.shop-item-card.shop-item-active {
+    background: linear-gradient(90deg, #fff2cc, #ffe08a, #fff2cc);
+    border-color: #d8860b;
+}
+
+.shop-item-name {
+    font-weight: bold;
+    color: #4a3728;
+    margin: 0 0 3px;
+    font-size: 0.95rem;
+}
+
+.shop-item-price {
+    font-weight: bold;
+    color: #d9534f;
+    font-size: 0.85rem;
+    margin-left: 4px;
+}
+
+.shop-item-desc {
+    font-size: 0.8rem;
+    color: #666;
+    margin: 0;
+}
+
+.btn-shop-buy {
+    flex-shrink: 0;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #d9534f;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-shop-buy:active {
+    transform: scale(0.97);
+}
+
+.btn-shop-buy:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.shop-active-status {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #d8860b;
+    text-align: center;
+    margin: 8px 0 0;
+}
+
+/* 🎒 収集アイテム */
+.collect-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+    color: #4a3728;
+}
+
+.collect-item-desc {
+    font-size: 0.78rem;
+    color: #999;
+    margin: 0 0 10px;
+}
+
+.collect-item-note {
+    font-size: 0.78rem;
+    color: #aaa;
+    font-style: italic;
+}
+
+.btn-equip {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #7cb342;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-equip:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.btn-equip-none {
+    display: block;
+    width: 100%;
+    margin-top: 6px;
+    padding: 6px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #4a3728;
+    background-color: #f0e6d8;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.equip-status {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #2e7d32;
+    text-align: center;
+    margin: 8px 0 0;
+}
+
 /* 🎋 ラッキーアイテム表示ボックス */
 .lucky-item-box {
     background: #eef9f1;
@@ -606,6 +793,63 @@ h1 {
     font-size: 0.85rem;
     color: #999;
     text-align: center;
+}
+
+/* 🏆 ランキングテーブル */
+.ranking-section {
+    margin-top: 25px;
+    text-align: left;
+}
+
+.ranking-section h2 {
+    text-align: center;
+    color: #4a3728;
+    font-size: 1.3rem;
+    border-bottom: 2px solid #8b5a2b;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+}
+
+#ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    font-size: 0.9rem;
+}
+
+#ranking-table thead th {
+    background-color: #8b5a2b;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px 8px;
+    text-align: center;
+}
+
+#ranking-table tbody td {
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 1px solid #f0e6d8;
+}
+
+#ranking-table tbody tr:nth-child(even) {
+    background-color: #fbf8f3;
+}
+
+.rank-me {
+    background: linear-gradient(90deg, #fff2cc, #ffe08a, #fff2cc) !important;
+    font-weight: bold;
+    color: #d8860b;
+}
+
+.rank-medal {
+    font-size: 1.1rem;
+}
+
+.my-rank-note {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #777;
+    margin-top: 8px;
 }
 
 /* スマホ表示の微調整 */
