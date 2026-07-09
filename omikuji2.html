@@ -25,6 +25,12 @@
             <p id="lucky-item-desc" class="lucky-item-desc">-</p>
         </div>
 
+        <div id="active-items-box" class="active-items-box hidden">
+            <p id="active-shop-text" class="hidden">-</p>
+            <p id="active-equip-text" class="hidden">-</p>
+        </div>
+
+
         <div id="bonus-area" style="display: none; margin-bottom: 15px;">
             <p style="font-size: 0.85rem; color: #d9534f; font-weight: bold; margin-bottom: 8px;">
                 😱 資金がピンチです…！神様にお祈りしますか？
@@ -54,53 +60,116 @@
             </div>
 
             <div class="right-panel">
-                <table class="prize-table">
-                    <thead>
-                        <tr>
-                            <th colspan="3" class="table-title">景品・等級一覧</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="rank">1等</td>
-                            <td class="fortune">大吉</td>
-                            <td class="prize">100,000円</td>
-                        </tr>
-                        <tr>
-                            <td class="rank">2等</td>
-                            <td class="fortune">吉</td>
-                            <td class="prize">10,000円</td>
-                        </tr>
-                        <tr>
-                            <td class="rank">3等</td>
-                            <td class="fortune">中吉</td>
-                            <td class="prize">2,000円</td>
-                        </tr>
-                        <tr>
-                            <td class="rank">4等</td>
-                            <td class="fortune">小吉</td>
-                            <td class="prize">1,000円</td>
-                        </tr>
-                        <tr>
-                            <td class="rank">5等</td>
-                            <td class="fortune">末吉</td>
-                            <td class="prize">500円</td>
-                        </tr>
-                        <tr class="row-kyo">
-                            <td class="rank">6等</td>
-                            <td class="fortune">凶</td>
-                            <td class="prize">はずれ！</td>
-                        </tr>
-                        <tr class="row-daikyo">
-                            <td class="rank">7等</td>
-                            <td class="fortune">大凶</td>
-                            <td class="prize">
-                                残金の半額(50%)徴収 ※20%で免除！<br>
-                                <span style="font-size: 0.75rem; font-weight: bold; color: #ff4d4d;">🔥引いた後は3回「大吉確率10倍」発動！</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="tab-buttons">
+                    <button id="tabBtn-prizes" class="tab-btn tab-active" onclick="showTab('prizes')" type="button">🏆 景品・等級一覧</button>
+                    <button id="tabBtn-shop" class="tab-btn" onclick="showTab('shop')" type="button">🛍️ アイテムショップ</button>
+                </div>
+
+                <div id="tab-prizes">
+                    <table class="prize-table">
+                        <thead>
+                            <tr>
+                                <th colspan="3" class="table-title">景品・等級一覧</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="rank">1等</td>
+                                <td class="fortune">大吉</td>
+                                <td class="prize">100,000円</td>
+                            </tr>
+                            <tr>
+                                <td class="rank">2等</td>
+                                <td class="fortune">吉</td>
+                                <td class="prize">10,000円</td>
+                            </tr>
+                            <tr>
+                                <td class="rank">3等</td>
+                                <td class="fortune">中吉</td>
+                                <td class="prize">2,000円</td>
+                            </tr>
+                            <tr>
+                                <td class="rank">4等</td>
+                                <td class="fortune">小吉</td>
+                                <td class="prize">1,000円</td>
+                            </tr>
+                            <tr>
+                                <td class="rank">5等</td>
+                                <td class="fortune">末吉</td>
+                                <td class="prize">500円</td>
+                            </tr>
+                            <tr class="row-kyo">
+                                <td class="rank">6等</td>
+                                <td class="fortune">凶</td>
+                                <td class="prize">はずれ！</td>
+                            </tr>
+                            <tr class="row-daikyo">
+                                <td class="rank">7等</td>
+                                <td class="fortune">大凶</td>
+                                <td class="prize">
+                                    残金の半額(50%)徴収 ※20%で免除！<br>
+                                    <span style="font-size: 0.75rem; font-weight: bold; color: #ff4d4d;">🔥引いた後は3回「大吉確率10倍」発動！</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="tab-shop" class="hidden">
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">🛍️ 購入アイテム（一定回数だけ効果）</h3>
+
+                        <div class="shop-item-card" data-key="manekineko">
+                            <div class="shop-item-info">
+                                <p class="shop-item-name">🐱 開運招き猫 <span class="shop-item-price">10,000円</span></p>
+                                <p class="shop-item-desc">大吉確率が一時的にアップ！（おみくじ5回分）</p>
+                            </div>
+                            <button class="btn-shop-buy" onclick="buyShopItem('manekineko')" type="button">購入する</button>
+                        </div>
+
+                        <div class="shop-item-card" data-key="gofu">
+                            <div class="shop-item-info">
+                                <p class="shop-item-name">📜 金運の護符 <span class="shop-item-price">5,000円</span></p>
+                                <p class="shop-item-desc">獲得賞金が1.1倍に！（おみくじ5回分）</p>
+                            </div>
+                            <button class="btn-shop-buy" onclick="buyShopItem('gofu')" type="button">購入する</button>
+                        </div>
+
+                        <div class="shop-item-card" data-key="suzu">
+                            <div class="shop-item-info">
+                                <p class="shop-item-name">🔔 破邪の鈴 <span class="shop-item-price">3,000円</span></p>
+                                <p class="shop-item-desc">大凶時の没収額が軽減される！（おみくじ5回分）</p>
+                            </div>
+                            <button class="btn-shop-buy" onclick="buyShopItem('suzu')" type="button">購入する</button>
+                        </div>
+
+                        <p id="shop-active-status" class="shop-active-status hidden">-</p>
+                    </div>
+
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">🎒 収集アイテム（おみくじで低確率ドロップ）</h3>
+
+                        <div class="collect-item-row">
+                            <span>🪙 黄金の小判 × <span id="count-koban">0</span></span>
+                            <button id="equipBtn-koban" class="btn-equip" onclick="equipCollectible('koban')" type="button">装備する</button>
+                        </div>
+                        <p class="collect-item-desc">装備中、大凶を引いても確定で「出世大凶（免除）」に！</p>
+
+                        <div class="collect-item-row">
+                            <span>🌳 神社の神木 × <span id="count-shinboku">0</span></span>
+                            <button id="equipBtn-shinboku" class="btn-equip" onclick="equipCollectible('shinboku')" type="button">装備する</button>
+                        </div>
+                        <p class="collect-item-desc">装備中、大凶を引いた時のフィーバー回数が+1回に！</p>
+
+                        <div class="collect-item-row">
+                            <span>🪨 謎の石ころ × <span id="count-ishikoro">0</span> / 100</span>
+                            <span class="collect-item-note">(近日実装)</span>
+                        </div>
+
+                        <button id="equipBtn-none" class="btn-equip-none" onclick="equipCollectible('')" type="button">装備を外す</button>
+                        <p id="equip-status" class="equip-status">現在の装備：なし</p>
+                    </div>
+                </div>
             </div>
 
         </div>
