@@ -70,19 +70,54 @@
 
         <div class="input-group">
             <label for="username">👤 ユーザー名</label>
-            <input type="text" id="username" placeholder="お名前を入力（自由）" value="ゲスト参拝者">
+            <input type="text" id="username" placeholder="お名前を入力（自由）" value="">
         </div>
 
         <div class="input-group">
             <label for="password">🔑 合言葉（パスワード）</label>
             <input type="password" id="password" placeholder="合言葉を入力してください">
-            <p style="font-size: 0.8rem; color: #999; margin-top: 5px;">※ヒント：jinja777</p>
+            <p style="font-size: 0.8rem; color: #999; margin-top: 5px;">※初めての参拝者様は、ここで入力した合言葉が今後の「あなた専用の合言葉」として登録されます。</p>
         </div>
-    
-        <button onclick="tryLogin()" class="login-btn">🙏 いざ、参拝する</button>
+
+        <button onclick="tryLogin()" id="loginBtn" class="login-btn">🙏 いざ、参拝する</button>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+        import {
+            getFirestore,
+            doc,
+            getDoc,
+            setDoc,
+            updateDoc
+        } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDKvro8iNDBPKVlTEXVp5A8r-OyEJoRgZk",
+            authDomain: "omikujisite.firebaseapp.com",
+            projectId: "omikujisite",
+            storageBucket: "omikujisite.firebasestorage.app",
+            messagingSenderId: "213364923898",
+            appId: "1:213364923898:web:b8a0a55eef1491bde15843",
+            measurementId: "G-BKVJTZKJBQ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 🍀 ラッキーアイテムの一覧（キー・絵文字・名前・効果説明）
+        const LUCKY_ITEMS = [
+            { key: "daikichi_up", emoji: "🍀", name: "四つ葉のクローバー", desc: "今日1日、大吉運が少しだけアップ！" },
+            { key: "prize_up", emoji: "🐟", name: "立派な鯛", desc: "今日1日、獲得賞金が10%アップ！" },
+            { key: "tax_half", emoji: "🐍", name: "白蛇の抜け殻", desc: "今日1日、大凶のお祓い料がさらに半額に！" },
+            { key: "fever_extra", emoji: "🔔", name: "縁起の良い鈴の音", desc: "今日1日、大凶時のフィーバー回数が+1回に！" },
+            { key: "zorome_up", emoji: "🌟", name: "流れ星のかけら", desc: "今日1日、ゾロ目ボーナスが+2,000円に！" }
+        ];
+
+        function todayStr() {
+            return new Date().toLocaleDateString("ja-JP");
+        }
+
         function unlockAudio() {
             const audio = document.querySelector("#se-coin");
             if (audio) {
@@ -93,32 +128,118 @@
             }
         }
 
-        function tryLogin() {
+        window.tryLogin = async function () {
             unlockAudio();
 
-            const userField = document.querySelector("#username").value;
+            const userField = (document.querySelector("#username").value || "").trim() || "ゲスト参拝者";
             const passField = document.querySelector("#password").value;
             const errorTxt = document.querySelector("#error-txt");
-            const audio = document.querySelector("#se-coin");
+            const loginBtn = document.querySelector("#loginBtn");
 
-            if (passField === "jinja777") {
+            if (!passField) {
+                errorTxt.textContent = "❌ 合言葉を入力してください！";
+                errorTxt.style.display = "block";
+                return;
+            }
+            if (userField.includes("/")) {
+                errorTxt.textContent = "❌ ユーザー名に「/」は使用できません！";
+                errorTxt.style.display = "block";
+                return;
+            }
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = "🔑 確認中…";
+
+            try {
+                const userRef = doc(db, "users", userField);
+                const snap = await getDoc(userRef);
+
+                let userData;
+                let isNewUser = false;
+
+                if (snap.exists()) {
+                    userData = snap.data();
+                    if (userData.password !== passField) {
+                        errorTxt.textContent = "❌ 合言葉（パスワード）が違います！";
+                        errorTxt.style.display = "block";
+                        document.querySelector("#password").value = "";
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = "🙏 いざ、参拝する";
+                        return;
+                    }
+                } else {
+                    // 新規登録：入力された合言葉でこの名前のアカウントを新規作成
+                    isNewUser = true;
+                    userData = {
+                        password: passField,
+                        money: 10000,
+                        feverCount: 0,
+                        prayDate: "",
+                        prayCount: 0,
+                        loginBonusDate: "",
+                        luckyItemDate: "",
+                        luckyItem: ""
+                    };
+                    await setDoc(userRef, userData);
+                }
+
                 errorTxt.style.display = "none";
-                localStorage.setItem("logged_in_user", userField || "名無しの参拝者");
 
+                const today = todayStr();
+                let bonusMsg = "";
+
+                // 🎁 ログインボーナス（1日1回・ランダム額）
+                if (userData.loginBonusDate !== today) {
+                    const bonus = Math.floor(Math.random() * 901) + 100; // 100〜1000円
+                    userData.money = (userData.money || 0) + bonus;
+                    userData.loginBonusDate = today;
+                    bonusMsg = "\n\n🎁 ログインボーナス！\n本日はじめてのご参拝、" + bonus.toLocaleString() + "円を授かりました！";
+                }
+
+                // 🎋 本日のラッキーアイテム抽選（1日1回）
+                if (userData.luckyItemDate !== today) {
+                    const picked = LUCKY_ITEMS[Math.floor(Math.random() * LUCKY_ITEMS.length)];
+                    userData.luckyItemDate = today;
+                    userData.luckyItem = picked.key;
+                }
+
+                await updateDoc(userRef, {
+                    money: userData.money,
+                    loginBonusDate: userData.loginBonusDate,
+                    luckyItemDate: userData.luckyItemDate,
+                    luckyItem: userData.luckyItem
+                });
+
+                localStorage.setItem("logged_in_user", userField);
+
+                const audio = document.querySelector("#se-coin");
                 if (audio) {
                     try {
                         audio.currentTime = 0;
                         audio.play();
-                    } catch(e) {}
+                    } catch (e) {}
                 }
 
-                alert("🎉 認証成功！\nようこそ、" + userField + "様。おみくじ神社へご案内します！");
+                const luckyPicked = LUCKY_ITEMS.find(i => i.key === userData.luckyItem);
+                const luckyMsg = luckyPicked
+                    ? ("\n\n" + luckyPicked.emoji + " 本日のラッキーアイテム：" + luckyPicked.name + "\n(" + luckyPicked.desc + ")")
+                    : "";
+
+                alert(
+                    (isNewUser ? "🎉 新規登録＆認証成功！\n" : "🎉 認証成功！\n") +
+                    "ようこそ、" + userField + "様。おみくじ神社へご案内します！" +
+                    bonusMsg + luckyMsg
+                );
+
                 window.location.href = "top.html"; // ログイン後はまずトップページへ移動
-            } else {
+            } catch (e) {
+                console.error("ログイン処理に失敗しました: ", e);
+                errorTxt.textContent = "⚠️ 通信エラーが発生しました。もう一度お試しください。";
                 errorTxt.style.display = "block";
-                document.querySelector("#password").value = "";
+                loginBtn.disabled = false;
+                loginBtn.textContent = "🙏 いざ、参拝する";
             }
-        }
+        };
     </script>
 </body>
 </html>
