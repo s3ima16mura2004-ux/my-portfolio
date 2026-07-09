@@ -178,7 +178,11 @@
                         prayCount: 0,
                         loginBonusDate: "",
                         luckyItemDate: "",
-                        luckyItem: ""
+                        luckyItem: "",
+                        ownedItems: { koban: 0, shinboku: 0, ishikoro: 0 },
+                        equippedCollectible: "",
+                        shopItemKey: "",
+                        shopItemRemaining: 0
                     };
                     await setDoc(userRef, userData);
                 }
@@ -188,9 +192,9 @@
                 const today = todayStr();
                 let bonusMsg = "";
 
-                // 🎁 ログインボーナス（1日1回・ランダム額）
+                // 🎁 ログインボーナス（1日1回・1,000〜15,000円をランダムに1,000円単位で）
                 if (userData.loginBonusDate !== today) {
-                    const bonus = Math.floor(Math.random() * 901) + 100; // 100〜1000円
+                    const bonus = (Math.floor(Math.random() * 15) + 1) * 1000; // 1000〜15000円(1000円単位)
                     userData.money = (userData.money || 0) + bonus;
                     userData.loginBonusDate = today;
                     bonusMsg = "\n\n🎁 ログインボーナス！\n本日はじめてのご参拝、" + bonus.toLocaleString() + "円を授かりました！";
