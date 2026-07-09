@@ -19,6 +19,12 @@
             💰 あなたの所持金：<span id="money">10000</span>円
         </div>
 
+        <div id="lucky-item-box" class="lucky-item-box hidden">
+            <p class="lucky-item-title">🎋 本日のラッキーアイテム 🎋</p>
+            <p id="lucky-item-name">-</p>
+            <p id="lucky-item-desc" class="lucky-item-desc">-</p>
+        </div>
+
         <div id="bonus-area" style="display: none; margin-bottom: 15px;">
             <p style="font-size: 0.85rem; color: #d9534f; font-weight: bold; margin-bottom: 8px;">
                 😱 資金がピンチです…！神様にお祈りしますか？
@@ -118,7 +124,10 @@
         import {
             getFirestore,
             collection,
-            addDoc
+            addDoc,
+            doc,
+            getDoc,
+            updateDoc
         } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -138,6 +147,9 @@
         window.omikujiDB = db;
         window.omikujiCollectionRef = collection(db, "history");
         window.omikujiAddDoc = addDoc;
+        window.omikujiDoc = doc;
+        window.omikujiGetDoc = getDoc;
+        window.omikujiUpdateDoc = updateDoc;
     </script>
 
     <script src="omikuji2.js"></script>
