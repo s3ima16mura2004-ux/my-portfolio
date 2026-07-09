@@ -8,7 +8,8 @@ import {
     getDocs,
     query,
     where,
-    orderBy
+    orderBy,
+    limit
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -41,6 +42,8 @@ const luckyBox = document.querySelector("#lucky-item-box");
 const luckyName = document.querySelector("#lucky-item-name");
 const luckyDesc = document.querySelector("#lucky-item-desc");
 const tbody = document.querySelector("#history-table tbody");
+const rankingTbody = document.querySelector("#ranking-table tbody");
+const myRankNote = document.querySelector("#my-rank-note");
 
 async function loadUserInfo() {
     if (userDisplay) userDisplay.textContent = username;
@@ -131,6 +134,67 @@ function escapeHtml(str) {
         .replace(/'/g, "&#39;");
 }
 
+const RANK_MEDALS = ["🥇", "🥈", "🥉"];
+
+async function loadRanking() {
+    if (!rankingTbody) return;
+
+    rankingTbody.innerHTML = `<tr><td colspan="3">読み込み中…</td></tr>`;
+    if (myRankNote) myRankNote.textContent = "";
+
+    try {
+        // 所持金の多い順に最大50人まで取得
+        const q = query(
+            collection(db, "users"),
+            orderBy("money", "desc"),
+            limit(50)
+        );
+
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+            rankingTbody.innerHTML = `<tr><td colspan="3">まだ参拝者がいません</td></tr>`;
+            return;
+        }
+
+        let rowsHtml = "";
+        let myRank = -1;
+        let rowIndex = 0;
+
+        snapshot.forEach(docSnap => {
+            rowIndex++;
+            const data = docSnap.data();
+            const name = docSnap.id;
+            const money = typeof data.money === "number" ? data.money : 0;
+            const isMe = name === username;
+            if (isMe) myRank = rowIndex;
+
+            const medal = RANK_MEDALS[rowIndex - 1] || "";
+
+            rowsHtml += `
+                <tr class="${isMe ? "rank-me" : ""}">
+                    <td><span class="rank-medal">${medal}</span> ${rowIndex}位</td>
+                    <td>${escapeHtml(name)}</td>
+                    <td>${money.toLocaleString()}円</td>
+                </tr>
+            `;
+        });
+
+        rankingTbody.innerHTML = rowsHtml;
+
+        if (myRankNote) {
+            if (myRank === -1) {
+                myRankNote.textContent = "あなたの順位：圏外（51位以下、またはまだおみくじ未参加）";
+            } else {
+                myRankNote.textContent = "あなたの現在の順位：" + myRank + "位";
+            }
+        }
+    } catch (e) {
+        console.error("ランキングの読み込みに失敗しました: ", e);
+        rankingTbody.innerHTML = `<tr><td colspan="3">ランキングの読み込みに失敗しました</td></tr>`;
+    }
+}
+
 async function init() {
     if (!username) {
         // 未ログインの場合はログインページへ
@@ -139,6 +203,7 @@ async function init() {
     }
     await loadUserInfo();
     await loadHistory();
+    await loadRanking();
 }
 
 init();
