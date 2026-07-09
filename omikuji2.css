@@ -323,6 +323,35 @@ h1 {
     display: none !important;
 }
 
+/* 🎋 ラッキーアイテム表示ボックス */
+.lucky-item-box {
+    background: #eef9f1;
+    border: 1px solid #b7e4c7;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.lucky-item-title {
+    font-weight: bold;
+    color: #2e7d32;
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+}
+
+#lucky-item-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #4a3728;
+    margin: 0 0 2px;
+}
+
+.lucky-item-desc {
+    font-size: 0.85rem;
+    color: #555;
+    margin: 0;
+}
+
 /* エフェクト用レイヤー */
 #confetti-overlay {
     position: fixed;
