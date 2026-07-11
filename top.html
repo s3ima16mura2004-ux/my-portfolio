@@ -12,6 +12,11 @@
             👤 参拝者：<span id="user-display">ゲスト参拝者</span>様
         </div>
 
+        <div id="titles-box" class="titles-box hidden">
+            <p class="titles-title">🎖️ 獲得称号</p>
+            <div id="titles-list" class="titles-list"></div>
+        </div>
+
         <div class="top-welcome">
             <p class="sub-title">\一攫千金の運試し/</p>
             <h1 class="main-title">金大黒 豪華おみくじ神社</h1>
@@ -21,11 +26,16 @@
             💰 あなたの所持金：<span id="money-display">読み込み中…</span>円
         </div>
 
+        <p class="bank-balance">🏦 賽銭箱（貯金）：<span id="bank-money-display-top">0</span>円</p>
+
         <div id="lucky-item-box" class="lucky-item-box hidden">
             <p class="lucky-item-title">🎋 本日のラッキーアイテム 🎋</p>
             <p id="lucky-item-name">-</p>
             <p id="lucky-item-desc" class="lucky-item-desc">-</p>
         </div>
+
+        <p id="taian-status-box" class="taian-status-box hidden">-</p>
+        <p id="community-status-box" class="community-status-box hidden">-</p>
 
         <div class="intro-section">
             <p class="catchphrase">「1,000円の投資で、10万円の奇跡を起こせ。」</p>
@@ -38,6 +48,12 @@
 
         <div class="entrance-area">
             <a href="omikuji2.html" class="enter-btn">境内へ進む（おみくじを引く）</a>
+        </div>
+
+        <div class="calendar-section">
+            <h2 id="calendar-title">📅 運勢カレンダー</h2>
+            <p class="calendar-note">※その日の当選金額の合計をもとにした簡易的な目安です（参加料は含みません）</p>
+            <div id="calendar-grid" class="calendar-grid"></div>
         </div>
 
         <div class="history-section">
