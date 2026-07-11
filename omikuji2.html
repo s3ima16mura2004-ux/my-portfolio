@@ -8,9 +8,16 @@
 </head>
 <body>
 
+    <a href="top.html" class="back-to-top-btn">🏠 トップに戻る</a>
+
     <div class="container">
         <div class="user-info">
             👤 参拝者：<span id="user-display">ゲスト参拝者</span>様
+        </div>
+
+        <div id="titles-box" class="titles-box hidden">
+            <p class="titles-title">🎖️ 獲得称号</p>
+            <div id="titles-list" class="titles-list"></div>
         </div>
 
         <h1>おみくじ（1回 1,000円）</h1>
@@ -29,6 +36,9 @@
             <p id="active-shop-text" class="hidden">-</p>
             <p id="active-equip-text" class="hidden">-</p>
         </div>
+
+        <p id="taian-status-box" class="taian-status-box hidden">-</p>
+        <p id="community-status-box" class="community-status-box hidden">-</p>
 
 
         <div id="bonus-area" style="display: none; margin-bottom: 15px;">
@@ -63,6 +73,7 @@
                 <div class="tab-buttons">
                     <button id="tabBtn-prizes" class="tab-btn tab-active" onclick="showTab('prizes')" type="button">🏆 景品・等級一覧</button>
                     <button id="tabBtn-shop" class="tab-btn" onclick="showTab('shop')" type="button">🛍️ アイテムショップ</button>
+                    <button id="tabBtn-dex" class="tab-btn" onclick="showTab('dex')" type="button">📖 図鑑</button>
                 </div>
 
                 <div id="tab-prizes">
@@ -105,9 +116,10 @@
                             </tr>
                             <tr class="row-daikyo">
                                 <td class="rank">7等</td>
-                                <td class="fortune">大凶</td>
+                                <td class="fortune">⚔️神の試練</td>
                                 <td class="prize">
-                                    残金の半額(50%)徴収 ※20%で免除！<br>
+                                    単発：挑戦(2倍 or 半額没収)か穏便に断るか選択！<br>
+                                    10連：自動判定（20%免除、それ以外は半額徴収）<br>
                                     <span style="font-size: 0.75rem; font-weight: bold; color: #ff4d4d;">🔥引いた後は3回「大吉確率10倍」発動！</span>
                                 </td>
                             </tr>
@@ -147,6 +159,15 @@
                     </div>
 
                     <div class="shop-section">
+                        <h3 class="shop-section-title">🏺 おみくじの壺（永続強化）</h3>
+                        <p id="urn-current-text" class="urn-current-text">現在の壺：普通の壺（大吉ボーナス +0.0%）</p>
+                        <div id="urn-next-box" class="urn-next-box">
+                            <p id="urn-next-text">-</p>
+                            <button id="urn-upgrade-btn" class="btn-shop-buy" onclick="upgradeUrn()" type="button">壺をランクアップする</button>
+                        </div>
+                    </div>
+
+                    <div class="shop-section">
                         <h3 class="shop-section-title">🎒 収集アイテム（おみくじで低確率ドロップ）</h3>
 
                         <div class="collect-item-row">
@@ -168,6 +189,26 @@
 
                         <button id="equipBtn-none" class="btn-equip-none" onclick="equipCollectible('')" type="button">装備を外す</button>
                         <p id="equip-status" class="equip-status">現在の装備：なし</p>
+                    </div>
+
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">🏦 賽銭箱（貯金）</h3>
+                        <p class="bank-desc">預けたお金はおみくじには使えませんが、大凶（神の試練）で失うこともありません。いつでも自由に出し入れできます。</p>
+                        <p class="bank-balance">賽銭箱の残高：<span id="bank-money-display">0</span>円</p>
+                        <input type="number" id="bank-amount-input" class="bank-amount-input" placeholder="金額を入力" min="1" step="1">
+                        <div class="bank-btn-row">
+                            <button class="btn-shop-buy" onclick="depositBank()" type="button">預ける</button>
+                            <button class="btn-equip" onclick="withdrawBank()" type="button">引き出す</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-dex" class="hidden">
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">📖 おみくじ図鑑</h3>
+                        <p id="dex-progress" class="dex-progress">達成状況：0 / 7</p>
+                        <div id="dex-grid" class="dex-grid"></div>
+                        <p id="dex-reward-status" class="dex-reward-status hidden">-</p>
                     </div>
                 </div>
             </div>
@@ -196,7 +237,9 @@
             addDoc,
             doc,
             getDoc,
-            updateDoc
+            updateDoc,
+            setDoc,
+            increment
         } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -219,6 +262,9 @@
         window.omikujiDoc = doc;
         window.omikujiGetDoc = getDoc;
         window.omikujiUpdateDoc = updateDoc;
+        window.omikujiSetDoc = setDoc;
+        window.omikujiIncrement = increment;
+        window.omikujiCommunityRef = doc(db, "global", "community");
     </script>
 
     <script src="omikuji2.js"></script>
