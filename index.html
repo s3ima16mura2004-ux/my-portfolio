@@ -70,7 +70,7 @@
 
         <div class="input-group">
             <label for="username">👤 ユーザー名</label>
-            <input type="text" id="username" placeholder="お名前を入力（自由）" value="">
+            <input type="text" id="username" placeholder="お名前を入力（自由）" value="ゲスト参拝者">
         </div>
 
         <div class="input-group">
@@ -182,7 +182,16 @@
                         ownedItems: { koban: 0, shinboku: 0, ishikoro: 0 },
                         equippedCollectible: "",
                         shopItemKey: "",
-                        shopItemRemaining: 0
+                        shopItemRemaining: 0,
+                        totalDraws: 0,
+                        totalDaikichi: 0,
+                        totalProfit: 0,
+                        urnLevel: 0,
+                        taianDate: "",
+                        taianActive: false,
+                        bankMoney: 0,
+                        dexAchieved: { daikichi: false, kichi: false, chuukichi: false, syoukichi: false, suekichi: false, kyou: false, daikyou: false },
+                        dexRewardClaimed: false
                     };
                     await setDoc(userRef, userData);
                 }
@@ -194,7 +203,7 @@
 
                 // 🎁 ログインボーナス（1日1回・1,000〜15,000円をランダムに1,000円単位で）
                 if (userData.loginBonusDate !== today) {
-                    const bonus = (Math.floor(Math.random() * 15) + 1) * 1000; // 1000〜15000円(1000円単位)
+                    const bonus = 10000 + (Math.floor(Math.random() * 15) + 1) * 1000; // 10,000円+(1000〜15000円を1000円単位で)
                     userData.money = (userData.money || 0) + bonus;
                     userData.loginBonusDate = today;
                     bonusMsg = "\n\n🎁 ログインボーナス！\n本日はじめてのご参拝、" + bonus.toLocaleString() + "円を授かりました！";
@@ -207,11 +216,23 @@
                     userData.luckyItem = picked.key;
                 }
 
+                // 🎊 大安吉日イベント抽選（1日1回・20%の確率で発生。個人ごとに判定）
+                let taianMsg = "";
+                if (userData.taianDate !== today) {
+                    userData.taianActive = Math.random() < 0.2;
+                    userData.taianDate = today;
+                    if (userData.taianActive) {
+                        taianMsg = "\n\n🎊【本日は大安吉日】🎊\n大吉運が少しアップ！おみくじ料金が本日だけ半額になります！";
+                    }
+                }
+
                 await updateDoc(userRef, {
                     money: userData.money,
                     loginBonusDate: userData.loginBonusDate,
                     luckyItemDate: userData.luckyItemDate,
-                    luckyItem: userData.luckyItem
+                    luckyItem: userData.luckyItem,
+                    taianDate: userData.taianDate,
+                    taianActive: userData.taianActive
                 });
 
                 localStorage.setItem("logged_in_user", userField);
@@ -232,7 +253,7 @@
                 alert(
                     (isNewUser ? "🎉 新規登録＆認証成功！\n" : "🎉 認証成功！\n") +
                     "ようこそ、" + userField + "様。おみくじ神社へご案内します！" +
-                    bonusMsg + luckyMsg
+                    bonusMsg + luckyMsg + taianMsg
                 );
 
                 window.location.href = "top.html"; // ログイン後はまずトップページへ移動
