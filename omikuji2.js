@@ -19,9 +19,12 @@ const LUCKY_ITEMS = [
 
 // 🛍️ ショップで買える「一定回数だけ効果」のアイテム
 const SHOP_ITEMS = [
-    { key: "manekineko", emoji: "🐱", name: "開運招き猫", price: 10000, duration: 5, desc: "大吉確率が一時的にアップ！" },
-    { key: "gofu", emoji: "📜", name: "金運の護符", price: 5000, duration: 5, desc: "獲得賞金が1.1倍に！" },
-    { key: "suzu", emoji: "🔔", name: "破邪の鈴", price: 3000, duration: 5, desc: "大凶時の没収額が軽減される！" }
+    { key: "manekineko", emoji: "🐱", name: "開運招き猫", price: 10000, duration: 5, desc: "大吉確率が一時的にアップ！", minRank: 0 },
+    { key: "gofu", emoji: "📜", name: "金運の護符", price: 5000, duration: 5, desc: "獲得賞金が1.1倍に！", minRank: 0 },
+    { key: "suzu", emoji: "🔔", name: "破邪の鈴", price: 3000, duration: 5, desc: "大凶時の没収額が軽減される！", minRank: 0 },
+    { key: "oogi", emoji: "🪭", name: "招福の扇", price: 15000, duration: 5, desc: "獲得賞金が1.15倍に！（護符より強力）", minRank: 1 },
+    { key: "gohei", emoji: "🎏", name: "五色の幣", price: 25000, duration: 5, desc: "大吉確率が大きくアップ！（招き猫より強力）", minRank: 2 },
+    { key: "ryujin", emoji: "🐉", name: "龍神の逆鱗", price: 50000, duration: 3, desc: "「神の試練」が確認なしで自動的に成功する！", minRank: 3 }
 ];
 
 // 🎒 おみくじを引くと低確率で手に入る収集アイテム（ドロップ率は独立判定）
@@ -63,6 +66,21 @@ const COMMUNITY_TIERS = [
 const FUKU_DARUMA_RATE = 0.05;
 const FUKU_DARUMA_PRIZE = 3000;
 
+// ⛩️ 参拝ランク（累計獲得賞金額で判定。ランクが上がるとショップの品揃えが増える）
+const VISITOR_RANKS = [
+    { tier: 0, name: "平参拝者", threshold: 0 },
+    { tier: 1, name: "常連客", threshold: 50000 },
+    { tier: 2, name: "氏子", threshold: 300000 },
+    { tier: 3, name: "神の寵愛者", threshold: 1500000 }
+];
+
+// 🎊 隠し要素（イースターエッグ）関連の設定
+const STRAIGHT_BONUS_PRIZE = 8000;
+const KIMAGURE_BONUS_PRIZE = 10000;
+const KIMAGURE_TIMES = ["01:01", "03:33", "04:44", "05:55", "11:11", "12:12", "22:22", "23:23"];
+const LUCKY_MONEY_PATTERNS = [777, 7777, 77777, 777777, 888, 8888, 88888, 888888, 1234, 12345, 123456, 111111, 222222, 333333, 555555, 999999];
+let kimagureLastTrigger = ""; // 同じ分に何度も発生しないようにするための記録（セッション内のみ・保存はしない）
+
 // 🎖️ 称号（達成条件を満たすと自動的に付与される。プレイヤーの各種累計値で判定）
 const TITLES = [
     { key: "hyakuman", emoji: "💰", name: "百万長者", desc: "累計収支+1,000,000円を達成", condition: s => s.totalProfit >= 1000000 },
@@ -92,6 +110,7 @@ let shopItemRemaining = 0;    // ショップアイテムの残り効果回数
 let totalDraws = 0;       // 累計参拝（おみくじを引いた）回数
 let totalDaikichi = 0;    // 累計「大吉」獲得回数
 let totalProfit = 0;      // 累計収支（参加料込みの実質損益）
+let totalWinnings = 0;    // 累計獲得賞金額（プラスの当選金のみの合計。参拝ランク判定に使用）
 let urnLevel = 0;         // おみくじの壺のランクアップ段階
 
 let taianActive = false;  // 本日が「大安吉日」かどうか（ログイン時に個人ごとに抽選済み）
@@ -142,6 +161,7 @@ async function saveUserState() {
             totalDraws: totalDraws,
             totalDaikichi: totalDaikichi,
             totalProfit: totalProfit,
+            totalWinnings: totalWinnings,
             urnLevel: urnLevel,
             bankMoney: bankMoney,
             dexAchieved: dexAchieved,
@@ -268,12 +288,28 @@ async function equipCollectible(key) {
 
 // ショップタブ・装備欄・発動中ステータス表示をまとめて更新する
 function updateShopUI() {
+    const rank = getVisitorRank(totalWinnings);
+
     SHOP_ITEMS.forEach(item => {
         const card = document.querySelector('.shop-item-card[data-key="' + item.key + '"]');
         if (!card) return;
 
         const btn = card.querySelector(".btn-shop-buy");
-        if (btn) btn.disabled = currentMoney < item.price;
+        const lockOverlay = card.querySelector(".shop-item-lock");
+        const isLocked = rank < item.minRank;
+
+        if (isLocked) {
+            card.classList.add("shop-item-locked");
+            if (btn) btn.disabled = true;
+            if (lockOverlay) {
+                lockOverlay.textContent = "🔒 参拝ランク「" + VISITOR_RANKS[item.minRank].name + "」で解放";
+                lockOverlay.classList.remove("hidden");
+            }
+        } else {
+            card.classList.remove("shop-item-locked");
+            if (btn) btn.disabled = currentMoney < item.price;
+            if (lockOverlay) lockOverlay.classList.add("hidden");
+        }
 
         if (shopItemKey === item.key && shopItemRemaining > 0) {
             card.classList.add("shop-item-active");
@@ -334,6 +370,7 @@ function updateShopUI() {
 
     updateActiveItemsUI();
     updateUrnUI();
+    updateRankUI();
 }
 
 // 🏺 壺のランクアップ欄の表示を更新する
@@ -387,6 +424,34 @@ async function upgradeUrn() {
     updateTitlesUI();
 
     alert("🏺 壺が「" + next.name + "」にランクアップしました！\n大吉ボーナスが永続的に+" + (next.bonus * 100).toFixed(1) + "%になりました！");
+}
+
+// ⛩️ 累計獲得賞金額から参拝ランクのティア番号を返す
+function getVisitorRank(winnings) {
+    let tier = 0;
+    VISITOR_RANKS.forEach(r => { if (winnings >= r.threshold) tier = r.tier; });
+    return tier;
+}
+
+// ⛩️ 参拝ランクの表示を更新する
+function updateRankUI() {
+    const rank = getVisitorRank(totalWinnings);
+    const current = VISITOR_RANKS[rank];
+    const next = VISITOR_RANKS[rank + 1];
+
+    const rankNameEl = document.querySelector("#rank-name-display");
+    if (rankNameEl) rankNameEl.textContent = "⛩️ 参拝ランク：" + current.name;
+
+    const rankProgressEl = document.querySelector("#rank-progress-display");
+    if (rankProgressEl) {
+        if (next) {
+            rankProgressEl.textContent =
+                "累計獲得賞金：" + totalWinnings.toLocaleString() + "円（次の「" + next.name + "」まであと" +
+                (next.threshold - totalWinnings).toLocaleString() + "円）";
+        } else {
+            rankProgressEl.textContent = "累計獲得賞金：" + totalWinnings.toLocaleString() + "円（最高ランクです！）";
+        }
+    }
 }
 
 // 🎖️ 称号バッジの表示を更新する
@@ -576,6 +641,7 @@ function rollFukuDaruma() {
     const amount = rollFukuDarumaAmount();
     if (amount > 0) {
         currentMoney += amount;
+        totalWinnings += amount;
         updateMoneyDisplay();
         recordHistory("🎊福だるま", amount, currentMoney);
         return amount;
@@ -837,6 +903,7 @@ function checkZoromeBonus(num) {
         const bonusAmount = hasEffect("zorome_up") ? 7000 : 5000;
 
         currentMoney += bonusAmount;
+        totalWinnings += bonusAmount;
         updateMoneyDisplay();
 
         playSE("se-win");
@@ -846,6 +913,64 @@ function checkZoromeBonus(num) {
         setTimeout(() => {
             alert("🌟【ゾロ目大吉ボーナス！】🌟\n奇跡が起きました！乱数の下4桁が「" + lastFour + "」のゾロ目です！\n神様から御祝儀として【" + bonusAmount.toLocaleString() + "円】が支給されました！");
         }, 600);
+        return;
+    }
+
+    checkStraightBonus(num, lastFour);
+}
+
+// 🌈 隠し要素：乱数の下4桁が「1234」「9876」のような階段状に並んだ時の奇跡
+function checkStraightBonus(num, lastFour) {
+    const digits = lastFour.split("").map(Number);
+    const isAscending = digits.every((d, i) => i === 0 || d === digits[i - 1] + 1);
+    const isDescending = digits.every((d, i) => i === 0 || d === digits[i - 1] - 1);
+
+    if (isAscending || isDescending) {
+        currentMoney += STRAIGHT_BONUS_PRIZE;
+        totalWinnings += STRAIGHT_BONUS_PRIZE;
+        updateMoneyDisplay();
+
+        playSE("se-win");
+        recordHistory("🌈階段の奇跡", STRAIGHT_BONUS_PRIZE, currentMoney);
+        saveUserState();
+
+        setTimeout(() => {
+            alert("🌈【階段の奇跡】🌈\n乱数の下4桁が「" + lastFour + "」の階段状に並びました！\n神様の粋な計らいで【" + STRAIGHT_BONUS_PRIZE.toLocaleString() + "円】を授かりました！");
+        }, 600);
+    }
+}
+
+// 🕛 隠し要素：実際の時計がゾロ目時刻ぴったりの瞬間におみくじを引くと発生する「神様の気まぐれ」
+function checkKimagureTime() {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, "0");
+    const mm = String(now.getMinutes()).padStart(2, "0");
+    const timeStr = hh + ":" + mm;
+    const triggerKey = todayStr() + " " + timeStr;
+
+    if (KIMAGURE_TIMES.includes(timeStr) && kimagureLastTrigger !== triggerKey) {
+        kimagureLastTrigger = triggerKey;
+
+        currentMoney += KIMAGURE_BONUS_PRIZE;
+        totalWinnings += KIMAGURE_BONUS_PRIZE;
+        updateMoneyDisplay();
+
+        playSE("se-win");
+        recordHistory("🕛神様の気まぐれ", KIMAGURE_BONUS_PRIZE, currentMoney);
+        saveUserState();
+
+        setTimeout(() => {
+            alert("🕛【神様の気まぐれ】🕛\n時刻がちょうど「" + timeStr + "」……なんという偶然でしょう！\n神様の気まぐれで【" + KIMAGURE_BONUS_PRIZE.toLocaleString() + "円】を授かりました！");
+        }, 700);
+    }
+}
+
+// 🎊 隠し要素：所持金がちょうど縁起の良い数字になった瞬間の演出（お金の増減はなし）
+function checkLuckyMoneyWhim() {
+    if (LUCKY_MONEY_PATTERNS.includes(currentMoney)) {
+        setTimeout(() => {
+            alert("🎊【ご縁の数字】🎊\nあなたの所持金がちょうど「" + currentMoney.toLocaleString() + "円」になりました！\nこれは良いことが起こる予兆かもしれません…✨");
+        }, 1000);
     }
 }
 
@@ -853,8 +978,18 @@ function checkZoromeBonus(num) {
 function resolveTrial() {
     let outcome;
 
-    // 🪙 黄金の小判を装備中なら、戦わずして自動的に試練に打ち勝つ
-    if (equippedCollectible === "koban") {
+    // 🐉 龍神の逆鱗が発動中なら、確認なしで自動的に試練に成功する
+    if (hasShopEffect("ryujin")) {
+        const winAmount = currentMoney;
+        outcome = {
+            resultName: "神の試練(龍神の加護)",
+            imgSrc: "omikuji_daikichi.png",
+            prizeMoney: winAmount,
+            extraMsg: "🐉【龍神の逆鱗】🐉\n龍神の力で、確認するまでもなく試練に打ち勝ちました！\n所持金が2倍になりました！",
+            feverAwarded: false
+        };
+    } else if (equippedCollectible === "koban") {
+        // 🪙 黄金の小判を装備中なら、戦わずして自動的に試練に打ち勝つ
         const winAmount = currentMoney;
         outcome = {
             resultName: "神の試練(小判の加護)",
@@ -990,6 +1125,9 @@ function omikuji() {
         let okj = Math.random();
         let isFeverActiveThisTurn = false;
 
+        // 🕛 隠し要素：ゾロ目時刻の「神様の気まぐれ」チェック
+        checkKimagureTime();
+
         if (feverCount > 0) {
             isFeverActiveThisTurn = true;
             feverCount--;
@@ -1002,6 +1140,7 @@ function omikuji() {
         let daikichiBonus = 0;
         if (hasEffect("daikichi_up")) daikichiBonus += 0.03;
         if (hasShopEffect("manekineko")) daikichiBonus += 0.05;
+        if (hasShopEffect("gohei")) daikichiBonus += 0.12;
         daikichiBonus += URN_LEVELS[urnLevel].bonus;
         if (taianActive) daikichiBonus += 0.002;
         if (dexRewardClaimed) daikichiBonus += 0.01;
@@ -1058,6 +1197,7 @@ function omikuji() {
             let prizeMultiplier = 1;
             if (hasEffect("prize_up")) prizeMultiplier *= 1.1;
             if (hasShopEffect("gofu")) prizeMultiplier *= 1.1;
+            if (hasShopEffect("oogi")) prizeMultiplier *= 1.15;
             if (prizeMultiplier > 1) prizeMoney = Math.floor(prizeMoney * prizeMultiplier);
         }
 
@@ -1066,6 +1206,7 @@ function omikuji() {
 
         currentMoney += prizeMoney;
         updateMoneyDisplay();
+        checkLuckyMoneyWhim();
 
         // 🛍️ ショップアイテムの残り回数を消費
         if (shopItemKey && shopItemRemaining > 0) {
@@ -1085,7 +1226,9 @@ function omikuji() {
         totalDraws++;
         if (resultName === "大吉") totalDaikichi++;
         totalProfit += (prizeMoney - drawCost);
+        if (prizeMoney > 0) totalWinnings += prizeMoney;
         updateTitlesUI();
+        updateRankUI();
 
         // 📖 図鑑に記録
         markDex(resultName);
@@ -1200,6 +1343,9 @@ function omikuji10() {
             stopShuffleSE();
             clearShuffleTierEffect();
 
+            // 🕛 隠し要素：ゾロ目時刻の「神様の気まぐれ」チェック（10連は1回だけ判定）
+            checkKimagureTime();
+
             for (let i = 0; i < 10; i++) {
                 let okj = Math.random();
 
@@ -1207,6 +1353,7 @@ function omikuji10() {
                 let daikichiBonus = 0;
                 if (hasEffect("daikichi_up")) daikichiBonus += 0.03;
                 if (hasShopEffect("manekineko")) daikichiBonus += 0.05;
+        if (hasShopEffect("gohei")) daikichiBonus += 0.12;
                 daikichiBonus += URN_LEVELS[urnLevel].bonus;
                 if (taianActive) daikichiBonus += 0.002;
                 if (dexRewardClaimed) daikichiBonus += 0.01;
@@ -1262,6 +1409,7 @@ function omikuji10() {
                     let prizeMultiplier = 1;
                     if (hasEffect("prize_up")) prizeMultiplier *= 1.1;
                     if (hasShopEffect("gofu")) prizeMultiplier *= 1.1;
+            if (hasShopEffect("oogi")) prizeMultiplier *= 1.15;
                     if (prizeMultiplier > 1) prize = Math.floor(prize * prizeMultiplier);
                 }
 
@@ -1299,6 +1447,7 @@ function omikuji10() {
                 totalDraws++;
                 if (okj >= 0.99) totalDaikichi++;
                 totalProfit += (prize - (drawCost10 / 10));
+                if (prize > 0) totalWinnings += prize;
 
                 totalPrize += prize;
                 checkZoromeBonus(okj);
@@ -1325,11 +1474,14 @@ function omikuji10() {
             }
 
             totalPrize += totalFukuDaruma;
+            if (totalFukuDaruma > 0) totalWinnings += totalFukuDaruma;
 
             currentMoney += totalPrize;
             updateMoneyDisplay();
             updateShopUI();
             updateTitlesUI();
+            updateRankUI();
+            checkLuckyMoneyWhim();
 
             // 10連の内訳を1件の履歴としてまとめて記録（0回だったものは表示しない）
             const breakdown = Object.entries(resultsCount)
@@ -1456,6 +1608,7 @@ window.addEventListener("DOMContentLoaded", async () => {
             totalDraws = typeof data.totalDraws === "number" ? data.totalDraws : 0;
             totalDaikichi = typeof data.totalDaikichi === "number" ? data.totalDaikichi : 0;
             totalProfit = typeof data.totalProfit === "number" ? data.totalProfit : 0;
+            totalWinnings = typeof data.totalWinnings === "number" ? data.totalWinnings : 0;
             urnLevel = typeof data.urnLevel === "number" ? data.urnLevel : 0;
 
             const today = todayStr();
