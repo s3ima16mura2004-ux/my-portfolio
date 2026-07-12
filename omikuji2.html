@@ -15,6 +15,11 @@
             👤 参拝者：<span id="user-display">ゲスト参拝者</span>様
         </div>
 
+        <div id="rank-box" class="rank-box">
+            <p id="rank-name-display" class="rank-name-display">⛩️ 参拝ランク：平参拝者</p>
+            <p id="rank-progress-display" class="rank-progress-display">累計獲得賞金：0円</p>
+        </div>
+
         <div id="titles-box" class="titles-box hidden">
             <p class="titles-title">🎖️ 獲得称号</p>
             <div id="titles-list" class="titles-list"></div>
@@ -137,6 +142,7 @@
                                 <p class="shop-item-desc">大吉確率が一時的にアップ！（おみくじ5回分）</p>
                             </div>
                             <button class="btn-shop-buy" onclick="buyShopItem('manekineko')" type="button">購入する</button>
+                            <p class="shop-item-lock hidden">-</p>
                         </div>
 
                         <div class="shop-item-card" data-key="gofu">
@@ -145,6 +151,7 @@
                                 <p class="shop-item-desc">獲得賞金が1.1倍に！（おみくじ5回分）</p>
                             </div>
                             <button class="btn-shop-buy" onclick="buyShopItem('gofu')" type="button">購入する</button>
+                            <p class="shop-item-lock hidden">-</p>
                         </div>
 
                         <div class="shop-item-card" data-key="suzu">
@@ -153,6 +160,34 @@
                                 <p class="shop-item-desc">大凶時の没収額が軽減される！（おみくじ5回分）</p>
                             </div>
                             <button class="btn-shop-buy" onclick="buyShopItem('suzu')" type="button">購入する</button>
+                            <p class="shop-item-lock hidden">-</p>
+                        </div>
+
+                        <div class="shop-item-card" data-key="oogi">
+                            <div class="shop-item-info">
+                                <p class="shop-item-name">🪭 招福の扇 <span class="shop-item-price">15,000円</span></p>
+                                <p class="shop-item-desc">獲得賞金が1.15倍に！（護符より強力・おみくじ5回分）</p>
+                            </div>
+                            <button class="btn-shop-buy" onclick="buyShopItem('oogi')" type="button">購入する</button>
+                            <p class="shop-item-lock hidden">-</p>
+                        </div>
+
+                        <div class="shop-item-card" data-key="gohei">
+                            <div class="shop-item-info">
+                                <p class="shop-item-name">🎏 五色の幣 <span class="shop-item-price">25,000円</span></p>
+                                <p class="shop-item-desc">大吉確率が大きくアップ！（招き猫より強力・おみくじ5回分）</p>
+                            </div>
+                            <button class="btn-shop-buy" onclick="buyShopItem('gohei')" type="button">購入する</button>
+                            <p class="shop-item-lock hidden">-</p>
+                        </div>
+
+                        <div class="shop-item-card" data-key="ryujin">
+                            <div class="shop-item-info">
+                                <p class="shop-item-name">🐉 龍神の逆鱗 <span class="shop-item-price">50,000円</span></p>
+                                <p class="shop-item-desc">「神の試練」が確認なしで自動的に成功する！（おみくじ3回分）</p>
+                            </div>
+                            <button class="btn-shop-buy" onclick="buyShopItem('ryujin')" type="button">購入する</button>
+                            <p class="shop-item-lock hidden">-</p>
                         </div>
 
                         <p id="shop-active-status" class="shop-active-status hidden">-</p>
@@ -267,6 +302,6 @@
         window.omikujiCommunityRef = doc(db, "global", "community");
     </script>
 
-    <script src="omikuji2.js?v=2"></script>
+    <script src="omikuji2.js?v=3"></script>
 </body>
 </html>
