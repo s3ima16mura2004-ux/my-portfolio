@@ -228,7 +228,29 @@ async function buyShopItem(itemKey) {
 }
 
 // 収集アイテムを装備／解除する
+// 装備中の収集アイテムを1個消費する。無くなったら自動的に装備を外す
+function consumeCollectible(key) {
+    if (!(ownedItems[key] > 0)) return;
+    ownedItems[key]--;
+    if (ownedItems[key] <= 0) {
+        ownedItems[key] = 0;
+        if (equippedCollectible === key) {
+            equippedCollectible = "";
+        }
+    }
+    updateShopUI();
+}
+
 async function equipCollectible(key) {
+    // すでに装備中のアイテムをクリックした場合は「外す」動作にする
+    if (key && equippedCollectible === key) {
+        equippedCollectible = "";
+        updateShopUI();
+        await saveUserState();
+        alert("🎒 装備を外しました。");
+        return;
+    }
+
     if (key && !(ownedItems[key] > 0)) {
         alert("🙅 そのアイテムを持っていません！おみくじを引いて手に入れましょう。");
         return;
@@ -279,9 +301,26 @@ function updateShopUI() {
     if (countIshikoro) countIshikoro.textContent = ownedItems.ishikoro || 0;
 
     const equipBtnKoban = document.querySelector("#equipBtn-koban");
-    if (equipBtnKoban) equipBtnKoban.disabled = !(ownedItems.koban > 0) || equippedCollectible === "koban";
+    if (equipBtnKoban) {
+        if (equippedCollectible === "koban") {
+            equipBtnKoban.textContent = "装備を外す";
+            equipBtnKoban.disabled = false;
+        } else {
+            equipBtnKoban.textContent = "装備する";
+            equipBtnKoban.disabled = !(ownedItems.koban > 0);
+        }
+    }
+
     const equipBtnShinboku = document.querySelector("#equipBtn-shinboku");
-    if (equipBtnShinboku) equipBtnShinboku.disabled = !(ownedItems.shinboku > 0) || equippedCollectible === "shinboku";
+    if (equipBtnShinboku) {
+        if (equippedCollectible === "shinboku") {
+            equipBtnShinboku.textContent = "装備を外す";
+            equipBtnShinboku.disabled = false;
+        } else {
+            equipBtnShinboku.textContent = "装備する";
+            equipBtnShinboku.disabled = !(ownedItems.shinboku > 0);
+        }
+    }
 
     const equipStatusEl = document.querySelector("#equip-status");
     if (equipStatusEl) {
@@ -824,6 +863,7 @@ function resolveTrial() {
             extraMsg: "🪙【黄金の小判の加護】🪙\n戦わずして試練に打ち勝ちました！\n所持金が2倍になりました！",
             feverAwarded: false
         };
+        consumeCollectible("koban");
     } else {
         const challenge = confirm(
             "⚔️【神の試練】⚔️\n" +
@@ -883,7 +923,10 @@ function resolveTrial() {
     if (outcome.feverAwarded) {
         feverCount = 3;
         if (hasEffect("fever_extra")) feverCount++;
-        if (equippedCollectible === "shinboku") feverCount++;
+        if (equippedCollectible === "shinboku") {
+            feverCount++;
+            consumeCollectible("shinboku");
+        }
     }
 
     return outcome;
@@ -1198,6 +1241,7 @@ function omikuji10() {
                     // 🪙装備中なら「黄金の小判」で確定免除
                     if (equippedCollectible === "koban") {
                         exemptedCount++;
+                        consumeCollectible("koban");
                     } else if (Math.random() < 0.2) {
                         exemptedCount++; // 免除！
                     } else {
@@ -1264,7 +1308,10 @@ function omikuji10() {
                 // 🔔🌳 フィーバー回数+1効果
                 feverCount = 3;
                 if (hasEffect("fever_extra")) feverCount++;
-                if (equippedCollectible === "shinboku") feverCount++;
+                if (equippedCollectible === "shinboku") {
+                    feverCount++;
+                    consumeCollectible("shinboku");
+                }
             }
 
             if (randomNumSpan) {
