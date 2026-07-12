@@ -447,6 +447,7 @@ h1 {
 
 .shop-item-card {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
@@ -460,6 +461,47 @@ h1 {
 .shop-item-card.shop-item-active {
     background: linear-gradient(90deg, #fff2cc, #ffe08a, #fff2cc);
     border-color: #d8860b;
+}
+
+.shop-item-card.shop-item-locked {
+    opacity: 0.6;
+    background: #ececec;
+}
+
+.shop-item-card.shop-item-locked .btn-shop-buy {
+    display: none;
+}
+
+.shop-item-lock {
+    flex-basis: 100%;
+    margin: 6px 0 0;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #b5651d;
+    text-align: center;
+}
+
+/* ⛩️ 参拝ランク表示 */
+.rank-box {
+    background: #f3ebe0;
+    border: 1px solid #cbb994;
+    padding: 8px 10px;
+    border-radius: 5px;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.rank-name-display {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #6b4a1b;
+    margin: 0 0 4px;
+}
+
+.rank-progress-display {
+    font-size: 0.8rem;
+    color: #8b6f47;
+    margin: 0;
 }
 
 .shop-item-name {
