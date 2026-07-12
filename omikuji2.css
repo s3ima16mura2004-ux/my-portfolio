@@ -510,6 +510,7 @@ h1 {
 }
 
 .shop-item-name {
+    white-space: nowrap;
     font-weight: bold;
     color: #4a3728;
     margin: 0 0 3px;
