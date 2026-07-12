@@ -458,6 +458,11 @@ h1 {
     margin-bottom: 8px;
 }
 
+.shop-item-info {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
 .shop-item-card.shop-item-active {
     background: linear-gradient(90deg, #fff2cc, #ffe08a, #fff2cc);
     border-color: #d8860b;
