@@ -234,39 +234,43 @@ async function loadRanking() {
     if (myRankNote) myRankNote.textContent = "";
 
     try {
-        // 所持金の多い順に最大50人まで取得
-        const q = query(
-            collection(db, "users"),
-            orderBy("money", "desc"),
-            limit(50)
-        );
-
-        const snapshot = await getDocs(q);
+        // 所持金+賽銭箱の合計でランキングするため、Firestore側の並び替えは使わず全員分を取得して集計する
+        const snapshot = await getDocs(collection(db, "users"));
 
         if (snapshot.empty) {
             rankingTbody.innerHTML = `<tr><td colspan="3">まだ参拝者がいません</td></tr>`;
             return;
         }
 
+        const entries = [];
+        snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            const money = typeof data.money === "number" ? data.money : 0;
+            const bank = typeof data.bankMoney === "number" ? data.bankMoney : 0;
+            entries.push({ name: docSnap.id, total: money + bank });
+        });
+
+        entries.sort((a, b) => b.total - a.total);
+
+        const displayEntries = entries.slice(0, 50);
+
         let rowsHtml = "";
         let myRank = -1;
-        let rowIndex = 0;
 
-        snapshot.forEach(docSnap => {
-            rowIndex++;
-            const data = docSnap.data();
-            const name = docSnap.id;
-            const money = typeof data.money === "number" ? data.money : 0;
-            const isMe = name === username;
-            if (isMe) myRank = rowIndex;
+        entries.forEach((entry, index) => {
+            if (entry.name === username) myRank = index + 1;
+        });
 
-            const medal = RANK_MEDALS[rowIndex - 1] || "";
+        displayEntries.forEach((entry, index) => {
+            const rowIndex = index + 1;
+            const isMe = entry.name === username;
+            const medal = RANK_MEDALS[index] || "";
 
             rowsHtml += `
                 <tr class="${isMe ? "rank-me" : ""}">
                     <td><span class="rank-medal">${medal}</span> ${rowIndex}位</td>
-                    <td>${escapeHtml(name)}</td>
-                    <td>${money.toLocaleString()}円</td>
+                    <td>${escapeHtml(entry.name)}</td>
+                    <td>${entry.total.toLocaleString()}円</td>
                 </tr>
             `;
         });
@@ -275,9 +279,9 @@ async function loadRanking() {
 
         if (myRankNote) {
             if (myRank === -1) {
-                myRankNote.textContent = "あなたの順位：圏外（51位以下、またはまだおみくじ未参加）";
+                myRankNote.textContent = "あなたの順位：まだおみくじ未参加です";
             } else {
-                myRankNote.textContent = "あなたの現在の順位：" + myRank + "位";
+                myRankNote.textContent = "あなたの現在の順位：" + myRank + "位（全" + entries.length + "人中）";
             }
         }
     } catch (e) {
