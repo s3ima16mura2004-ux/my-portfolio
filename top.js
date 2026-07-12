@@ -38,6 +38,14 @@ const LUCKY_ITEMS = [
 const URN_LEVEL_COUNT = 6;
 
 // 🎖️ 称号（omikuji2.jsと同じ条件。トップページのプロフィール欄にも表示するため）
+// ⛩️ 参拝ランク（omikuji2.jsと同じ内容。累計獲得賞金額で判定）
+const VISITOR_RANKS = [
+    { tier: 0, name: "平参拝者", threshold: 0 },
+    { tier: 1, name: "常連客", threshold: 50000 },
+    { tier: 2, name: "氏子", threshold: 300000 },
+    { tier: 3, name: "神の寵愛者", threshold: 1500000 }
+];
+
 const TITLES = [
     { key: "hyakuman", emoji: "💰", name: "百万長者", desc: "累計収支+1,000,000円を達成", condition: s => s.totalProfit >= 1000000 },
     { key: "juman", emoji: "💴", name: "実は儲かってる人", desc: "累計収支+100,000円を達成", condition: s => s.totalProfit >= 100000 },
@@ -104,6 +112,9 @@ async function loadUserInfo() {
                 dexRewardClaimed: data.dexRewardClaimed === true
             };
             renderTitles(stats);
+
+            const totalWinnings = typeof data.totalWinnings === "number" ? data.totalWinnings : 0;
+            renderRank(totalWinnings);
         } else {
             if (moneyDisplay) moneyDisplay.textContent = "0";
         }
@@ -159,6 +170,28 @@ function renderTitles(stats) {
     list.innerHTML = earned.map(t =>
         '<span class="title-badge" title="' + t.desc.replace(/"/g, "&quot;") + '">' + t.emoji + " " + t.name + "</span>"
     ).join("");
+}
+
+// ⛩️ 参拝ランクの表示
+function renderRank(totalWinnings) {
+    let tier = 0;
+    VISITOR_RANKS.forEach(r => { if (totalWinnings >= r.threshold) tier = r.tier; });
+    const current = VISITOR_RANKS[tier];
+    const next = VISITOR_RANKS[tier + 1];
+
+    const nameEl = document.querySelector("#rank-name-display");
+    if (nameEl) nameEl.textContent = "⛩️ 参拝ランク：" + current.name;
+
+    const progressEl = document.querySelector("#rank-progress-display");
+    if (progressEl) {
+        if (next) {
+            progressEl.textContent =
+                "累計獲得賞金：" + totalWinnings.toLocaleString() + "円（次の「" + next.name + "」まであと" +
+                (next.threshold - totalWinnings).toLocaleString() + "円）";
+        } else {
+            progressEl.textContent = "累計獲得賞金：" + totalWinnings.toLocaleString() + "円（最高ランクです！）";
+        }
+    }
 }
 
 async function loadHistory() {
