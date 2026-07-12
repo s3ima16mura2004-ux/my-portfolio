@@ -450,7 +450,7 @@ h1 {
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 5px;
     background: #fbf8f3;
     border: 1px solid #e8dcc8;
     border-radius: 6px;
