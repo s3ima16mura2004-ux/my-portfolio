@@ -447,7 +447,7 @@ h1 {
 
 .shop-item-card {
     display: flex;
-    flex-wrap: no-wrap;
+    flex-wrap: nowrap;
     align-items: center;
     justify-content: space-between;
     gap: 5px;
