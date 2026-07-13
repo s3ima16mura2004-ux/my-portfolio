@@ -5,7 +5,10 @@ const omikujiImages = [
     "omikuji_syoukichi.png",
     "omikuji_suekichi.png",
     "omikuji_kyou.png",
-    "omikuji_daikyou.png"
+    "omikuji_daikyou.png",
+    "omikuji_daidaikichi.jpg",
+    "omikuji_kamikichi.jpg",
+    "omikuji_daidaikyou.jpg"
 ];
 
 // 🎋 ラッキーアイテムの一覧（毎日ログイン時に1個抽選・無料）
@@ -46,14 +49,57 @@ const URN_LEVELS = [
 
 // 📖 図鑑（これまでに引いた結果を記録するコレクション。7種類すべて達成で永続ボーナス）
 const DEX_ENTRIES = [
+    { key: "daidaikichi", emoji: "☀️", name: "大大吉", match: r => r === "大大吉" },
     { key: "daikichi", emoji: "🎉", name: "大吉", match: r => r === "大吉" },
+    { key: "kamikichi", emoji: "😊", name: "神吉", match: r => r === "神吉" },
     { key: "kichi", emoji: "✨", name: "吉", match: r => r === "吉" },
     { key: "chuukichi", emoji: "🎵", name: "中吉", match: r => r === "中吉" },
     { key: "syoukichi", emoji: "👍", name: "小吉", match: r => r === "小吉" },
     { key: "suekichi", emoji: "😄", name: "末吉", match: r => r === "末吉" },
     { key: "kyou", emoji: "😢", name: "凶", match: r => r === "凶" },
-    { key: "daikyou", emoji: "⚔️", name: "大凶(神の試練)", match: r => r.startsWith("神の試練") || r === "大凶" }
+    { key: "daikyou", emoji: "⚔️", name: "大凶(神の試練)", match: r => r.startsWith("神の試練") || r === "大凶" },
+    { key: "daidaikyou", emoji: "💀", name: "大大凶", match: r => r === "大大凶" }
 ];
+
+// ☀️😊💀 超激レア枠（大大吉・神吉・大大凶）の設定
+const DAIDAIKICHI_PRIZE = 500000;
+const KAMIKICHI_PRIZE = 20000;
+const DAIDAIKICHI_THRESHOLD_NORMAL = 0.9995;   // 上位0.05%
+const DAIDAIKICHI_THRESHOLD_USHIMITSU = 0.995; // 丑三つ時は上位0.5%に跳ね上がる
+const DAIDAIKYOU_THRESHOLD_NORMAL = 0.0005;    // 下位0.05%
+const DAIDAIKYOU_THRESHOLD_USHIMITSU = 0.005;  // 丑三つ時は下位0.5%に跳ね上がる
+const KAMIKICHI_THRESHOLD = 0.99995; // 上位0.005%（大大吉よりもさらに珍しい特別枠）
+
+// 🌅🌇🌙 時間帯（朝・昼・夜・丑三つ時）の設定
+function getTimePeriod() {
+    const hour = new Date().getHours();
+    if (hour >= 2 && hour < 4) return "ushimitsu"; // 丑三つ時（深夜2時〜4時）
+    if (hour >= 5 && hour < 11) return "morning";  // 朝
+    if (hour >= 11 && hour < 17) return "afternoon"; // 昼
+    return "evening"; // 夜（17時〜翌2時）
+}
+
+// 現在の時間帯に応じて背景演出とバナー表示を切り替える
+function applyTimeTheme() {
+    const container = document.querySelector(".container");
+    const period = getTimePeriod();
+
+    if (container) {
+        container.classList.remove("time-morning", "time-afternoon", "time-evening", "time-ushimitsu");
+        container.classList.add("time-" + period);
+    }
+
+    const banner = document.querySelector("#ushimitsu-banner");
+    if (banner) {
+        if (period === "ushimitsu") {
+            banner.classList.remove("hidden");
+        } else {
+            banner.classList.add("hidden");
+        }
+    }
+
+    return period;
+}
 
 // 🏘️ 神社改築（コミュニティ目標）の段階（全ユーザー合計の参拝回数で判定）
 const COMMUNITY_TIERS = [
@@ -92,12 +138,17 @@ const TITLES = [
     { key: "first_visit", emoji: "🔰", name: "初参拝", desc: "はじめての参拝を達成", condition: s => s.totalDraws >= 1 },
     { key: "urn_master", emoji: "🏺", name: "壺のマイスター", desc: "おみくじの壺を最大までランクアップ", condition: s => s.urnLevel >= URN_LEVELS.length - 1 },
     { key: "stone_collector", emoji: "🪨", name: "石ころコレクター", desc: "謎の石ころを100個集めた", condition: s => (s.ownedItems && s.ownedItems.ishikoro || 0) >= 100 },
-    { key: "dex_complete", emoji: "📖", name: "図鑑コンプリート", desc: "大吉〜大凶(神の試練)まで全種類を達成", condition: s => s.dexRewardClaimed === true }
+    { key: "dex_complete", emoji: "📖", name: "図鑑コンプリート", desc: "大吉〜大凶(神の試練)まで全種類を達成", condition: s => s.dexRewardClaimed === true },
+    { key: "daidaikichi_title", emoji: "☀️", name: "天啓を受けし者", desc: "「大大吉」を引いた", condition: s => s.gotDaidaikichi === true },
+    { key: "kamikichi_title", emoji: "😊", name: "神様に微笑まれし者", desc: "「神吉」を引いた", condition: s => s.gotKamikichi === true },
+    { key: "daidaikyou_title", emoji: "💀", name: "丑三つ時の生還者", desc: "「大大凶」を乗り越えた", condition: s => s.gotDaidaikyou === true },
+    { key: "ushimitsu_title", emoji: "🌙", name: "丑三つ時の参拝者", desc: "深夜2時〜4時の「丑三つ時」に参拝した", condition: s => s.gotUshimitsuDraw === true }
 ];
 
 let currentUser = null;      // ログイン中のユーザー名
 let currentMoney = 10000;    // Firestoreから読み込むまでの仮の初期値
 let feverCount = 0;          // フィーバータイム（大吉確率UP）の残り回数
+let feverTier = 1;           // フィーバーの強さ（1=通常10倍, 2=大大凶後の20倍）
 let prayDate = "";           // 最後にお祈りボーナスを使った日
 let prayCount = 0;           // その日にお祈りした回数
 let luckyItemKey = "";       // 今日のラッキーアイテムのキー
@@ -115,9 +166,14 @@ let urnLevel = 0;         // おみくじの壺のランクアップ段階
 
 let taianActive = false;  // 本日が「大安吉日」かどうか（ログイン時に個人ごとに抽選済み）
 let bankMoney = 0;        // 賽銭箱（貯金）の残高。おみくじには使えないが大凶等のリスクからは守られる
-let dexAchieved = { daikichi: false, kichi: false, chuukichi: false, syoukichi: false, suekichi: false, kyou: false, daikyou: false }; // 図鑑の達成状況
+let dexAchieved = { daidaikichi: false, daikichi: false, kamikichi: false, kichi: false, chuukichi: false, syoukichi: false, suekichi: false, kyou: false, daikyou: false, daidaikyou: false }; // 図鑑の達成状況
 let dexRewardClaimed = false; // 図鑑コンプリート報酬をすでに受け取ったか
 let communityDraws = 0;   // 全ユーザー合計の参拝回数（神社改築コミュニティ目標）
+
+let gotDaidaikichi = false; // 「大大吉」を引いたことがあるか（称号判定用）
+let gotKamikichi = false;   // 「神吉」を引いたことがあるか
+let gotDaidaikyou = false;  // 「大大凶」を引いたことがあるか
+let gotUshimitsuDraw = false; // 丑三つ時に参拝したことがあるか
 
 // 「結果を送信する」ボタンを押すまでの間、おみくじ結果を貯めておく配列
 let historyBuffer = [];
@@ -152,6 +208,7 @@ async function saveUserState() {
         await window.omikujiUpdateDoc(window.omikujiDoc(window.omikujiDB, "users", currentUser), {
             money: currentMoney,
             feverCount: feverCount,
+            feverTier: feverTier,
             prayDate: prayDate,
             prayCount: prayCount,
             ownedItems: ownedItems,
@@ -165,7 +222,11 @@ async function saveUserState() {
             urnLevel: urnLevel,
             bankMoney: bankMoney,
             dexAchieved: dexAchieved,
-            dexRewardClaimed: dexRewardClaimed
+            dexRewardClaimed: dexRewardClaimed,
+            gotDaidaikichi: gotDaidaikichi,
+            gotKamikichi: gotKamikichi,
+            gotDaidaikyou: gotDaidaikyou,
+            gotUshimitsuDraw: gotUshimitsuDraw
         });
     } catch (e) {
         console.error("ユーザーデータの保存に失敗しました: ", e);
@@ -460,7 +521,7 @@ function updateTitlesUI() {
     const list = document.querySelector("#titles-list");
     if (!box || !list) return;
 
-    const stats = { totalDraws, totalDaikichi, totalProfit, urnLevel, ownedItems };
+    const stats = { totalDraws, totalDaikichi, totalProfit, urnLevel, ownedItems, dexRewardClaimed, gotDaidaikichi, gotKamikichi, gotDaidaikyou, gotUshimitsuDraw };
     const earned = TITLES.filter(t => t.condition(stats));
 
     if (earned.length === 0) {
@@ -1057,6 +1118,7 @@ function resolveTrial() {
 
     if (outcome.feverAwarded) {
         feverCount = 3;
+        feverTier = 1; // 通常の試練は大吉確率10倍のフィーバー
         if (hasEffect("fever_extra")) feverCount++;
         if (equippedCollectible === "shinboku") {
             feverCount++;
@@ -1131,9 +1193,11 @@ function omikuji() {
         if (feverCount > 0) {
             isFeverActiveThisTurn = true;
             feverCount--;
-            if (okj >= 0.90) {
+            const feverThreshold = feverTier === 2 ? 0.80 : 0.90;
+            if (okj >= feverThreshold) {
                 okj = 0.995;
             }
+            if (feverCount === 0) feverTier = 1; // フィーバー終了時は次回に備えて通常倍率に戻す
         }
 
         // 🍀🐱🏺🎊📖 大吉運アップ効果（ラッキーアイテム＋ショップの招き猫＋壺＋大安吉日＋図鑑報酬は加算で重複可）
@@ -1147,7 +1211,8 @@ function omikuji() {
         if (daikichiBonus > 0) okj = Math.min(1, okj + daikichiBonus);
 
         if (randomNumSpan) {
-            let feverText = feverCount > 0 ? ` (🔥フィーバー残り: ${feverCount}回)` : " (通常モード)";
+            const feverMultiplierText = feverTier === 2 ? "20倍" : "10倍";
+            let feverText = feverCount > 0 ? ` (🔥フィーバー残り: ${feverCount}回・大吉確率${feverMultiplierText})` : " (通常モード)";
             if (isFeverActiveThisTurn && feverCount === 0) feverText = " (🔥フィーバーラスト！)";
             randomNumSpan.innerHTML = okj.toFixed(4) + feverText;
         }
@@ -1156,9 +1221,30 @@ function omikuji() {
         let imgSrc = "";
         let prizeMoney = 0;
         let isTrial = false;
+        let isExtremeTier = false;
         let trialExtraMsg = "";
 
-        if (okj >= 0.99) {
+        // 🌙 現在の時間帯を判定（丑三つ時は大大吉・大大凶の確率が跳ね上がる）
+        const timePeriod = getTimePeriod();
+        if (timePeriod === "ushimitsu") gotUshimitsuDraw = true;
+        const daidaikichiThreshold = timePeriod === "ushimitsu" ? DAIDAIKICHI_THRESHOLD_USHIMITSU : DAIDAIKICHI_THRESHOLD_NORMAL;
+        const daidaikyouThreshold = timePeriod === "ushimitsu" ? DAIDAIKYOU_THRESHOLD_USHIMITSU : DAIDAIKYOU_THRESHOLD_NORMAL;
+
+        if (okj >= KAMIKICHI_THRESHOLD) {
+            // 😊 超激レア「神吉」（大大吉よりもさらに珍しい特別枠）
+            isExtremeTier = true;
+            imgSrc = "omikuji_kamikichi.jpg";
+            resultName = "神吉";
+            prizeMoney = KAMIKICHI_PRIZE;
+            gotKamikichi = true;
+        } else if (okj >= daidaikichiThreshold) {
+            // ☀️ 激レア「大大吉」
+            isExtremeTier = true;
+            imgSrc = "omikuji_daidaikichi.jpg";
+            resultName = "大大吉";
+            prizeMoney = DAIDAIKICHI_PRIZE;
+            gotDaidaikichi = true;
+        } else if (okj >= 0.99) {
             imgSrc = "omikuji_daikichi.png";
             resultName = "大吉";
             prizeMoney = 100000;
@@ -1182,7 +1268,7 @@ function omikuji() {
             imgSrc = "omikuji_kyou.png";
             resultName = "凶";
             prizeMoney = 0;
-        } else {
+        } else if (okj >= daidaikyouThreshold) {
             // ⚔️「大凶」の代わりに「神の試練」が発生（挑戦するか選べる）
             isTrial = true;
             const trialOutcome = resolveTrial();
@@ -1190,10 +1276,26 @@ function omikuji() {
             imgSrc = trialOutcome.imgSrc;
             prizeMoney = trialOutcome.prizeMoney;
             trialExtraMsg = trialOutcome.extraMsg;
+        } else {
+            // 💀 激レア「大大凶」：免除なしで所持金の80%を没収する代わりに、大きなフィーバーで挽回のチャンスを与える
+            isExtremeTier = true;
+            imgSrc = "omikuji_daidaikyou.jpg";
+            resultName = "大大凶";
+            const tax = Math.floor(currentMoney * 0.8);
+            prizeMoney = -tax;
+            gotDaidaikyou = true;
+
+            feverCount = 5;
+            feverTier = 2; // 大大凶後は大吉確率20倍のフィーバーになる
+            if (hasEffect("fever_extra")) feverCount++;
+            if (equippedCollectible === "shinboku") {
+                feverCount++;
+                consumeCollectible("shinboku");
+            }
         }
 
-        // 🐟📜 獲得賞金アップ効果（ラッキーアイテム＋ショップの護符は掛け算で重複可。神の試練の結果には適用しない）
-        if (!isTrial && prizeMoney > 0) {
+        // 🐟📜 獲得賞金アップ効果（ラッキーアイテム＋ショップの護符は掛け算で重複可。神の試練・超激レア枠の結果には適用しない）
+        if (!isTrial && !isExtremeTier && prizeMoney > 0) {
             let prizeMultiplier = 1;
             if (hasEffect("prize_up")) prizeMultiplier *= 1.1;
             if (hasShopEffect("gofu")) prizeMultiplier *= 1.1;
@@ -1245,11 +1347,18 @@ function omikuji() {
         if (drawBtn) drawBtn.disabled = false;
         if (submitBtn) submitBtn.disabled = false;
 
-        if (resultName === "大吉" || resultName === "吉" || resultName === "中吉") {
+        if (resultName === "大大吉") {
+            playSE("se-win");
+            startConfetti();
+            startConfetti();
+        } else if (resultName === "大吉" || resultName === "神吉" || resultName === "吉" || resultName === "中吉") {
             playSE("se-win");
             if (resultName === "大吉") startConfetti();
         } else if (resultName === "凶") {
             playSE("se-lose");
+        } else if (resultName === "大大凶") {
+            playSE("se-doom");
+            startDoomEffect();
         } else if (isTrial) {
             if (prizeMoney > 0) {
                 playSE("se-win");
@@ -1261,8 +1370,12 @@ function omikuji() {
         }
 
         setTimeout(() => {
-            if (resultName === "大吉") {
+            if (resultName === "大大吉") {
+                alert("☀️🎊【大大吉】🎊☀️\n史上最高の奇跡です！神様が最大級の祝福をくださいました！\n【" + DAIDAIKICHI_PRIZE.toLocaleString() + "円】が当選しました！！！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon));
+            } else if (resultName === "大吉") {
                 alert("🎉 おめでとうございます！【大吉】です！ 🎉\nなんと最高額の 100,000円 が当選しました！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon));
+            } else if (resultName === "神吉") {
+                alert("😊【神吉】😊\n神様がにっこり微笑んでくれました！\n【" + KAMIKICHI_PRIZE.toLocaleString() + "円】を授かりました！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon));
             } else if (resultName === "吉") {
                 alert("✨ やりました！【吉】です！ ✨\nみごと 10,000円 が当選しました！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon));
             } else if (resultName === "中吉") {
@@ -1273,6 +1386,9 @@ function omikuji() {
                 alert("😄 ちょっぴりお小遣い！【末吉】です！ 😄\n500円 が当選しました！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon));
             } else if (resultName === "凶") {
                 alert("😢残念！【凶】です！ 😢\n景品はありません。はずれです！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon));
+            } else if (resultName === "大大凶") {
+                alert("💀⚡【大大凶】⚡💀\n史上最悪の凶事です…お財布の80%【" + Math.abs(prizeMoney).toLocaleString() + "円】が没収されました。\n\n🔥しかし！この上ない災いは、この上ない福に転じます！次の単発おみくじ" + feverCount + "回分は【大吉の確率が20倍(20%)】になります！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon));
+                stopDoomEffect();
             } else if (isTrial) {
                 alert(trialExtraMsg + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon));
                 stopDoomEffect();
@@ -1320,14 +1436,21 @@ function omikuji10() {
     startShuffleSE();
     applyShuffleTierEffect();
 
-    let resultsCount = {"大吉": 0, "吉": 0, "中吉": 0, "小吉": 0, "末吉": 0, "凶": 0, "大凶": 0};
+    let resultsCount = {"大大吉": 0, "大吉": 0, "神吉": 0, "吉": 0, "中吉": 0, "小吉": 0, "末吉": 0, "凶": 0, "大凶": 0, "大大凶": 0};
     let totalPrize = 0;
     let lastRandomNum = 0;
     let gotDaikyouIn10 = false;
+    let gotDaidaikyouIn10 = false;
     let totalDoomTax = 0; // 💡10連の中で取られた大凶(試練)お祓い料の合計
     let exemptedCount = 0; // 💡10連の中で免除された大凶(試練)の数
     let allDropped = []; // 10連まとめてのドロップ一覧
     let totalFukuDaruma = 0; // 10連の中で発生した福だるまボーナスの合計
+
+    // 🌙 現在の時間帯を判定（丑三つ時は大大吉・大大凶の確率が跳ね上がる。10連は1回だけ判定）
+    const timePeriod10 = getTimePeriod();
+    if (timePeriod10 === "ushimitsu") gotUshimitsuDraw = true;
+    const daidaikichiThreshold10 = timePeriod10 === "ushimitsu" ? DAIDAIKICHI_THRESHOLD_USHIMITSU : DAIDAIKICHI_THRESHOLD_NORMAL;
+    const daidaikyouThreshold10 = timePeriod10 === "ushimitsu" ? DAIDAIKYOU_THRESHOLD_USHIMITSU : DAIDAIKYOU_THRESHOLD_NORMAL;
 
     let shuffleCount = 0;
     const shuffleInterval = setInterval(() => {
@@ -1362,8 +1485,19 @@ function omikuji10() {
                 if (i === 9) lastRandomNum = okj;
 
                 let prize = 0;
+                let isExtremeTier10 = false;
 
-                if (okj >= 0.99) {
+                if (okj >= KAMIKICHI_THRESHOLD) {
+                    resultsCount["神吉"]++;
+                    prize = KAMIKICHI_PRIZE;
+                    isExtremeTier10 = true;
+                    gotKamikichi = true;
+                } else if (okj >= daidaikichiThreshold10) {
+                    resultsCount["大大吉"]++;
+                    prize = DAIDAIKICHI_PRIZE;
+                    isExtremeTier10 = true;
+                    gotDaidaikichi = true;
+                } else if (okj >= 0.99) {
                     resultsCount["大吉"]++;
                     prize = 100000;
                 } else if (okj >= 0.95) {
@@ -1381,7 +1515,7 @@ function omikuji10() {
                 } else if (okj >= 0.1) {
                     resultsCount["凶"]++;
                     prize = 0;
-                } else {
+                } else if (okj >= daidaikyouThreshold10) {
                     resultsCount["大凶"]++;
                     gotDaikyouIn10 = true;
 
@@ -1402,14 +1536,24 @@ function omikuji10() {
                         totalDoomTax += tax;
                         prize = -tax;
                     }
+                } else {
+                    // 💀 激レア「大大凶」：免除なしで、その時点の残高の80%を没収
+                    resultsCount["大大凶"]++;
+                    isExtremeTier10 = true;
+                    gotDaidaikyou = true;
+                    gotDaidaikyouIn10 = true;
+
+                    const tax = Math.floor((currentMoney + totalPrize) * 0.8);
+                    totalDoomTax += tax;
+                    prize = -tax;
                 }
 
                 // 🐟📜 獲得賞金アップ効果
-                if (prize > 0) {
+                if (!isExtremeTier10 && prize > 0) {
                     let prizeMultiplier = 1;
                     if (hasEffect("prize_up")) prizeMultiplier *= 1.1;
                     if (hasShopEffect("gofu")) prizeMultiplier *= 1.1;
-            if (hasShopEffect("oogi")) prizeMultiplier *= 1.15;
+                    if (hasShopEffect("oogi")) prizeMultiplier *= 1.15;
                     if (prizeMultiplier > 1) prize = Math.floor(prize * prizeMultiplier);
                 }
 
@@ -1426,13 +1570,16 @@ function omikuji10() {
                 allDropped = allDropped.concat(rollDrops());
 
                 // 📖 図鑑に記録
-                if (okj >= 0.99) markDex("大吉");
+                if (okj >= KAMIKICHI_THRESHOLD) markDex("神吉");
+                else if (okj >= daidaikichiThreshold10) markDex("大大吉");
+                else if (okj >= 0.99) markDex("大吉");
                 else if (okj >= 0.95) markDex("吉");
                 else if (okj >= 0.85) markDex("中吉");
                 else if (okj >= 0.7) markDex("小吉");
                 else if (okj >= 0.6) markDex("末吉");
                 else if (okj >= 0.1) markDex("凶");
-                else markDex("大凶");
+                else if (okj >= daidaikyouThreshold10) markDex("大凶");
+                else markDex("大大凶");
 
                 // 🏘️ みんなの参拝合計を更新（神社改築コミュニティ目標）
                 incrementCommunityDraws();
@@ -1445,7 +1592,7 @@ function omikuji10() {
 
                 // 🎖️ 称号判定用の累計データを更新（10連の1回1回もカウント）
                 totalDraws++;
-                if (okj >= 0.99) totalDaikichi++;
+                if (okj >= 0.99 && okj < daidaikichiThreshold10) totalDaikichi++;
                 totalProfit += (prize - (drawCost10 / 10));
                 if (prize > 0) totalWinnings += prize;
 
@@ -1453,9 +1600,10 @@ function omikuji10() {
                 checkZoromeBonus(okj);
             }
 
-            if (gotDaikyouIn10) {
-                // 🔔🌳 フィーバー回数+1効果
-                feverCount = 3;
+            if (gotDaidaikyouIn10 || gotDaikyouIn10) {
+                // 🔔🌳 フィーバー回数+1効果（大大凶が混ざっていれば基礎5回・20倍、通常の試練なら3回・10倍）
+                feverCount = gotDaidaikyouIn10 ? 5 : 3;
+                feverTier = gotDaidaikyouIn10 ? 2 : 1;
                 if (hasEffect("fever_extra")) feverCount++;
                 if (equippedCollectible === "shinboku") {
                     feverCount++;
@@ -1499,27 +1647,30 @@ function omikuji10() {
             if (totalPrize > 0) {
                 playSE("se-win");
             } else if (totalPrize < 0) {
-                if (resultsCount["大凶"] > 0) {
+                if (resultsCount["大凶"] > 0 || resultsCount["大大凶"] > 0) {
                     playSE("se-doom");
                 } else {
                     playSE("se-lose");
                 }
             }
 
-            if (resultsCount["大吉"] > 0) startConfetti();
-            if (resultsCount["大凶"] > 0) startDoomEffect();
+            if (resultsCount["大吉"] > 0 || resultsCount["大大吉"] > 0 || resultsCount["神吉"] > 0) startConfetti();
+            if (resultsCount["大凶"] > 0 || resultsCount["大大凶"] > 0) startDoomEffect();
 
             setTimeout(() => {
                 let alertMsg =
                     "🔥【10連おみくじ結果発表】🔥\n" +
                     "--------------------------------\n" +
+                    "☀️ 大大吉： " + resultsCount["大大吉"] + "回\n" +
                     "🎉 大吉： " + resultsCount["大吉"] + "回\n" +
+                    "😊 神吉： " + resultsCount["神吉"] + "回\n" +
                     "✨ 吉 ： " + resultsCount["吉"] + "回\n" +
                     "🎵 中吉： " + resultsCount["中吉"] + "回\n" +
                     "👍 小吉： " + resultsCount["小吉"] + "回\n" +
                     "😄 末吉： " + resultsCount["末吉"] + "回\n" +
                     "😢 凶 ： " + resultsCount["凶"] + "回\n" +
                     "⚔️ 神の試練(大凶枠)： " + resultsCount["大凶"] + "回\n" +
+                    "💀 大大凶： " + resultsCount["大大凶"] + "回\n" +
                     "--------------------------------\n";
 
                 if (totalDoomTax > 0) {
@@ -1535,7 +1686,9 @@ function omikuji10() {
 
                 alertMsg += "💰 合計損益：" + totalPrize.toLocaleString() + "円！";
 
-                if (gotDaikyouIn10) {
+                if (gotDaidaikyouIn10) {
+                    alertMsg += "\n\n💀🔥【大厄落としフィーバー発動！】🔥💀\n「大大凶」を乗り越えたため、次の単発おみくじ" + feverCount + "回は【大吉確率20倍(20%)】になります！";
+                } else if (gotDaikyouIn10) {
                     alertMsg += "\n\n🔥【厄落としフィーバー発動！】🔥\n神の試練(大凶枠)が含まれていたため、次の単発おみくじ" + feverCount + "回は【大吉確率10倍(10%)】になります！";
                 }
 
@@ -1598,6 +1751,7 @@ window.addEventListener("DOMContentLoaded", async () => {
             const data = snap.data();
             currentMoney = typeof data.money === "number" ? data.money : 10000;
             feverCount = typeof data.feverCount === "number" ? data.feverCount : 0;
+            feverTier = typeof data.feverTier === "number" ? data.feverTier : 1;
             prayDate = data.prayDate || "";
             prayCount = typeof data.prayCount === "number" ? data.prayCount : 0;
             luckyItemKey = data.luckyItem || "";
@@ -1615,16 +1769,22 @@ window.addEventListener("DOMContentLoaded", async () => {
             taianActive = (data.taianDate === today) && data.taianActive === true;
             bankMoney = typeof data.bankMoney === "number" ? data.bankMoney : 0;
             dexAchieved = Object.assign(
-                { daikichi: false, kichi: false, chuukichi: false, syoukichi: false, suekichi: false, kyou: false, daikyou: false },
+                { daidaikichi: false, daikichi: false, kamikichi: false, kichi: false, chuukichi: false, syoukichi: false, suekichi: false, kyou: false, daikyou: false, daidaikyou: false },
                 data.dexAchieved || {}
             );
             dexRewardClaimed = data.dexRewardClaimed === true;
+            gotDaidaikichi = data.gotDaidaikichi === true;
+            gotKamikichi = data.gotKamikichi === true;
+            gotDaidaikyou = data.gotDaidaikyou === true;
+            gotUshimitsuDraw = data.gotUshimitsuDraw === true;
         }
 
         updateMoneyDisplay();
         updateTitlesUI();
         updateDexUI();
         updateBankUI();
+        applyTimeTheme();
+        setInterval(applyTimeTheme, 60000); // 1分ごとに時間帯を再チェック（長時間開いたままでも自動で切り替わる）
 
         // 🎊 本日が大安吉日なら表示する
         const taianBox = document.querySelector("#taian-status-box");
