@@ -56,7 +56,11 @@ const TITLES = [
     { key: "first_visit", emoji: "🔰", name: "初参拝", desc: "はじめての参拝を達成", condition: s => s.totalDraws >= 1 },
     { key: "urn_master", emoji: "🏺", name: "壺のマイスター", desc: "おみくじの壺を最大までランクアップ", condition: s => s.urnLevel >= URN_LEVEL_COUNT - 1 },
     { key: "stone_collector", emoji: "🪨", name: "石ころコレクター", desc: "謎の石ころを100個集めた", condition: s => (s.ownedItems && s.ownedItems.ishikoro || 0) >= 100 },
-    { key: "dex_complete", emoji: "📖", name: "図鑑コンプリート", desc: "大吉〜大凶(神の試練)まで全種類を達成", condition: s => s.dexRewardClaimed === true }
+    { key: "dex_complete", emoji: "📖", name: "図鑑コンプリート", desc: "大吉〜大凶(神の試練)まで全種類を達成", condition: s => s.dexRewardClaimed === true },
+    { key: "daidaikichi_title", emoji: "☀️", name: "天啓を受けし者", desc: "「大大吉」を引いた", condition: s => s.gotDaidaikichi === true },
+    { key: "kamikichi_title", emoji: "😊", name: "神様に微笑まれし者", desc: "「神吉」を引いた", condition: s => s.gotKamikichi === true },
+    { key: "daidaikyou_title", emoji: "💀", name: "丑三つ時の生還者", desc: "「大大凶」を乗り越えた", condition: s => s.gotDaidaikyou === true },
+    { key: "ushimitsu_title", emoji: "🌙", name: "丑三つ時の参拝者", desc: "深夜2時〜4時の「丑三つ時」に参拝した", condition: s => s.gotUshimitsuDraw === true }
 ];
 
 const username = localStorage.getItem("logged_in_user");
@@ -109,7 +113,11 @@ async function loadUserInfo() {
                 totalProfit: typeof data.totalProfit === "number" ? data.totalProfit : 0,
                 urnLevel: typeof data.urnLevel === "number" ? data.urnLevel : 0,
                 ownedItems: data.ownedItems || {},
-                dexRewardClaimed: data.dexRewardClaimed === true
+                dexRewardClaimed: data.dexRewardClaimed === true,
+                gotDaidaikichi: data.gotDaidaikichi === true,
+                gotKamikichi: data.gotKamikichi === true,
+                gotDaidaikyou: data.gotDaidaikyou === true,
+                gotUshimitsuDraw: data.gotUshimitsuDraw === true
             };
             renderTitles(stats);
 
@@ -408,12 +416,42 @@ function renderCalendarGrid(grid, year, month, dayTotals) {
     grid.innerHTML = html;
 }
 
+// 🌅🌇🌙 時間帯（朝・昼・夜・丑三つ時）の背景演出（omikuji2.jsと同じロジック）
+function getTimePeriod() {
+    const hour = new Date().getHours();
+    if (hour >= 2 && hour < 4) return "ushimitsu";
+    if (hour >= 5 && hour < 11) return "morning";
+    if (hour >= 11 && hour < 17) return "afternoon";
+    return "evening";
+}
+
+function applyTimeTheme() {
+    const container = document.querySelector(".container");
+    const period = getTimePeriod();
+
+    if (container) {
+        container.classList.remove("time-morning", "time-afternoon", "time-evening", "time-ushimitsu");
+        container.classList.add("time-" + period);
+    }
+
+    const banner = document.querySelector("#ushimitsu-banner");
+    if (banner) {
+        if (period === "ushimitsu") {
+            banner.classList.remove("hidden");
+        } else {
+            banner.classList.add("hidden");
+        }
+    }
+}
+
 async function init() {
     if (!username) {
         // 未ログインの場合はログインページへ
         window.location.href = "index.html";
         return;
     }
+    applyTimeTheme();
+    setInterval(applyTimeTheme, 60000);
     await loadUserInfo();
     await loadCommunityStatus();
     await loadHistory();
