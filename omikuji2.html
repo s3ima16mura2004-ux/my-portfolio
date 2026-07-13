@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>おみくじ（1回 1,000円）</title>
-    <link rel="stylesheet" href="omikuji2.css?v=2">
+    <link rel="stylesheet" href="omikuji2.css?v=4">
 </head>
 <body>
 
@@ -44,6 +44,7 @@
 
         <p id="taian-status-box" class="taian-status-box hidden">-</p>
         <p id="community-status-box" class="community-status-box hidden">-</p>
+        <p id="ushimitsu-banner" class="ushimitsu-banner hidden">🌙 ただいま「丑三つ時」…大大吉・大大凶の確率が跳ね上がっています…</p>
 
 
         <div id="bonus-area" style="display: none; margin-bottom: 15px;">
@@ -89,6 +90,16 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <tr class="row-kamikichi-unlocked">
+                                <td class="rank">特神</td>
+                                <td class="fortune">😊神吉</td>
+                                <td class="prize">20,000円<br><span style="font-size: 0.7rem;">(全枠中最もレア・大大吉の10倍珍しい)</span></td>
+                            </tr>
+                            <tr class="row-kamikichi-unlocked">
+                                <td class="rank">特上</td>
+                                <td class="fortune">☀️大大吉</td>
+                                <td class="prize">500,000円<br><span style="font-size: 0.7rem;">(超激レア・丑三つ時は確率10倍)</span></td>
+                            </tr>
                             <tr>
                                 <td class="rank">1等</td>
                                 <td class="fortune">大吉</td>
@@ -126,6 +137,14 @@
                                     単発：挑戦(2倍 or 半額没収)か穏便に断るか選択！<br>
                                     10連：自動判定（20%免除、それ以外は半額徴収）<br>
                                     <span style="font-size: 0.75rem; font-weight: bold; color: #ff4d4d;">🔥引いた後は3回「大吉確率10倍」発動！</span>
+                                </td>
+                            </tr>
+                            <tr class="row-daikyo">
+                                <td class="rank">特凶</td>
+                                <td class="fortune">💀大大凶</td>
+                                <td class="prize">
+                                    免除なしで残金の80%没収（超激レア・丑三つ時は確率10倍）<br>
+                                    <span style="font-size: 0.75rem; font-weight: bold; color: #ff4d4d;">🔥引いた後は5回「大吉確率20倍」発動！</span>
                                 </td>
                             </tr>
                         </tbody>
@@ -241,7 +260,7 @@
                 <div id="tab-dex" class="hidden">
                     <div class="shop-section">
                         <h3 class="shop-section-title">📖 おみくじ図鑑</h3>
-                        <p id="dex-progress" class="dex-progress">達成状況：0 / 7</p>
+                        <p id="dex-progress" class="dex-progress">達成状況：0 / 10</p>
                         <div id="dex-grid" class="dex-grid"></div>
                         <p id="dex-reward-status" class="dex-reward-status hidden">-</p>
                     </div>
@@ -302,6 +321,6 @@
         window.omikujiCommunityRef = doc(db, "global", "community");
     </script>
 
-    <script src="omikuji2.js?v=3"></script>
+    <script src="omikuji2.js?v=5"></script>
 </body>
 </html>
