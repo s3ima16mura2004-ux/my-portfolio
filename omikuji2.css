@@ -741,6 +741,47 @@ h1 {
     box-shadow: 0 0 25px rgba(218, 165, 32, 0.5);
 }
 
+/* 🌅🌇🌙 時間帯による背景演出（朝・昼・夜・丑三つ時） */
+.container.time-morning {
+    background-image: linear-gradient(rgba(255, 247, 235, 0.85), rgba(255, 230, 210, 0.85));
+}
+
+.container.time-afternoon {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 250, 235, 0.9));
+}
+
+.container.time-evening {
+    background-image: linear-gradient(rgba(255, 235, 225, 0.85), rgba(220, 200, 235, 0.85));
+}
+
+.container.time-ushimitsu {
+    background-image: linear-gradient(rgba(30, 20, 45, 0.92), rgba(50, 25, 55, 0.92));
+    box-shadow: 0 0 30px rgba(120, 20, 140, 0.5);
+}
+
+.container.time-ushimitsu h1,
+.container.time-ushimitsu .main-title {
+    color: #e6d6ff;
+}
+
+.ushimitsu-banner {
+    background: linear-gradient(90deg, #2b1a33, #4a1f4f, #2b1a33);
+    border: 1px solid #a35bd1;
+    color: #f0d9ff;
+    padding: 8px 10px;
+    border-radius: 5px;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-align: center;
+    animation: ushimitsu-pulse 2s infinite alternate;
+}
+
+@keyframes ushimitsu-pulse {
+    0% { box-shadow: 0 0 5px rgba(163, 91, 209, 0.4); }
+    100% { box-shadow: 0 0 18px rgba(163, 91, 209, 0.9); }
+}
+
 /* 📅 運勢カレンダー */
 .calendar-section {
     margin-top: 25px;
