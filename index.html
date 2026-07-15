@@ -200,6 +200,20 @@
                         loginBtn.textContent = "🙏 いざ、参拝する";
                         return;
                     }
+
+                    // 🛠️ 過去に作成されたアカウントには存在しないフィールドがある場合があるため、
+                    // undefinedのままFirestoreに書き込もうとして失敗しないよう、ここで安全な初期値を補っておく
+                    userData.money = typeof userData.money === "number" ? userData.money : 10000;
+                    userData.loginBonusDate = userData.loginBonusDate || "";
+                    userData.luckyItemDate = userData.luckyItemDate || "";
+                    userData.luckyItem = userData.luckyItem || "";
+                    userData.taianDate = userData.taianDate || "";
+                    userData.taianActive = userData.taianActive === true;
+                    userData.birthdayMonth = typeof userData.birthdayMonth === "number" ? userData.birthdayMonth : null;
+                    userData.birthdayDay = typeof userData.birthdayDay === "number" ? userData.birthdayDay : null;
+                    userData.birthdayBonusYear = typeof userData.birthdayBonusYear === "number" ? userData.birthdayBonusYear : 0;
+                    userData.birthdayTicket = userData.birthdayTicket === true;
+                    userData.kimagureFeverUntil = typeof userData.kimagureFeverUntil === "number" ? userData.kimagureFeverUntil : 0;
                 } else {
                     // 新規登録：入力された合言葉でこの名前のアカウントを新規作成
                     isNewUser = true;
@@ -212,7 +226,13 @@
                         loginBonusDate: "",
                         luckyItemDate: "",
                         luckyItem: "",
-                        ownedItems: { koban: 0, shinboku: 0, ishikoro: 0, tanzaku: 0 },
+                        ownedItems: {
+                            koban: 0, shinboku: 0, ishikoro: 0, tanzaku: 0,
+                            orihime_thread: 0, hikoboshi_star: 0,
+                            natsumatsuri_lantern: 0, kingyo: 0, kakigori: 0, hanabi_tama: 0,
+                            tsukimi_mochi: 0, momiji_shiori: 0,
+                            hatsuyume_fuji: 0, hatsuyume_taka: 0, hatsuyume_nasu: 0
+                        },
                         equippedCollectible: "",
                         shopItemKey: "",
                         shopItemRemaining: 0,
@@ -238,7 +258,10 @@
                         birthdayTicket: false,
                         kimagureFeverUntil: 0,
                         tanabataWishDate: "",
-                        tanabataLuckDate: ""
+                        tanabataLuckDate: "",
+                        orihimeHikoboshiMeetCount: 0,
+                        orihimeHikoboshiLastMetYear: 0,
+                        hatsuyumeComplete: false
                     };
                     await setDoc(userRef, userData);
                 }
