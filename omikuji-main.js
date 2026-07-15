@@ -47,7 +47,13 @@ window.addEventListener("DOMContentLoaded", async () => {
             prayDate = data.prayDate || "";
             prayCount = typeof data.prayCount === "number" ? data.prayCount : 0;
             luckyItemKey = data.luckyItem || "";
-            ownedItems = Object.assign({ koban: 0, shinboku: 0, ishikoro: 0, tanzaku: 0, orihime_thread: 0, hikoboshi_star: 0, natsumatsuri_lantern: 0 }, data.ownedItems || {});
+            ownedItems = Object.assign({
+                koban: 0, shinboku: 0, ishikoro: 0, tanzaku: 0,
+                orihime_thread: 0, hikoboshi_star: 0,
+                natsumatsuri_lantern: 0, kingyo: 0, kakigori: 0, hanabi_tama: 0,
+                tsukimi_mochi: 0, momiji_shiori: 0,
+                hatsuyume_fuji: 0, hatsuyume_taka: 0, hatsuyume_nasu: 0
+            }, data.ownedItems || {});
             equippedCollectible = data.equippedCollectible || "";
             shopItemKey = data.shopItemKey || "";
             shopItemRemaining = typeof data.shopItemRemaining === "number" ? data.shopItemRemaining : 0;
@@ -76,8 +82,22 @@ window.addEventListener("DOMContentLoaded", async () => {
             kimagureFeverUntil = typeof data.kimagureFeverUntil === "number" ? data.kimagureFeverUntil : 0;
             tanabataWishDate = data.tanabataWishDate || "";
             tanabataLuckDate = data.tanabataLuckDate || "";
-            orihimeHikoboshiMet = data.orihimeHikoboshiMet === true;
+            orihimeHikoboshiMeetCount = typeof data.orihimeHikoboshiMeetCount === "number" ? data.orihimeHikoboshiMeetCount : 0;
+            orihimeHikoboshiLastMetYear = typeof data.orihimeHikoboshiLastMetYear === "number" ? data.orihimeHikoboshiLastMetYear : 0;
+            hatsuyumeComplete = data.hatsuyumeComplete === true;
+
+            missionDate = data.missionDate || "";
+            missionKeysToday = Array.isArray(data.missionKeysToday) ? data.missionKeysToday : [];
+            missionProgress = data.missionProgress || {};
+            missionClaimed = data.missionClaimed || {};
+            missionDrawsToday = typeof data.missionDrawsToday === "number" ? data.missionDrawsToday : 0;
+            wentBankruptToday = data.wentBankruptToday === true;
+            steadyVisitorEarned = data.steadyVisitorEarned === true;
+            kiyomeShioActive = data.kiyomeShioActive === true;
+            boostTicketCount = typeof data.boostTicketCount === "number" ? data.boostTicketCount : 0;
         }
+
+        refreshDailyMissions(); // 🎯 日付が変わっていればデイリーミッションをリセット（前日分の「お財布の達人」判定も含む）
 
         updateMoneyDisplay();
         updateTitlesUI();
@@ -87,10 +107,13 @@ window.addEventListener("DOMContentLoaded", async () => {
         updateShopFeverUI();
         updateTanabataUI();
         updateNatsumatsuriUI();
+        updateMissionsUI();
         applyTimeTheme();
         setInterval(applyTimeTheme, 60000); // 1分ごとに時間帯を再チェック（長時間開いたままでも自動で切り替わる）
         setInterval(updateShopFeverUI, 30000); // 😲 神の気まぐれフィーバーの残り時間を定期的に更新
         setInterval(updateNatsumatsuriUI, 60000); // 🎆 夏祭り（夜・週末）の切り替わりを定期的に再チェック
+        startCountdownTimers(); // ⏳ 次の季節イベント／次のボーナスタイムまでのカウントダウンを開始
+        if (typeof schedulePhantomSpawn === "function") schedulePhantomSpawn(); // 🐱🐸 幻の参拝客の出現スケジュールを開始
 
         // 🎊 本日が大安吉日なら表示する
         const taianBox = document.querySelector("#taian-status-box");
@@ -170,6 +193,7 @@ async function submitResults() {
         }
 
         historyBuffer = [];
+        trackMissionSubmit(); // 🎯「大吉を目指せ」ミッションの進捗を更新
         await saveUserState();
         window.location.href = "top.html";
     } catch (e) {
