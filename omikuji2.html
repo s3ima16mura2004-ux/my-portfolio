@@ -11,62 +11,68 @@
 
     <a href="top.html" class="back-to-top-btn">🏠 トップに戻る</a>
 
-    <div class="container">
+    <div class="container container-wide">
         <div class="user-info">
             👤 参拝者：<span id="user-display">ゲスト参拝者</span>様
-        </div>
-
-        <div id="rank-box" class="rank-box">
-            <p id="rank-name-display" class="rank-name-display">⛩️ 参拝ランク：平参拝者</p>
-            <p id="rank-progress-display" class="rank-progress-display">累計獲得賞金：0円</p>
-        </div>
-
-        <div id="titles-box" class="titles-box hidden">
-            <p class="titles-title">🎖️ 獲得称号</p>
-            <div id="titles-list" class="titles-list"></div>
+            <button type="button" class="logout-btn" onclick="logout()">ログアウト</button>
         </div>
 
         <h1>おみくじ（1回 1,000円）</h1>
 
-        <div class="money-box">
-            💰 あなたの所持金：<span id="money">10000</span>円
-        </div>
+        <div class="page-columns">
+            <div class="col-side">
+                <div id="rank-box" class="rank-box">
+                    <p id="rank-name-display" class="rank-name-display">⛩️ 参拝ランク：平参拝者</p>
+                    <p id="rank-progress-display" class="rank-progress-display">累計獲得賞金：0円</p>
+                </div>
 
-        <div id="lucky-item-box" class="lucky-item-box hidden">
-            <p class="lucky-item-title">🎋 本日のラッキーアイテム 🎋</p>
-            <p id="lucky-item-name">-</p>
-            <p id="lucky-item-desc" class="lucky-item-desc">-</p>
-        </div>
+                <div id="titles-box" class="titles-box hidden">
+                    <p class="titles-title">🎖️ 獲得称号</p>
+                    <div id="titles-list" class="titles-list"></div>
+                </div>
 
-        <div id="active-items-box" class="active-items-box hidden">
-            <p id="active-shop-text" class="hidden">-</p>
-            <p id="active-equip-text" class="hidden">-</p>
-        </div>
+                <div class="money-box">
+                    💰 あなたの所持金：<span id="money">10000</span>円
+                </div>
 
-        <p id="taian-status-box" class="taian-status-box hidden">-</p>
-        <p id="birthday-ticket-box" class="taian-status-box hidden">-</p>
-        <p id="shop-fever-box" class="taian-status-box hidden">-</p>
-        <p id="community-status-box" class="community-status-box hidden">-</p>
-        <p id="ushimitsu-banner" class="ushimitsu-banner hidden">🌙 ただいま「丑三つ時」…大大吉・大大凶の確率が跳ね上がっています…</p>
-        <p id="natsumatsuri-banner" class="ushimitsu-banner hidden">🎆 ただいま「夏祭り」開催中！（夜・週末限定）収集アイテムのドロップ率が1.5倍です！</p>
-        <p id="summer-theme-banner" class="ushimitsu-banner hidden">🌻 8月の昼下がり…夏の日差しがまぶしいですね（夏祭りは夜と週末に開催されます）</p>
+                <div id="lucky-item-box" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">🎋 本日のラッキーアイテム 🎋</p>
+                    <p id="lucky-item-name">-</p>
+                    <p id="lucky-item-desc" class="lucky-item-desc">-</p>
+                </div>
 
-        <div id="tanabata-box" class="lucky-item-box hidden">
-            <p class="lucky-item-title">🎋 七夕・短冊に願いを書く（7/1〜7/7限定） 🎋</p>
-            <p id="tanabata-status-text" class="lucky-item-desc">-</p>
-            <p id="tanabata-star-text" class="lucky-item-desc">-</p>
-            <button id="tanabata-wish-btn" class="btn-equip" onclick="tanabataWish()" type="button">🎋 短冊に願いを書く</button>
-        </div>
+                <div id="active-items-box" class="active-items-box hidden">
+                    <p id="active-shop-text" class="hidden">-</p>
+                    <p id="active-equip-text" class="hidden">-</p>
+                </div>
 
+                <p id="taian-status-box" class="taian-status-box hidden">-</p>
+                <p id="birthday-ticket-box" class="taian-status-box hidden">-</p>
+                <p id="shop-fever-box" class="taian-status-box hidden">-</p>
+                <p id="community-status-box" class="community-status-box hidden">-</p>
+                <p id="countdown-season-box" class="taian-status-box hidden">-</p>
+                <p id="countdown-bonus-box" class="taian-status-box hidden">-</p>
+                <p id="ushimitsu-banner" class="ushimitsu-banner hidden">🌙 ただいま「丑三つ時」…大大吉・大大凶の確率が跳ね上がっています…</p>
+                <p id="natsumatsuri-banner" class="ushimitsu-banner hidden">🎆 ただいま「夏祭り」開催中！（夜・週末限定）収集アイテムのドロップ率が1.5倍です！</p>
+                <p id="summer-theme-banner" class="ushimitsu-banner hidden">🌻 8月の昼下がり…夏の日差しがまぶしいですね（夏祭りは夜と週末に開催されます）</p>
 
+                <div id="tanabata-box" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">🎋 七夕・短冊に願いを書く（7/1〜7/7限定） 🎋</p>
+                    <p id="tanabata-status-text" class="lucky-item-desc">-</p>
+                    <p id="tanabata-star-text" class="lucky-item-desc">-</p>
+                    <button id="tanabata-wish-btn" class="btn-equip" onclick="tanabataWish()" type="button">🎋 短冊に願いを書く</button>
+                </div>
 
-        <div id="bonus-area" style="display: none; margin-bottom: 15px;">
-            <p style="font-size: 0.85rem; color: #d9534f; font-weight: bold; margin-bottom: 8px;">
-                😱 資金がピンチです…！神様にお祈りしますか？
-            </p>
-            <button id="bonusBtn" class="btn-bonus" onclick="getBonusMoney()">🙏 神様にお祈りして3,000円貰う</button>
-            <a href="top.html" class="btn-bonus-back">🏠 トップページに戻る</a>
-        </div>
+                <div id="bonus-area" style="display: none; margin-bottom: 15px;">
+                    <p style="font-size: 0.85rem; color: #d9534f; font-weight: bold; margin-bottom: 8px;">
+                        😱 資金がピンチです…！神様にお祈りしますか？
+                    </p>
+                    <button id="bonusBtn" class="btn-bonus" onclick="getBonusMoney()">🙏 神様にお祈りして3,000円貰う</button>
+                    <a href="top.html" class="btn-bonus-back">🏠 トップページに戻る</a>
+                </div>
+            </div>
+
+            <div class="col-main">
 
         <div class="main-content">
             
@@ -90,9 +96,23 @@
 
             <div class="right-panel">
                 <div class="tab-buttons">
+                    <button id="tabBtn-missions" class="tab-btn" onclick="showTab('missions')" type="button">🎯 デイリーミッション</button>
                     <button id="tabBtn-prizes" class="tab-btn tab-active" onclick="showTab('prizes')" type="button">🏆 景品・等級一覧</button>
                     <button id="tabBtn-shop" class="tab-btn" onclick="showTab('shop')" type="button">🛍️ アイテムショップ</button>
+                    <button id="tabBtn-collect" class="tab-btn" onclick="showTab('collect')" type="button">🎒 収集品・貯金</button>
                     <button id="tabBtn-dex" class="tab-btn" onclick="showTab('dex')" type="button">📖 図鑑</button>
+                </div>
+
+                <div id="tab-missions" class="hidden">
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">🎯 本日のデイリーミッション（ランダム5個）</h3>
+                        <p id="missions-summary" class="missions-summary">-</p>
+                        <div id="missions-list" class="missions-list"></div>
+                    </div>
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">🌙 常設ミッション</h3>
+                        <div id="missions-always-list" class="missions-list"></div>
+                    </div>
                 </div>
 
                 <div id="tab-prizes">
@@ -252,6 +272,9 @@
                         </div>
                     </div>
 
+                </div>
+
+                <div id="tab-collect" class="hidden">
                     <div class="shop-section">
                         <h3 class="shop-section-title">🎒 収集アイテム（おみくじで低確率ドロップ）</h3>
 
@@ -278,21 +301,19 @@
                             <span class="collect-item-note">100個で称号／500個で永久ボーナス／1000個ごとにガチャ券</span>
                         </div>
 
-                        <div id="orihime-row" class="collect-item-row hidden">
-                            <span>🎐 織姫の五色糸 × <span id="count-orihime">0</span>　🌠 彦星の一等星 × <span id="count-hikoboshi">0</span></span>
-                            <span class="collect-item-note">七夕（7/1〜7/7）限定ドロップ。両方1個ずつ揃うと特別なご縁が結ばれます</span>
-                        </div>
-
-                        <div id="lantern-row" class="collect-item-row hidden">
-                            <span>🏮 夏祭りの提灯 × <span id="count-lantern">0</span></span>
-                            <span class="collect-item-note">夏祭り開催中（8月の夜・週末）限定ドロップ。10個で称号「夏祭りの常連」</span>
-                        </div>
+                        <div id="seasonal-items-box" class="hidden"></div>
 
                         <div class="collect-item-row">
                             <span>🎰 ガチャ券 × <span id="gacha-ticket-count">0</span></span>
                             <button id="gacha-draw-btn" class="btn-equip" onclick="drawGacha()" type="button">ガチャを引く</button>
                         </div>
                         <p class="collect-item-desc">1枚消費して、黄金の小判か神社の神木のどちらかがランダムで1個手に入ります。</p>
+
+                        <div class="collect-item-row">
+                            <span>🎟️ ブースト券 × <span id="boost-ticket-count">0</span></span>
+                            <button id="boost-ticket-use-btn" class="btn-equip" onclick="useBoostTicket()" type="button">使う</button>
+                        </div>
+                        <p class="collect-item-desc">1枚消費して、その場で所持金が1.1倍になります。（デイリーミッション「連勝街道」の報酬）</p>
 
                         <button id="equipBtn-none" class="btn-equip-none" onclick="equipCollectible('')" type="button">装備を外す</button>
                         <p id="equip-status" class="equip-status">現在の装備：なし</p>
@@ -324,6 +345,9 @@
 
         <div class="footer-debug">
             ⚙️ デバッグ用乱数：<span id="randomNumber">まだ引いていません (通常モード)
+        </div>
+
+            </div>
         </div>
     </div>
 
@@ -374,13 +398,26 @@
         window.omikujiCommunityRef = doc(db, "global", "community");
     </script>
 
+    <script src="omikuji-seasonal.js?v=1"></script>
+    <script src="omikuji-countdown.js?v=1"></script>
     <script src="omikuji-data.js?v=1"></script>
     <script src="omikuji-state.js?v=1"></script>
     <script src="omikuji-ui.js?v=1"></script>
     <script src="omikuji-shop.js?v=1"></script>
+    <script src="omikuji-missions.js?v=1"></script>
     <script src="omikuji-draw-helpers.js?v=1"></script>
     <script src="omikuji-draw-single.js?v=1"></script>
     <script src="omikuji-draw-multi.js?v=1"></script>
     <script src="omikuji-main.js?v=1"></script>
+    <script src="omikuji-phantom.js?v=1"></script>
+    <script>
+        // 🚪 ログアウト処理：ログイン情報を消してログインページへ戻る
+        function logout() {
+            if (confirm("ログアウトしますか？")) {
+                localStorage.removeItem("logged_in_user");
+                window.location.href = "index.html";
+            }
+        }
+    </script>
 </body>
 </html>
