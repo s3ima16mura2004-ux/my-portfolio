@@ -48,7 +48,15 @@ const DROP_ITEMS = [
     { key: "tanzaku", emoji: "🎏", name: "五色の短冊", rate: 0.02, desc: "装備中、大吉ボーナスが+1%になる（神社改築で本殿完成後に解放）", minCommunityTier: 4 },
     { key: "orihime_thread", emoji: "🎐", name: "織姫の五色糸", rate: 0.06, desc: "七夕（7/1〜7/7）限定ドロップ。彦星の一等星と両方揃うと特別なご縁が結ばれる", minCommunityTier: 0, seasonal: "tanabata" },
     { key: "hikoboshi_star", emoji: "🌠", name: "彦星の一等星", rate: 0.06, desc: "七夕（7/1〜7/7）限定ドロップ。織姫の五色糸と両方揃うと特別なご縁が結ばれる", minCommunityTier: 0, seasonal: "tanabata" },
-    { key: "natsumatsuri_lantern", emoji: "🏮", name: "夏祭りの提灯", rate: 0.05, desc: "夏祭り開催中（8月の夜・週末）限定ドロップ。集めるほど夏祭りが盛り上がる", minCommunityTier: 0, seasonal: "natsumatsuri" }
+    { key: "natsumatsuri_lantern", emoji: "🏮", name: "夏祭りの提灯", rate: 0.05, desc: "夏祭り開催中（8月の夜・週末）限定ドロップ。集めるほど夏祭りが盛り上がる", minCommunityTier: 0, seasonal: "natsumatsuri" },
+    { key: "kingyo", emoji: "🐠", name: "金魚すくいの金魚", rate: 0.05, desc: "夏祭り開催中（8月の夜・週末）限定ドロップ", minCommunityTier: 0, seasonal: "natsumatsuri" },
+    { key: "kakigori", emoji: "🍧", name: "かき氷", rate: 0.05, desc: "夏祭り開催中（8月の夜・週末）限定ドロップ", minCommunityTier: 0, seasonal: "natsumatsuri" },
+    { key: "hanabi_tama", emoji: "🎆", name: "打ち上げ花火の玉", rate: 0.04, desc: "夏祭り開催中（8月の夜・週末）限定ドロップ", minCommunityTier: 0, seasonal: "natsumatsuri" },
+    { key: "tsukimi_mochi", emoji: "🐰", name: "月見うさぎの餅", rate: 0.05, desc: "お月見（9/15〜9/30）限定ドロップ。10個で称号「お月見上手」", minCommunityTier: 0, seasonal: "otsukimi" },
+    { key: "momiji_shiori", emoji: "🍁", name: "紅葉のしおり", rate: 0.05, desc: "紅葉狩り（11月）限定ドロップ。10個で称号「紅葉狩り名人」", minCommunityTier: 0, seasonal: "koyo" },
+    { key: "hatsuyume_fuji", emoji: "🗻", name: "初夢の富士", rate: 0.04, desc: "お正月（1/1〜1/3）限定ドロップ。鷹・茄子と揃うと縁起物コンプリート！", minCommunityTier: 0, seasonal: "oshogatsu" },
+    { key: "hatsuyume_taka", emoji: "🦅", name: "初夢の鷹", rate: 0.04, desc: "お正月（1/1〜1/3）限定ドロップ。富士・茄子と揃うと縁起物コンプリート！", minCommunityTier: 0, seasonal: "oshogatsu" },
+    { key: "hatsuyume_nasu", emoji: "🍆", name: "初夢の茄子", rate: 0.04, desc: "お正月（1/1〜1/3）限定ドロップ。富士・鷹と揃うと縁起物コンプリート！", minCommunityTier: 0, seasonal: "oshogatsu" }
 ];
 
 // 🏺 おみくじの壺のランクアップ（永続的に大吉ボーナスが増える・所持金で購入）
@@ -137,8 +145,17 @@ const TITLES = [
     { key: "daidaikyou_title", emoji: "💀", name: "丑三つ時の生還者", desc: "「大大凶」を乗り越えた", condition: s => s.gotDaidaikyou === true },
     { key: "ushimitsu_title", emoji: "🌙", name: "丑三つ時の参拝者", desc: "深夜2時〜4時の「丑三つ時」に参拝した", condition: s => s.gotUshimitsuDraw === true },
     { key: "founding_priest", emoji: "⛩️👑", name: "初代宮司", desc: "神社改築が「国宝指定」まで到達した（全員に付与）", condition: s => s.communityDraws >= 1000000 },
-    { key: "tanabata_matchmaker", emoji: "🌌", name: "星々を結ぶ者", desc: "織姫と彦星を引き合わせた", condition: s => s.orihimeHikoboshiMet === true },
-    { key: "matsuri_regular", emoji: "🏮", name: "夏祭りの常連", desc: "夏祭りの提灯を10個集めた", condition: s => (s.ownedItems && s.ownedItems.natsumatsuri_lantern || 0) >= 10 }
+    { key: "tanabata_matchmaker", emoji: "🌌", name: "星々を結ぶ者", desc: "織姫と彦星を引き合わせた", condition: s => (s.orihimeHikoboshiMeetCount || 0) >= 1 },
+    { key: "tanabata_matchmaker_5", emoji: "🌌✨", name: "星々の守り人", desc: "織姫と彦星の再会を5年連続で見届けた", condition: s => (s.orihimeHikoboshiMeetCount || 0) >= 5 },
+    { key: "matsuri_regular", emoji: "🏮", name: "夏祭りの常連", desc: "夏祭りの提灯を10個集めた", condition: s => (s.ownedItems && s.ownedItems.natsumatsuri_lantern || 0) >= 10 },
+    { key: "matsuri_master", emoji: "🎇", name: "夏祭りマスター", desc: "夏祭りの限定アイテムを合計20個集めた", condition: s => {
+        const oi = s.ownedItems || {};
+        return ((oi.natsumatsuri_lantern || 0) + (oi.kingyo || 0) + (oi.kakigori || 0) + (oi.hanabi_tama || 0)) >= 20;
+    } },
+    { key: "tsukimi_lover", emoji: "🌕", name: "お月見上手", desc: "月見うさぎの餅を10個集めた", condition: s => (s.ownedItems && s.ownedItems.tsukimi_mochi || 0) >= 10 },
+    { key: "koyo_master", emoji: "🍁", name: "紅葉狩り名人", desc: "紅葉のしおりを10個集めた", condition: s => (s.ownedItems && s.ownedItems.momiji_shiori || 0) >= 10 },
+    { key: "hatsuyume_complete", emoji: "🗻", name: "一富士二鷹三茄子", desc: "初夢の縁起物（富士・鷹・茄子）を揃えた", condition: s => s.hatsuyumeComplete === true },
+    { key: "steady_visitor", emoji: "💼", name: "堅実な参拝者", desc: "デイリーミッション「お財布の達人」を達成（破産せずに1日を終えた）", condition: s => s.steadyVisitorEarned === true }
 ];
 
 // 🎂 誕生日ボーナス（ログイン画面で任意設定。誕生日当日のログインで「大大吉確定チケット」を1枚獲得）
@@ -157,10 +174,14 @@ const TANABATA_DAY = 7; // 七夕当日
 const TANABATA_SUCCESS_RATE = 0.3;
 const TANABATA_DAY_SUCCESS_RATE = 1.0; // 七夕当日は確定で願いが叶う
 const TANABATA_DAIKICHI_BONUS = 0.03; // 短冊の願いが叶った日は大吉運+3%
-const ORIHIME_HIKOBOSHI_MEETING_PRIZE = 30000; // 織姫の糸＋彦星の星が揃った時の一度きりのご祝儀
+const ORIHIME_HIKOBOSHI_MEETING_PRIZE = 30000; // 織姫の糸＋彦星の星が揃った時（初回）のご祝儀
+const ORIHIME_HIKOBOSHI_REUNION_PRIZE = 15000; // 2年目以降の再会イベントのご祝儀
 
 // 🎆 夏祭り（8月限定）：夜と週末だけ本格的なお祭り演出＆ドロップ率アップ。それ以外の8月は「夏っぽい」軽い演出だけになる
 const NATSUMATSURI_MONTH = 8;
 const NATSUMATSURI_DROP_MULTIPLIER = 1.5;
 const NATSUMATSURI_NIGHT_START_HOUR = 17; // 17時〜翌5時を「夜」とみなす
 const NATSUMATSURI_NIGHT_END_HOUR = 5;
+
+// 🗻🦅🍆 お正月（1/1〜1/3）：初夢の縁起物「一富士二鷹三茄子」が3つ揃った時のご褒美
+const HATSUYUME_COMPLETE_PRIZE = 50000;
