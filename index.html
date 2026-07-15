@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>金大黒 豪華おみくじ神社 - ログイン</title>
-    <link rel="stylesheet" href="omikuji2.css?v=4">
+    <link rel="stylesheet" href="omikuji-core.css?v=1">
+    <link rel="stylesheet" href="omikuji-effects.css?v=1">
     <style>
         .login-box {
             max-width: 400px;
@@ -79,8 +80,40 @@
             <p style="font-size: 0.8rem; color: #999; margin-top: 5px;">※初めての参拝者様は、ここで入力した合言葉が今後の「あなた専用の合言葉」として登録されます。</p>
         </div>
 
+        <div class="input-group">
+            <label for="birthMonth">🎂 誕生日（任意・当日ログインで特典あり）</label>
+            <div style="display: flex; gap: 8px;">
+                <select id="birthMonth" style="flex: 1; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                    <option value="">月</option>
+                </select>
+                <select id="birthDay" style="flex: 1; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                    <option value="">日</option>
+                </select>
+            </div>
+        </div>
+
         <button onclick="tryLogin()" id="loginBtn" class="login-btn">🙏 いざ、参拝する</button>
     </div>
+
+    <script>
+        // 誕生日セレクトボックス（月1-12・日1-31）の選択肢を生成する
+        (function populateBirthdaySelects() {
+            const monthSel = document.querySelector("#birthMonth");
+            const daySel = document.querySelector("#birthDay");
+            for (let m = 1; m <= 12; m++) {
+                const opt = document.createElement("option");
+                opt.value = String(m);
+                opt.textContent = m + "月";
+                monthSel.appendChild(opt);
+            }
+            for (let d = 1; d <= 31; d++) {
+                const opt = document.createElement("option");
+                opt.value = String(d);
+                opt.textContent = d + "日";
+                daySel.appendChild(opt);
+            }
+        })();
+    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
@@ -179,7 +212,7 @@
                         loginBonusDate: "",
                         luckyItemDate: "",
                         luckyItem: "",
-                        ownedItems: { koban: 0, shinboku: 0, ishikoro: 0 },
+                        ownedItems: { koban: 0, shinboku: 0, ishikoro: 0, tanzaku: 0 },
                         equippedCollectible: "",
                         shopItemKey: "",
                         shopItemRemaining: 0,
@@ -195,7 +228,17 @@
                         gotDaidaikichi: false,
                         gotKamikichi: false,
                         gotDaidaikyou: false,
-                        gotUshimitsuDraw: false
+                        gotUshimitsuDraw: false,
+                        kamikichiBonus: 0,
+                        ishikoro500Claimed: false,
+                        gachaTickets: 0,
+                        birthdayMonth: null,
+                        birthdayDay: null,
+                        birthdayBonusYear: 0,
+                        birthdayTicket: false,
+                        kimagureFeverUntil: 0,
+                        tanabataWishDate: "",
+                        tanabataLuckDate: ""
                     };
                     await setDoc(userRef, userData);
                 }
@@ -230,13 +273,46 @@
                     }
                 }
 
+                // 🎂 誕生日（任意）：選択されていれば保存し、当日ログインなら年1回だけ「大大吉確定チケット」を授与
+                const birthMonthField = document.querySelector("#birthMonth").value;
+                const birthDayField = document.querySelector("#birthDay").value;
+                if (birthMonthField && birthDayField) {
+                    userData.birthdayMonth = parseInt(birthMonthField, 10);
+                    userData.birthdayDay = parseInt(birthDayField, 10);
+                }
+
+                let birthdayMsg = "";
+                const now = new Date();
+                const currentYear = now.getFullYear();
+                if (
+                    userData.birthdayMonth === (now.getMonth() + 1) &&
+                    userData.birthdayDay === now.getDate() &&
+                    userData.birthdayBonusYear !== currentYear
+                ) {
+                    userData.birthdayBonusYear = currentYear;
+                    userData.birthdayTicket = true;
+                    birthdayMsg = "\n\n🎂🎉【お誕生日おめでとうございます！】🎉🎂\n「大大吉確定チケット」を1枚授かりました！次の単発おみくじで自動的に大大吉が発動します！";
+                }
+
+                // 😲 神の気まぐれフィーバー抽選（ログイン時2%の確率・当選で1時間ショップ全品半額）
+                let kimagureFeverMsg = "";
+                if (Math.random() < 0.02) {
+                    userData.kimagureFeverUntil = Date.now() + (60 * 60 * 1000);
+                    kimagureFeverMsg = "\n\n😲【神の気まぐれフィーバー】😲\n神様の気まぐれで、これから1時間だけショップの全アイテムが半額になります！";
+                }
+
                 await updateDoc(userRef, {
                     money: userData.money,
                     loginBonusDate: userData.loginBonusDate,
                     luckyItemDate: userData.luckyItemDate,
                     luckyItem: userData.luckyItem,
                     taianDate: userData.taianDate,
-                    taianActive: userData.taianActive
+                    taianActive: userData.taianActive,
+                    birthdayMonth: userData.birthdayMonth,
+                    birthdayDay: userData.birthdayDay,
+                    birthdayBonusYear: userData.birthdayBonusYear,
+                    birthdayTicket: userData.birthdayTicket,
+                    kimagureFeverUntil: userData.kimagureFeverUntil
                 });
 
                 localStorage.setItem("logged_in_user", userField);
@@ -257,7 +333,7 @@
                 alert(
                     (isNewUser ? "🎉 新規登録＆認証成功！\n" : "🎉 認証成功！\n") +
                     "ようこそ、" + userField + "様。おみくじ神社へご案内します！" +
-                    bonusMsg + luckyMsg + taianMsg
+                    bonusMsg + luckyMsg + taianMsg + birthdayMsg + kimagureFeverMsg
                 );
 
                 window.location.href = "top.html"; // ログイン後はまずトップページへ移動
