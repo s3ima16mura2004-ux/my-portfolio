@@ -200,6 +200,8 @@ function omikuji() {
         updateMoneyDisplay();
         checkLuckyMoneyWhim();
 
+        trackMissionDraw(resultName, prizeMoney); // 🎯 デイリーミッション（参拝回数・凶克服・連勝街道・大金稼ぎ等）の進捗を更新
+
         // 🛍️ ショップアイテムの残り回数を消費
         if (shopItemKey && shopItemRemaining > 0) {
             shopItemRemaining--;
