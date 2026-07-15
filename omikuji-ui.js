@@ -633,6 +633,91 @@ function updateSeasonalItemsUI() {
     }
 }
 
+// 🌕 十五夜「月が昇る」演出を1回発生させる（画面右側にふわっと満月を出す）
+function spawnMoonRise() {
+    const overlay = document.querySelector("#season-fx-overlay");
+    if (!overlay) return;
+    const moon = document.createElement("span");
+    moon.textContent = "🌕";
+    moon.className = "moon-rise";
+    overlay.appendChild(moon);
+    setTimeout(() => { moon.remove(); }, 5200);
+}
+
+// 最後に「月が昇る」演出を出した時刻（同じ夜に何度も出過ぎないようにする・保存はしない）
+let otsukimiMoonShownAt = 0;
+
+// 🌕 お月見（9/15〜9/30）の表示を更新する。夜間は「月が昇る」十五夜演出、昼間は淡い夕月演出にする
+function updateOtsukimiUI() {
+    const container = document.querySelector(".container");
+    const nightBanner = document.querySelector("#otsukimi-banner");
+    const dayBanner = document.querySelector("#otsukimi-day-banner");
+    const inSeason = isSeasonalEventActive("otsukimi");
+    const night = isNightHour();
+
+    if (container) {
+        container.classList.toggle("otsukimi-active", inSeason && night);
+        container.classList.toggle("otsukimi-day", inSeason && !night);
+    }
+    if (nightBanner) nightBanner.classList.toggle("hidden", !(inSeason && night));
+    if (dayBanner) dayBanner.classList.toggle("hidden", !(inSeason && !night));
+
+    // 🌕 夜間は10分に1回程度、月が昇る演出を発生させる
+    if (inSeason && night) {
+        const now = Date.now();
+        if (now - otsukimiMoonShownAt > 10 * 60 * 1000) {
+            otsukimiMoonShownAt = now;
+            spawnMoonRise();
+        }
+    }
+}
+
+// 🍁 紅葉狩り中に舞い落ちる葉っぱを1枚だけ画面に出す
+function spawnFallingLeaf() {
+    const overlay = document.querySelector("#season-fx-overlay");
+    if (!overlay) return;
+    const leaves = ["🍁", "🍂"];
+    const leaf = document.createElement("span");
+    leaf.textContent = leaves[Math.floor(Math.random() * leaves.length)];
+    leaf.className = "leaf-piece";
+    leaf.style.left = Math.random() * 100 + "vw";
+    leaf.style.animationDuration = (Math.random() * 3 + 5) + "s";
+    overlay.appendChild(leaf);
+    setTimeout(() => { leaf.remove(); }, 8500);
+}
+
+// 落ち葉を定期的に降らせるタイマー（紅葉狩り期間中だけ動かす）
+let koyoLeafInterval = null;
+
+// 🍁 紅葉狩り（11月）の表示を更新する
+function updateKoyoUI() {
+    const container = document.querySelector(".container");
+    const banner = document.querySelector("#koyo-banner");
+    const active = isSeasonalEventActive("koyo");
+
+    if (container) container.classList.toggle("koyo-active", active);
+    if (banner) banner.classList.toggle("hidden", !active);
+
+    if (active && !koyoLeafInterval) {
+        koyoLeafInterval = setInterval(spawnFallingLeaf, 900);
+    } else if (!active && koyoLeafInterval) {
+        clearInterval(koyoLeafInterval);
+        koyoLeafInterval = null;
+    }
+}
+
+// 🎍 お正月（1/1〜1/3）の表示を更新する（初日の出をイメージした演出）
+function updateOshogatsuUI() {
+    const container = document.querySelector(".container");
+    const banner = document.querySelector("#oshogatsu-banner");
+    const glow = document.querySelector("#oshogatsu-glow");
+    const active = isSeasonalEventActive("oshogatsu");
+
+    if (container) container.classList.toggle("oshogatsu-active", active);
+    if (banner) banner.classList.toggle("hidden", !active);
+    if (glow) glow.classList.toggle("hidden", !active);
+}
+
 // 🎆 夏祭り（8月限定・夜と週末は本格的な演出、それ以外は夏っぽい軽い演出）の表示を更新する
 function updateNatsumatsuriUI() {
     const matsuriBanner = document.querySelector("#natsumatsuri-banner");
