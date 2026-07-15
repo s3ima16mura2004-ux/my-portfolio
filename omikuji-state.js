@@ -16,7 +16,13 @@ let prayDate = "";           // 最後にお祈りボーナスを使った日
 let prayCount = 0;           // その日にお祈りした回数
 let luckyItemKey = "";       // 今日のラッキーアイテムのキー
 
-let ownedItems = { koban: 0, shinboku: 0, ishikoro: 0, tanzaku: 0, orihime_thread: 0, hikoboshi_star: 0, natsumatsuri_lantern: 0 }; // 収集アイテムの所持数
+let ownedItems = {
+    koban: 0, shinboku: 0, ishikoro: 0, tanzaku: 0,
+    orihime_thread: 0, hikoboshi_star: 0,
+    natsumatsuri_lantern: 0, kingyo: 0, kakigori: 0, hanabi_tama: 0,
+    tsukimi_mochi: 0, momiji_shiori: 0,
+    hatsuyume_fuji: 0, hatsuyume_taka: 0, hatsuyume_nasu: 0
+}; // 収集アイテムの所持数
 let equippedCollectible = ""; // 装備中の収集アイテム（"koban" / "shinboku" / ""）
 let shopItemKey = "";         // 現在発動中のショップアイテムのキー
 let shopItemRemaining = 0;    // ショップアイテムの残り効果回数
@@ -101,7 +107,18 @@ async function saveUserState() {
             kimagureFeverUntil: kimagureFeverUntil,
             tanabataWishDate: tanabataWishDate,
             tanabataLuckDate: tanabataLuckDate,
-            orihimeHikoboshiMet: orihimeHikoboshiMet
+            orihimeHikoboshiMeetCount: orihimeHikoboshiMeetCount,
+            orihimeHikoboshiLastMetYear: orihimeHikoboshiLastMetYear,
+            hatsuyumeComplete: hatsuyumeComplete,
+            missionDate: missionDate,
+            missionKeysToday: missionKeysToday,
+            missionProgress: missionProgress,
+            missionClaimed: missionClaimed,
+            missionDrawsToday: missionDrawsToday,
+            wentBankruptToday: wentBankruptToday,
+            steadyVisitorEarned: steadyVisitorEarned,
+            kiyomeShioActive: kiyomeShioActive,
+            boostTicketCount: boostTicketCount
         });
     } catch (e) {
         console.error("ユーザーデータの保存に失敗しました: ", e);
@@ -129,8 +146,23 @@ let kimagureFeverUntil = 0;
 let tanabataWishDate = "";  // 最後に短冊を書いた日付（1日1回制限用）
 let tanabataLuckDate = "";  // 願いが叶い、金運アップ効果が有効になっている日付
 
-// 🎐🌠 織姫と彦星が引き合わされた（両アイテムが揃った）ことがあるか（一生に一度きりのイベント）
-let orihimeHikoboshiMet = false;
+// 🎐🌠 織姫と彦星の再会イベント関連の状態（毎年七夕シーズンに再挑戦できる）
+let orihimeHikoboshiMeetCount = 0;     // これまでに再会を果たした回数（称号判定にも使用）
+let orihimeHikoboshiLastMetYear = 0;   // 最後に再会した西暦年（同じ年に何度も発生しないようにする）
+
+// 🗻🦅🍆 お正月「初夢の縁起物（一富士二鷹三茄子）」が揃ったことがあるか（一生に一度きりのイベント）
+let hatsuyumeComplete = false;
+
+// 🎯 デイリーミッション関連の状態
+let missionDate = "";          // ミッションが最後にリセットされた日付（日付が変わったら全ミッションをリセット）
+let missionKeysToday = [];     // 本日ローテーションで選ばれたミッションのキー一覧（ランダム5個）
+let missionProgress = {};      // 各ミッションの進捗（key: 進捗値）
+let missionClaimed = {};       // 各ミッションの報酬を受け取り済みかどうか（key: true/false）
+let missionDrawsToday = 0;     // 本日おみくじを引いた回数（「朝の参拝」「連打の極み」の進捗計算に使用）
+let wentBankruptToday = false; // 本日ゲームオーバー（破産）になったことがあるか（「お財布の達人」判定用）
+let steadyVisitorEarned = false; // 称号「堅実な参拝者」を獲得済みか
+let kiyomeShioActive = false;  // 🧂「清めの塩」の効果が本日有効か（お祓い料がさらに軽減される）
+let boostTicketCount = 0;      // 🎟️「所持金1.1倍ブースト券」の所持枚数
 
 // 😲 神の気まぐれフィーバーが現在有効かどうか
 function isShopFeverActive() {
@@ -142,12 +174,9 @@ function isTanabataLuckActive() {
     return tanabataLuckDate === todayStr();
 }
 
-// 🎋 今日が七夕期間（7/1〜7/7）かどうか
+// 🎋 今日が七夕期間（7/1〜7/7）かどうか（マスターデータはomikuji-seasonal.jsで管理）
 function isTanabataActive() {
-    const now = new Date();
-    const month = now.getMonth() + 1;
-    const day = now.getDate();
-    return month === TANABATA_MONTH && day >= TANABATA_START_DAY && day <= TANABATA_END_DAY;
+    return isSeasonalEventActive("tanabata");
 }
 
 // 🎋 今日が七夕当日（7/7・織姫と彦星が逢う日）かどうか
@@ -156,24 +185,27 @@ function isTanabataDay() {
     return (now.getMonth() + 1) === TANABATA_MONTH && now.getDate() === TANABATA_DAY;
 }
 
-// 🌙 現在時刻が「夜」（17時〜翌5時）かどうか
-function isNightHour() {
-    const hour = new Date().getHours();
-    return hour >= NATSUMATSURI_NIGHT_START_HOUR || hour < NATSUMATSURI_NIGHT_END_HOUR;
-}
-
-// 📅 今日が週末（土日）かどうか
-function isWeekendDay() {
-    const day = new Date().getDay();
-    return day === 0 || day === 6;
-}
-
 // 🎆 夏祭りが本格的に開催中かどうか（8月の夜、または8月の週末）
 function isNatsumatsuriFestivalActive() {
-    return (new Date().getMonth() + 1) === NATSUMATSURI_MONTH && (isNightHour() || isWeekendDay());
+    return isSeasonalEventActive("natsumatsuri");
 }
 
 // 🌻 8月だが夏祭りは開催していない時間帯（軽い「夏っぽい」演出だけ表示する）
 function isSummerThemeActive() {
     return (new Date().getMonth() + 1) === NATSUMATSURI_MONTH && !isNatsumatsuriFestivalActive();
+}
+
+// 🌕 お月見（9/15〜9/30）期間中かどうか
+function isOtsukimiActive() {
+    return isSeasonalEventActive("otsukimi");
+}
+
+// 🍁 紅葉狩り（11月）期間中かどうか
+function isKoyoActive() {
+    return isSeasonalEventActive("koyo");
+}
+
+// 🎍 お正月（1/1〜1/3）期間中かどうか
+function isOshogatsuActive() {
+    return isSeasonalEventActive("oshogatsu");
 }
