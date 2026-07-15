@@ -60,6 +60,24 @@ body {
     color: #333;
     font-weight: bold;
     z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logout-btn {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #888;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 10px;
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    background-color: #666;
 }
 
 h1 {
@@ -104,23 +122,58 @@ h1 {
     width: 100%;
 }
 
+/* ============================================================
+   🧱 ページ全体の2カラムレイアウト（左：ステータス情報 / 右：メイン内容）
+   top.html・omikuji2.html 共通で使用
+   ============================================================ */
+
+.container-wide {
+    max-width: 1400px;
+}
+
+.page-columns {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 25px;
+    align-items: start;
+    text-align: left;
+}
+
+.page-columns .col-side {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+.page-columns .col-main {
+    min-width: 0;
+    text-align: center;
+}
+
+@media (max-width: 900px) {
+    .page-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
 .omikuji-box {
     background: #fff;
     border: 2px dashed #ccc;
     padding: 10px;
     border-radius: 5px;
-    min-height: 250px;
+    min-height: 340px;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 50%;
+    width: 80%;
     box-sizing: border-box;
     position: relative;
 }
 
 .omikuji-box img {
     max-width: 100%;
-    max-height: 220px;
+    max-height: 320px;
     object-fit: contain;
 }
 
@@ -147,7 +200,7 @@ h1 {
     display: flex;
     flex-direction: column; /* 縦並びに強制変更 */
     gap: 12px;              /* ボタン同士の隙間 */
-    width: 50%;
+    width: 80%;
     box-sizing: border-box;
 }
 
@@ -708,4 +761,89 @@ h1 {
     font-weight: bold;
     color: #d8860b;
     text-align: center;
+}
+/* 🎯 デイリーミッション */
+.missions-summary {
+    font-size: 0.85rem;
+    color: #7a5c3e;
+    background: #fff6e6;
+    border: 1px solid #e8dcc8;
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin: 0 0 10px;
+}
+
+.missions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mission-card {
+    background: #fbf8f3;
+    border: 1px solid #e8dcc8;
+    border-radius: 6px;
+    padding: 8px 10px;
+}
+
+.mission-card.mission-card-complete {
+    border-color: #d8860b;
+    background: linear-gradient(90deg, #fff2cc, #fff8e6);
+}
+
+.mission-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.mission-card-title {
+    font-weight: bold;
+    color: #4a3728;
+    font-size: 0.9rem;
+}
+
+.mission-card-desc {
+    font-size: 0.78rem;
+    color: #7a5c3e;
+    margin: 0 0 6px;
+}
+
+.mission-progress-outer {
+    background: #e8dcc8;
+    border-radius: 10px;
+    height: 8px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.mission-progress-inner {
+    background: linear-gradient(90deg, #f4a940, #d8860b);
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.mission-progress-text {
+    font-size: 0.72rem;
+    color: #8a7259;
+    margin: 0;
+}
+
+.mission-status-tag {
+    font-size: 0.75rem;
+    color: #8a7259;
+    white-space: nowrap;
+}
+
+.mission-status-tag.mission-status-done {
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+.mission-claim-btn {
+    white-space: nowrap;
+    padding: 4px 10px;
+    font-size: 0.78rem;
 }
