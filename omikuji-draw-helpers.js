@@ -30,6 +30,8 @@ function getBonusMoney() {
     const bonusArea = document.querySelector("#bonus-area");
     if (bonusArea) bonusArea.style.display = "none";
 
+    trackMissionPray(); // 🎯「お祈りの感謝」ミッションの進捗を更新
+
     saveUserState();
 
     alert("🙏 神様が哀れんで 3,000円 を授けてくれました！\n(今日のお祈り： " + prayCount + " / 3回)");
@@ -43,11 +45,10 @@ function checkBankruptcy() {
         if (bonusArea) bonusArea.style.display = "block";
 
         if (prayCount >= 3) {
-            // alertでユーザーに通知し、OKを押した後に遷移する
-            alert("💸【ゲームオーバー】💸\nお財布が空っぽになり、本日の神様の救済も使い切りました。\nトップページに戻ります。");
-
-            // ファイル名が正しいか必ず確認してください
-            window.location.href = "top.html";
+            // 💸 資金が尽きても自動的にはトップページへ遷移しない（プレイヤーの操作に任せる）
+            wentBankruptToday = true; // 🎯「お財布の達人」ミッション判定用
+            saveUserState();
+            alert("💸【ゲームオーバー】💸\nお財布が空っぽになり、本日の神様の救済も使い切りました。\n「トップに戻る」ボタンから戻るか、明日また挑戦してください。");
         } else {
             // お祈り回数が残っている場合はそのまま留まる
             if (bonusBtn) {
@@ -188,6 +189,7 @@ function resolveTrial() {
                 if (hasEffect("tax_half")) tax = Math.floor(tax / 2);
                 if (hasShopEffect("suzu")) tax = Math.floor(tax / 2);
                 if (hasShopEffect("ikigami")) tax = Math.floor(tax / 2);
+                if (kiyomeShioActive) tax = Math.floor(tax / 2); // 🧂「清めの塩」ミッション報酬効果
                 outcome = {
                     resultName: "神の試練(失敗)",
                     imgSrc: "omikuji_daikyou.png",
@@ -211,6 +213,7 @@ function resolveTrial() {
                 if (hasEffect("tax_half")) tax = Math.floor(tax / 2);
                 if (hasShopEffect("suzu")) tax = Math.floor(tax / 2);
                 if (hasShopEffect("ikigami")) tax = Math.floor(tax / 2);
+                if (kiyomeShioActive) tax = Math.floor(tax / 2); // 🧂「清めの塩」ミッション報酬効果
                 outcome = {
                     resultName: "神の試練(回避)",
                     imgSrc: "omikuji_daikyou.png",
