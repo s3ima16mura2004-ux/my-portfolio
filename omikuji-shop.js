@@ -31,6 +31,7 @@ async function buyShopItem(itemKey) {
 
     updateMoneyDisplay();
     playSE("se-coin");
+    trackMissionShopBuy(); // 🎯「ショップの常連」ミッションの進捗を更新
     await saveUserState();
 
     alert("🛍️ 「" + item.name + "」を購入しました！\n" + item.desc + "\n(効果はこれから" + item.duration + "回のおみくじに適用されます)" + (price !== item.price ? "\n😲 神の気まぐれフィーバーで半額の" + price.toLocaleString() + "円でした！" : ""));
@@ -135,6 +136,7 @@ async function depositBank() {
     updateBankUI();
     if (input) input.value = "";
     playSE("se-coin");
+    trackMissionDeposit(amount); // 🎯「貯蓄家」ミッションの進捗を更新
     await saveUserState();
     alert("🏦 " + amount.toLocaleString() + "円を賽銭箱に預けました。\n（このお金はおみくじには使えませんが、大凶や神の試練で失うこともありません）");
 }
@@ -209,14 +211,12 @@ function rollFukuDaruma() {
 function rollDrops() {
     const dropped = [];
 
-    // 🎆 夏祭り（8月の夜・週末限定）：収集アイテムのドロップ率が1.5倍になる
+    // 🎆 夏祭り（8月の夜・週末限定）：ドロップ率が1.5倍になる（対象は全アイテム）
     const isNatsumatsuri = isNatsumatsuriFestivalActive();
-    const isTanabata = isTanabataActive();
 
     DROP_ITEMS.forEach(item => {
         if (item.minCommunityTier && getCommunityTier(communityDraws) < item.minCommunityTier) return;
-        if (item.seasonal === "tanabata" && !isTanabata) return;       // 七夕（7/1〜7/7）限定アイテム
-        if (item.seasonal === "natsumatsuri" && !isNatsumatsuri) return; // 夏祭り（8月の夜・週末）限定アイテム
+        if (item.seasonal && !isSeasonalEventActive(item.seasonal)) return; // 季節限定アイテムは期間外はドロップしない
 
         const effectiveRate = isNatsumatsuri ? item.rate * NATSUMATSURI_DROP_MULTIPLIER : item.rate;
         if (Math.random() < effectiveRate) {
@@ -248,30 +248,76 @@ function rollDrops() {
     });
 
     checkOrihimeHikoboshiMeeting();
+    checkOshogatsuHatsuyumeSet();
+
+    if (dropped.length > 0) trackMissionDropItem(); // 🎯「収集家見習い」ミッションの進捗を更新
 
     return dropped;
 }
 
-// 🎐🌠 織姫の五色糸と彦星の一等星が両方揃うと、一生に一度だけ特別なご縁イベントが発生する
+// 🎐🌠 織姫の五色糸と彦星の一等星が両方揃うと、特別なご縁イベントが発生する（毎年七夕シーズンに1回まで再挑戦可）
 function checkOrihimeHikoboshiMeeting() {
-    if (orihimeHikoboshiMet) return;
+    const currentYear = new Date().getFullYear();
+    if (orihimeHikoboshiLastMetYear === currentYear) return; // 今年はもう再会済み
+
     if ((ownedItems.orihime_thread || 0) >= 1 && (ownedItems.hikoboshi_star || 0) >= 1) {
         ownedItems.orihime_thread--;
         ownedItems.hikoboshi_star--;
-        orihimeHikoboshiMet = true;
+        orihimeHikoboshiMeetCount++;
+        orihimeHikoboshiLastMetYear = currentYear;
 
-        currentMoney += ORIHIME_HIKOBOSHI_MEETING_PRIZE;
-        totalWinnings += ORIHIME_HIKOBOSHI_MEETING_PRIZE;
+        const isFirstMeeting = orihimeHikoboshiMeetCount === 1;
+        const prize = isFirstMeeting ? ORIHIME_HIKOBOSHI_MEETING_PRIZE : ORIHIME_HIKOBOSHI_REUNION_PRIZE;
+
+        currentMoney += prize;
+        totalWinnings += prize;
         updateMoneyDisplay();
-        recordHistory("🌌織姫と彦星の逢瀬", ORIHIME_HIKOBOSHI_MEETING_PRIZE, currentMoney);
+        recordHistory(isFirstMeeting ? "🌌織姫と彦星の逢瀬" : "🌌織姫と彦星、" + orihimeHikoboshiMeetCount + "年目の再会", prize, currentMoney);
+        updateTitlesUI();
+
+        setTimeout(() => {
+            if (isFirstMeeting) {
+                alert(
+                    "🎐🌠【織姫と彦星、天の川で逢う】🌠🎐\n" +
+                    "織姫の五色糸と彦星の一等星、両方を手に入れたことで、二人はついに再会を果たしました！\n" +
+                    "神様からのお祝いとして【" + prize.toLocaleString() + "円】を授かりました！\n" +
+                    "（称号「星々を結ぶ者」を獲得！来年の七夕もまた再会のチャンスがあります）"
+                );
+            } else {
+                let msg =
+                    "🌌🎊【織姫と彦星、" + orihimeHikoboshiMeetCount + "年目の再会】🎊🌌\n" +
+                    "今年もまた、二人は天の川で巡り会うことができました！\n" +
+                    "神様からのお祝いとして【" + prize.toLocaleString() + "円】を授かりました！";
+                if (orihimeHikoboshiMeetCount === 5) {
+                    msg += "\n\n✨5年連続の再会を見届け、称号「星々の守り人」を獲得しました！✨";
+                }
+                alert(msg);
+            }
+        }, 1300);
+    }
+}
+
+// 🗻🦅🍆 お正月「初夢の縁起物（一富士二鷹三茄子）」が3つ揃うと、一生に一度だけ特別なご褒美が発生する
+function checkOshogatsuHatsuyumeSet() {
+    if (hatsuyumeComplete) return;
+    if ((ownedItems.hatsuyume_fuji || 0) >= 1 && (ownedItems.hatsuyume_taka || 0) >= 1 && (ownedItems.hatsuyume_nasu || 0) >= 1) {
+        ownedItems.hatsuyume_fuji--;
+        ownedItems.hatsuyume_taka--;
+        ownedItems.hatsuyume_nasu--;
+        hatsuyumeComplete = true;
+
+        currentMoney += HATSUYUME_COMPLETE_PRIZE;
+        totalWinnings += HATSUYUME_COMPLETE_PRIZE;
+        updateMoneyDisplay();
+        recordHistory("🗻初夢コンプリート", HATSUYUME_COMPLETE_PRIZE, currentMoney);
         updateTitlesUI();
 
         setTimeout(() => {
             alert(
-                "🎐🌠【織姫と彦星、天の川で逢う】🌠🎐\n" +
-                "織姫の五色糸と彦星の一等星、両方を手に入れたことで、二人はついに再会を果たしました！\n" +
-                "神様からのお祝いとして【" + ORIHIME_HIKOBOSHI_MEETING_PRIZE.toLocaleString() + "円】を授かりました！\n" +
-                "（称号「星々を結ぶ者」を獲得！）"
+                "🗻🦅🍆【一富士二鷹三茄子！】🍆🦅🗻\n" +
+                "初夢に見ると縁起が良いとされる三つがすべて揃いました！\n" +
+                "今年一年の幸運を先取りし、神様から【" + HATSUYUME_COMPLETE_PRIZE.toLocaleString() + "円】を授かりました！\n" +
+                "（称号「一富士二鷹三茄子」を獲得！）"
             );
         }, 1300);
     }
