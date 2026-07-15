@@ -51,7 +51,8 @@ window.addEventListener("DOMContentLoaded", async () => {
                 koban: 0, shinboku: 0, ishikoro: 0, tanzaku: 0,
                 orihime_thread: 0, hikoboshi_star: 0,
                 natsumatsuri_lantern: 0, kingyo: 0, kakigori: 0, hanabi_tama: 0,
-                tsukimi_mochi: 0, momiji_shiori: 0,
+                tsukimi_mochi: 0, susuki_hoshi: 0, tsukimi_dango: 0,
+                momiji_shiori: 0, icho_leaf: 0, kuri: 0,
                 hatsuyume_fuji: 0, hatsuyume_taka: 0, hatsuyume_nasu: 0
             }, data.ownedItems || {});
             equippedCollectible = data.equippedCollectible || "";
@@ -112,6 +113,12 @@ window.addEventListener("DOMContentLoaded", async () => {
         setInterval(applyTimeTheme, 60000); // 1分ごとに時間帯を再チェック（長時間開いたままでも自動で切り替わる）
         setInterval(updateShopFeverUI, 30000); // 😲 神の気まぐれフィーバーの残り時間を定期的に更新
         setInterval(updateNatsumatsuriUI, 60000); // 🎆 夏祭り（夜・週末）の切り替わりを定期的に再チェック
+        updateOtsukimiUI();
+        setInterval(updateOtsukimiUI, 60000); // 🌕 お月見（夜・昼の切り替わり／月が昇る演出）を定期的に再チェック
+        updateKoyoUI();
+        setInterval(updateKoyoUI, 60000); // 🍁 紅葉狩り（落ち葉演出）の開催状況を定期的に再チェック
+        updateOshogatsuUI();
+        setInterval(updateOshogatsuUI, 60000); // 🎍 お正月（初日の出演出）の開催状況を定期的に再チェック
         startCountdownTimers(); // ⏳ 次の季節イベント／次のボーナスタイムまでのカウントダウンを開始
         if (typeof schedulePhantomSpawn === "function") schedulePhantomSpawn(); // 🐱🐸 幻の参拝客の出現スケジュールを開始
 
