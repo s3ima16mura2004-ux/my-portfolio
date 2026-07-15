@@ -1,0 +1,723 @@
+/* ============================================================
+   omikuji-effects.css
+   ✨ ステータス表示・カレンダー・履歴・ランキング・
+   演出エフェクト・レスポンシブ対応など（後半）
+   ============================================================ */
+
+/* 🎊 大安吉日 / 🏘️ 神社改築コミュニティ目標 の表示 */
+.taian-status-box {
+    background: #fff0f5;
+    border: 1px solid #ffb3d1;
+    padding: 8px 10px;
+    border-radius: 5px;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #c2185b;
+    text-align: center;
+    white-space: pre-line;
+}
+
+.community-status-box {
+    background: #eef4fb;
+    border: 1px solid #a9c6e8;
+    padding: 8px 10px;
+    border-radius: 5px;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #2b5c8a;
+    text-align: center;
+    white-space: pre-line;
+}
+
+/* 🏘️ 神社改築による背景演出 */
+.container.shrine-tier1 {
+    background: linear-gradient(135deg, rgba(255,247,230,0.95), rgba(255,215,0,0.15), rgba(255,247,230,0.95));
+}
+
+.container.shrine-tier2 {
+    background: linear-gradient(135deg, rgba(255,247,230,0.95), rgba(255,215,0,0.25), rgba(230,255,240,0.3), rgba(255,247,230,0.95));
+    box-shadow: 0 0 25px rgba(218, 165, 32, 0.5);
+}
+
+.container.shrine-tier3 {
+    background: linear-gradient(135deg, rgba(255,247,230,0.95), rgba(255,215,0,0.3), rgba(255,180,120,0.25), rgba(255,247,230,0.95));
+    box-shadow: 0 0 30px rgba(218, 140, 20, 0.55);
+    border: 2px solid rgba(218, 140, 20, 0.3);
+}
+
+.container.shrine-tier4 {
+    background: linear-gradient(135deg, rgba(255,247,230,0.95), rgba(255,215,0,0.3), rgba(255,120,180,0.2), rgba(230,220,255,0.25), rgba(255,247,230,0.95));
+    box-shadow: 0 0 35px rgba(218, 120, 160, 0.55);
+    border: 2px solid rgba(200, 140, 200, 0.35);
+}
+
+.container.shrine-tier5 {
+    background: linear-gradient(135deg, rgba(255,247,230,0.95), rgba(255,215,0,0.35), rgba(120,200,255,0.25), rgba(255,120,180,0.2), rgba(255,247,230,0.95));
+    box-shadow: 0 0 40px rgba(120, 170, 230, 0.6);
+    border: 2px solid rgba(120, 170, 230, 0.4);
+    animation: shrine-tier5-shimmer 3s infinite alternate;
+}
+
+@keyframes shrine-tier5-shimmer {
+    0% { box-shadow: 0 0 30px rgba(120, 170, 230, 0.5); }
+    100% { box-shadow: 0 0 50px rgba(255, 215, 0, 0.7); }
+}
+
+.container.shrine-tier6 {
+    background: linear-gradient(135deg, rgba(255,250,235,0.97), rgba(255,215,0,0.4), rgba(255,255,255,0.5), rgba(255,215,0,0.4), rgba(255,250,235,0.97));
+    box-shadow: 0 0 50px rgba(255, 215, 0, 0.8);
+    border: 3px double #d8860b;
+    animation: shrine-tier6-glow 2.5s infinite alternate;
+}
+
+@keyframes shrine-tier6-glow {
+    0% { box-shadow: 0 0 35px rgba(255, 215, 0, 0.6); }
+    100% { box-shadow: 0 0 60px rgba(255, 215, 0, 1); }
+}
+
+/* 🌅🌇🌙 時間帯による背景演出（朝・昼・夜・丑三つ時） */
+.container.time-morning {
+    background-image: linear-gradient(rgba(255, 247, 235, 0.85), rgba(255, 230, 210, 0.85));
+}
+
+.container.time-afternoon {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 250, 235, 0.9));
+}
+
+.container.time-evening {
+    background-image: linear-gradient(rgba(255, 235, 225, 0.85), rgba(220, 200, 235, 0.85));
+}
+
+.container.time-ushimitsu {
+    background-image: linear-gradient(rgba(30, 20, 45, 0.92), rgba(50, 25, 55, 0.92));
+    box-shadow: 0 0 30px rgba(120, 20, 140, 0.5);
+}
+
+.container.time-ushimitsu h1,
+.container.time-ushimitsu .main-title {
+    color: #e6d6ff;
+}
+
+.ushimitsu-banner {
+    background: linear-gradient(90deg, #2b1a33, #4a1f4f, #2b1a33);
+    border: 1px solid #a35bd1;
+    color: #f0d9ff;
+    padding: 8px 10px;
+    border-radius: 5px;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-align: center;
+    animation: ushimitsu-pulse 2s infinite alternate;
+}
+
+@keyframes ushimitsu-pulse {
+    0% { box-shadow: 0 0 5px rgba(163, 91, 209, 0.4); }
+    100% { box-shadow: 0 0 18px rgba(163, 91, 209, 0.9); }
+}
+/* 🎆 夏祭り（8月の夜・週末限定）の背景演出 */
+.container.natsumatsuri-active {
+    background-image: linear-gradient(rgba(40, 15, 20, 0.88), rgba(70, 20, 15, 0.88));
+    box-shadow: 0 0 30px rgba(255, 100, 20, 0.5);
+}
+
+.container.natsumatsuri-active h1,
+.container.natsumatsuri-active .main-title {
+    color: #ffdca8;
+}
+
+#natsumatsuri-banner {
+    background: linear-gradient(90deg, #3a1010, #6e1f12, #3a1010);
+    border: 1px solid #ff8a3d;
+    color: #ffe3c2;
+}
+
+/* 🌻 夏っぽい軽い演出（8月の昼間・夏祭り開催時間外） */
+.container.summer-theme {
+    background-image: linear-gradient(rgba(224, 247, 255, 0.85), rgba(255, 250, 210, 0.85));
+}
+
+#summer-theme-banner {
+    background: linear-gradient(90deg, #eafaff, #fffbe0, #eafaff);
+    border: 1px solid #7fd4e8;
+    color: #2b6777;
+}
+
+
+/* 📅 運勢カレンダー */
+.calendar-section {
+    margin-top: 25px;
+    text-align: left;
+}
+
+.calendar-section h2 {
+    text-align: center;
+    color: #4a3728;
+    font-size: 1.3rem;
+    border-bottom: 2px solid #8b5a2b;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+}
+
+.calendar-note {
+    text-align: center;
+    font-size: 0.78rem;
+    color: #999;
+    margin: 0 0 12px;
+}
+
+.calendar-loading {
+    text-align: center;
+    color: #999;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 4px;
+}
+
+.calendar-weekday {
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #8b5a2b;
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-day {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #555;
+    background: #f5f5f5;
+}
+
+.calendar-day-empty {
+    background: transparent;
+}
+
+.calendar-day-good {
+    background: #d9f2d9;
+    color: #2e7d32;
+}
+
+.calendar-day-bad {
+    background: #fbdede;
+    color: #d9534f;
+}
+
+.calendar-day-neutral {
+    background: #eee;
+    color: #777;
+}
+
+.calendar-day-none {
+    background: #f7f7f7;
+    color: #ccc;
+}
+
+.calendar-day-today {
+    outline: 2px solid #8b5a2b;
+    outline-offset: 1px;
+}
+
+@media (max-width: 600px) {
+    .calendar-day {
+        font-size: 0.7rem;
+    }
+}
+
+/* 🎖️ 称号バッジ */
+.titles-box {
+    background: #fdf6e3;
+    border: 1px solid #e0c98c;
+    padding: 8px 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.titles-title {
+    font-weight: bold;
+    color: #8b5a2b;
+    margin: 0 0 6px;
+    font-size: 0.9rem;
+}
+
+.titles-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.title-badge {
+    background: linear-gradient(135deg, #fff2cc, #ffd700);
+    border: 1px solid #d8860b;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #6b4a1b;
+    white-space: nowrap;
+    cursor: help;
+}
+
+/* 🏺 壺のランクアップ */
+.urn-current-text {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #4a3728;
+    margin: 0 0 8px;
+}
+
+.urn-next-box {
+    background: #fbf8f3;
+    border: 1px solid #e8dcc8;
+    border-radius: 6px;
+    padding: 10px;
+    text-align: center;
+}
+
+#urn-next-text {
+    font-size: 0.85rem;
+    color: #666;
+    margin: 0 0 8px;
+}
+
+/* 🎉 参拝回数マイルストーンによるシャッフル演出 */
+@keyframes glow-gold-pulse {
+    0% { box-shadow: 0 0 5px 2px rgba(255, 215, 0, 0.4); border-color: #ffe08a; }
+    100% { box-shadow: 0 0 20px 6px rgba(255, 215, 0, 0.9); border-color: #ffd700; }
+}
+
+.omikuji-box.shuffle-glow-gold {
+    animation: glow-gold-pulse 0.6s infinite alternate;
+    border-style: solid;
+}
+
+@keyframes glow-rainbow-pulse {
+    0% { box-shadow: 0 0 10px 3px #ff4d4d; }
+    16% { box-shadow: 0 0 10px 3px #ff9800; }
+    33% { box-shadow: 0 0 10px 3px #ffeb3b; }
+    50% { box-shadow: 0 0 10px 3px #4caf50; }
+    66% { box-shadow: 0 0 10px 3px #2196f3; }
+    83% { box-shadow: 0 0 10px 3px #673ab7; }
+    100% { box-shadow: 0 0 10px 3px #e91e63; }
+}
+
+.omikuji-box.shuffle-glow-rainbow {
+    animation: glow-rainbow-pulse 1.2s infinite linear;
+    border-style: solid;
+    border-color: #fff;
+}
+
+@keyframes sparkle-fall {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(40px) scale(1.4); }
+}
+
+/* 🎋 ラッキーアイテム表示ボックス */
+.lucky-item-box {
+    background: #eef9f1;
+    border: 1px solid #b7e4c7;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.lucky-item-title {
+    font-weight: bold;
+    color: #2e7d32;
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+}
+
+#lucky-item-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #4a3728;
+    margin: 0 0 2px;
+}
+
+.lucky-item-desc {
+    font-size: 0.85rem;
+    color: #555;
+    margin: 0;
+}
+
+/* エフェクト用レイヤー */
+#confetti-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+#doom-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(139, 0, 0, 0.4);
+    pointer-events: none;
+    z-index: 9998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.doom-shake {
+    animation: screen-shake 0.15s infinite;
+}
+
+@keyframes screen-shake {
+    0% { transform: translate(3px, 5px) rotate(0deg); }
+    20% { transform: translate(-5px, -3px) rotate(-1deg); }
+    40% { transform: translate(-4px, 3px) rotate(1deg); }
+    60% { transform: translate(4px, -2px) rotate(0deg); }
+    80% { transform: translate(-2px, 4px) rotate(1deg); }
+    100% { transform: translate(3px, -3px) rotate(-1deg); }
+}
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .left-panel, .right-panel {
+        width: 100%;
+    }
+    .user-info {
+        position: static;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+    h1 {
+        margin-top: 10px;
+    }
+}
+.enter-btn {
+    display: inline-block;
+    width: 100%;
+    max-width: 320px;
+    background-color: #d9534f;
+    color: white !important;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 5px 0 #b33c39;
+    box-sizing: border-box;
+    transition: all 0.1s ease;
+    margin: 10px auto;
+}
+
+/* ボタンを押したときのカチッとする演出 */
+.enter-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #b33c39;
+}
+/* 揺れるアニメーションの定義 */
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(3px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(3px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(1px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+/* 演出用のクラス */
+.is-shaking {
+  animation: shake 0.5s;
+}
+/* 🏠 常時表示のトップページへ戻るボタン */
+.back-to-top-btn {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 1000;
+    background: #8b5a2b;
+    color: #fff !important;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 999px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.back-to-top-btn:hover {
+    background: #6f4620;
+}
+
+.back-to-top-btn:active {
+    transform: scale(0.96);
+}
+
+@media (max-width: 600px) {
+    .back-to-top-btn {
+        top: 6px;
+        left: 6px;
+        font-size: 0.75rem;
+        padding: 6px 10px;
+    }
+}
+
+/* =====================================================
+   top.html 専用スタイル（トップページ・おみくじ履歴）
+   ===================================================== */
+
+.text-center {
+    text-align: center;
+}
+
+.top-welcome {
+    margin-bottom: 10px;
+}
+
+.sub-title {
+    font-size: 1rem;
+    color: #b8860b;
+    letter-spacing: 3px;
+    margin: 0 0 5px;
+}
+
+.main-title {
+    font-size: 2rem;
+    color: #4a3728;
+    margin: 0 0 15px;
+    padding-bottom: 12px;
+    display: inline-block;
+    border-bottom: 3px double #8b5a2b;
+}
+
+.intro-section {
+    margin-bottom: 15px;
+}
+
+.catchphrase {
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: #d9534f;
+    margin-bottom: 10px;
+}
+
+.intro-section .description {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.8;
+}
+
+.entrance-area {
+    margin: 20px 0 30px;
+}
+
+.history-section {
+    margin-top: 25px;
+    text-align: left;
+}
+
+.history-section h2 {
+    text-align: center;
+    color: #4a3728;
+    font-size: 1.3rem;
+    border-bottom: 2px solid #8b5a2b;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+}
+
+/* 履歴が増えても画面に収まるようスクロール可能なラッパー */
+.table-scroll {
+    max-height: 420px;
+    overflow-y: auto;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* 履歴テーブル本体 */
+#history-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    font-size: 0.9rem;
+}
+
+#history-table thead th {
+    background-color: #8b5a2b;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px 8px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+#history-table tbody td {
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 1px solid #f0e6d8;
+    white-space: nowrap;
+}
+
+#history-table tbody tr:nth-child(even) {
+    background-color: #fbf8f3;
+}
+
+#history-table tbody tr:hover {
+    background-color: #fff2cc;
+    transition: background-color 0.2s ease;
+}
+
+#history-table tbody td:first-child,
+#history-table tbody th:first-child {
+    border-radius: 0;
+}
+
+/* データが空、または読み込み中のときの表示 */
+#history-table tbody tr td[colspan] {
+    padding: 20px;
+    color: #999;
+    font-style: italic;
+    white-space: normal;
+}
+
+/* 結果に応じた行の色分け（top.jsがtrにクラスを付与） */
+.hist-daikichi {
+    background: linear-gradient(90deg, #fff2cc, #ffe08a, #fff2cc) !important;
+    font-weight: bold;
+    color: #d8860b;
+}
+
+.hist-kichi,
+.hist-chuukichi,
+.hist-syoukichi,
+.hist-suekichi {
+    background-color: #f2fbee !important;
+}
+
+.hist-kyou {
+    background-color: #fff0f0 !important;
+}
+
+.hist-daikyou {
+    background-color: #f5e6ff !important;
+    color: #8b008b;
+    font-weight: bold;
+}
+
+/* 賞金のプラス／マイナスの色分け */
+.prize-plus {
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+.prize-minus {
+    color: #d9534f;
+    font-weight: bold;
+}
+
+.warning-notes {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: #999;
+    text-align: center;
+}
+
+/* 🏆 ランキングテーブル */
+.ranking-section {
+    margin-top: 25px;
+    text-align: left;
+}
+
+.ranking-section h2 {
+    text-align: center;
+    color: #4a3728;
+    font-size: 1.3rem;
+    border-bottom: 2px solid #8b5a2b;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+}
+
+#ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    font-size: 0.9rem;
+}
+
+#ranking-table thead th {
+    background-color: #8b5a2b;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px 8px;
+    text-align: center;
+}
+
+#ranking-table tbody td {
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 1px solid #f0e6d8;
+}
+
+#ranking-table tbody tr:nth-child(even) {
+    background-color: #fbf8f3;
+}
+
+.rank-me {
+    background: linear-gradient(90deg, #fff2cc, #ffe08a, #fff2cc) !important;
+    font-weight: bold;
+    color: #d8860b;
+}
+
+.rank-medal {
+    font-size: 1.1rem;
+}
+
+.my-rank-note {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #777;
+    margin-top: 8px;
+}
+
+/* スマホ表示の微調整 */
+@media (max-width: 600px) {
+    .main-title {
+        font-size: 1.5rem;
+    }
+    #history-table {
+        font-size: 0.78rem;
+    }
+    #history-table thead th,
+    #history-table tbody td {
+        padding: 6px 4px;
+        white-space: normal;
+    }
+    .table-scroll {
+        max-height: 320px;
+    }
+}
