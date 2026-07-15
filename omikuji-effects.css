@@ -233,6 +233,95 @@
     outline-offset: 1px;
 }
 
+.calendar-day {
+    position: relative;
+}
+
+.calendar-day-event-badge {
+    position: absolute;
+    top: 1px;
+    right: 2px;
+    font-size: 0.65rem;
+    line-height: 1;
+}
+
+/* 🎐 今シーズンのイベント一覧（運勢カレンダー内） */
+.season-events-box {
+    background: #fff8ee;
+    border: 1px solid #e0c9a0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+}
+
+.season-events-title {
+    font-weight: bold;
+    color: #8b5a2b;
+    margin: 0 0 6px;
+    font-size: 0.9rem;
+}
+
+.season-events-empty {
+    color: #999;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.season-event-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    margin-top: 6px;
+}
+
+.season-event-emoji {
+    font-size: 1rem;
+}
+
+.season-event-name {
+    font-weight: bold;
+    color: #4a3728;
+}
+
+.season-event-status {
+    margin-left: auto;
+    font-size: 0.78rem;
+    color: #d9534f;
+    font-weight: bold;
+}
+
+.season-event-desc {
+    font-size: 0.75rem;
+    color: #888;
+    margin: 2px 0 0;
+}
+
+/* 🎋🏮🌕🍁🎍 季節限定アイテム欄（おみくじページ・収集アイテムタブ内） */
+.seasonal-group-title {
+    font-weight: bold;
+    color: #8b5a2b;
+    margin: 14px 0 2px;
+    font-size: 0.9rem;
+}
+
+.seasonal-active-tag {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 8px;
+    background: #ff8a3d;
+    color: #fff;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    vertical-align: middle;
+}
+
+.seasonal-group-desc {
+    font-size: 0.75rem;
+    color: #888;
+    margin: 0 0 6px;
+}
+
 @media (max-width: 600px) {
     .calendar-day {
         font-size: 0.7rem;
@@ -535,6 +624,60 @@
     margin: 20px 0 30px;
 }
 
+/* 🎯 トップページの「境内へ進む」を目立たせるヒーローCTA */
+.entrance-hero {
+    margin: 15px 0 25px;
+    padding: 22px 20px;
+    background: linear-gradient(135deg, #fff7e6, #ffe08a, #fff7e6);
+    border: 2px solid #d8860b;
+    border-radius: 14px;
+    box-shadow: 0 0 20px rgba(218, 165, 32, 0.4);
+    text-align: center;
+}
+
+.entrance-hero-note {
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #b8620b;
+    margin: 0 0 14px;
+}
+
+.enter-btn-hero {
+    display: inline-block;
+    width: 100%;
+    max-width: 480px;
+    background: linear-gradient(90deg, #e53935, #ff7043, #e53935);
+    background-size: 200% 100%;
+    color: white !important;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    padding: 20px 24px;
+    border-radius: 12px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    transition: transform 0.1s ease;
+    animation: hero-btn-glow 1.6s ease-in-out infinite;
+}
+
+.enter-btn-hero:active {
+    transform: translateY(3px);
+}
+
+@keyframes hero-btn-glow {
+    0% { box-shadow: 0 6px 0 #b33c39, 0 0 15px rgba(229, 57, 53, 0.5); background-position: 0% 50%; }
+    50% { box-shadow: 0 6px 0 #b33c39, 0 0 35px rgba(255, 140, 0, 0.85); background-position: 100% 50%; }
+    100% { box-shadow: 0 6px 0 #b33c39, 0 0 15px rgba(229, 57, 53, 0.5); background-position: 0% 50%; }
+}
+
+@media (max-width: 600px) {
+    .enter-btn-hero {
+        font-size: 1.2rem;
+        padding: 16px 18px;
+    }
+}
+
 .history-section {
     margin-top: 25px;
     text-align: left;
@@ -720,4 +863,34 @@
     .table-scroll {
         max-height: 320px;
     }
+}
+/* 🐱🐸 幻の参拝客出現演出 */
+.phantom-visitor {
+    position: fixed;
+    left: -80px;
+    font-size: 2.6rem;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 900;
+    transition-property: left;
+    transition-timing-function: linear;
+    user-select: none;
+    filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35));
+    animation: phantom-bob 0.5s ease-in-out infinite alternate;
+    touch-action: manipulation;
+}
+
+.phantom-visitor:hover {
+    filter: drop-shadow(0 3px 8px rgba(255, 215, 0, 0.8));
+    transform: scale(1.15);
+}
+
+.phantom-visitor-frog {
+    font-size: 2.9rem;
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.9));
+}
+
+@keyframes phantom-bob {
+    from { transform: translateY(0); }
+    to { transform: translateY(-12px); }
 }
