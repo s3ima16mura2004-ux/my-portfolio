@@ -37,22 +37,28 @@ function applyTimeTheme() {
 }
 function updateMoneyDisplay() {
     const moneySpan = document.querySelector("#money");
-    if (moneySpan) moneySpan.innerHTML = currentMoney;
+    if (moneySpan) moneySpan.innerHTML = currentMoney.toLocaleString();
     updateShopUI();
 }
 
 // 🛍️🎒 タブの切り替え
 function showTab(tabName) {
+    const missionsTab = document.querySelector("#tab-missions");
     const prizeTab = document.querySelector("#tab-prizes");
     const shopTab = document.querySelector("#tab-shop");
+    const collectTab = document.querySelector("#tab-collect");
     const dexTab = document.querySelector("#tab-dex");
+    const missionsBtn = document.querySelector("#tabBtn-missions");
     const prizeBtn = document.querySelector("#tabBtn-prizes");
     const shopBtn = document.querySelector("#tabBtn-shop");
+    const collectBtn = document.querySelector("#tabBtn-collect");
     const dexBtn = document.querySelector("#tabBtn-dex");
 
     const tabs = [
+        { name: "missions", el: missionsTab, btn: missionsBtn },
         { name: "prizes", el: prizeTab, btn: prizeBtn },
         { name: "shop", el: shopTab, btn: shopBtn },
+        { name: "collect", el: collectTab, btn: collectBtn },
         { name: "dex", el: dexTab, btn: dexBtn }
     ];
 
@@ -181,22 +187,8 @@ function updateShopUI() {
         }
     }
 
-    // 🎐🌠 織姫の五色糸・彦星の一等星（七夕7/1〜7/7限定。所持している間は期間外でも表示し続ける）
-    const orihimeRow = document.querySelector("#orihime-row");
-    const showOrihimeRow = isTanabataActive() || (ownedItems.orihime_thread || 0) > 0 || (ownedItems.hikoboshi_star || 0) > 0;
-    if (orihimeRow) orihimeRow.classList.toggle("hidden", !showOrihimeRow);
-    const countOrihime = document.querySelector("#count-orihime");
-    if (countOrihime) countOrihime.textContent = ownedItems.orihime_thread || 0;
-    const countHikoboshi = document.querySelector("#count-hikoboshi");
-    if (countHikoboshi) countHikoboshi.textContent = ownedItems.hikoboshi_star || 0;
-
-    // 🏮 夏祭りの提灯（8月限定。所持している間は月をまたいでも表示し続ける）
-    const lanternRow = document.querySelector("#lantern-row");
-    const isAugustNow = (new Date().getMonth() + 1) === NATSUMATSURI_MONTH;
-    const showLanternRow = isAugustNow || (ownedItems.natsumatsuri_lantern || 0) > 0;
-    if (lanternRow) lanternRow.classList.toggle("hidden", !showLanternRow);
-    const countLantern = document.querySelector("#count-lantern");
-    if (countLantern) countLantern.textContent = ownedItems.natsumatsuri_lantern || 0;
+    // 🎐🌠🏮🗻 季節限定アイテム（七夕・夏祭り・お月見・紅葉狩り・お正月）の表示
+    updateSeasonalItemsUI();
 
     updateActiveItemsUI();
     updateUrnUI();
@@ -263,7 +255,7 @@ function updateTitlesUI() {
     const list = document.querySelector("#titles-list");
     if (!box || !list) return;
 
-    const stats = { totalDraws, totalDaikichi, totalProfit, urnLevel, ownedItems, dexRewardClaimed, gotDaidaikichi, gotKamikichi, gotDaidaikyou, gotUshimitsuDraw, ishikoro500Claimed, communityDraws, orihimeHikoboshiMet };
+    const stats = { totalDraws, totalDaikichi, totalProfit, urnLevel, ownedItems, dexRewardClaimed, gotDaidaikichi, gotKamikichi, gotDaidaikyou, gotUshimitsuDraw, ishikoro500Claimed, communityDraws, orihimeHikoboshiMeetCount, hatsuyumeComplete, steadyVisitorEarned };
     const earned = TITLES.filter(t => t.condition(stats));
 
     if (earned.length === 0) {
@@ -316,6 +308,7 @@ function markDex(resultName) {
     if (!entry) return;
     if (!dexAchieved[entry.key]) {
         dexAchieved[entry.key] = true;
+        trackMissionDexProgress(); // 🎯「図鑑を進めよう」ミッションの進捗を更新
 
         const allDone = DEX_ENTRIES.every(e => dexAchieved[e.key]);
         if (allDone && !dexRewardClaimed) {
@@ -588,16 +581,55 @@ function updateTanabataUI() {
         }
     }
 
-    // 🎐🌠 織姫・彦星アイテムの収集状況
+    // 🎐🌠 織姫・彦星アイテムの収集状況（毎年七夕シーズンに再挑戦できる）
     if (starText) {
-        if (orihimeHikoboshiMet) {
-            starText.textContent = "🌌 織姫と彦星はすでに再会を果たしました。";
+        const alreadyMetThisYear = orihimeHikoboshiLastMetYear === new Date().getFullYear();
+        if (alreadyMetThisYear) {
+            starText.textContent = "🌌 今年はすでに織姫と彦星の再会を見届けました（来年もまた挑戦できます）。これまでの再会回数：" + orihimeHikoboshiMeetCount + "回";
         } else {
             starText.textContent =
                 "🎐 織姫の五色糸：" + (ownedItems.orihime_thread || 0) + "個　" +
                 "🌠 彦星の一等星：" + (ownedItems.hikoboshi_star || 0) + "個" +
                 "（両方1個ずつ揃うと特別なご縁が結ばれます）";
         }
+    }
+}
+
+// 🎐🌠🏮🍁🌕🗻 季節限定アイテム（七夕・夏祭り・お月見・紅葉狩り・お正月）の収集状況を表示する
+function updateSeasonalItemsUI() {
+    const box = document.querySelector("#seasonal-items-box");
+    if (!box) return;
+
+    const seasonalItems = DROP_ITEMS.filter(i => i.seasonal);
+    const groups = {};
+    seasonalItems.forEach(item => {
+        if (!groups[item.seasonal]) groups[item.seasonal] = [];
+        groups[item.seasonal].push(item);
+    });
+
+    let html = "";
+    SEASONAL_EVENTS.forEach(event => {
+        const items = groups[event.key];
+        if (!items) return;
+
+        const hasAny = items.some(i => (ownedItems[i.key] || 0) > 0);
+        const isActive = isSeasonalEventActive(event.key);
+        if (!isActive && !hasAny) return; // 開催中でも所持もしていなければ表示しない
+
+        html += '<p class="seasonal-group-title">' + event.emoji + " " + event.name +
+            (isActive ? '<span class="seasonal-active-tag">開催中</span>' : '') + '</p>';
+        html += '<p class="seasonal-group-desc">' + event.desc + '</p>';
+        items.forEach(item => {
+            html += '<div class="collect-item-row"><span>' + item.emoji + ' ' + item.name + ' × ' + (ownedItems[item.key] || 0) + '</span></div>';
+        });
+    });
+
+    if (!html) {
+        box.classList.add("hidden");
+        box.innerHTML = "";
+    } else {
+        box.classList.remove("hidden");
+        box.innerHTML = html;
     }
 }
 
