@@ -145,6 +145,134 @@
     color: #2b6777;
 }
 
+/* 🌕 お月見（9/15〜9/30）の背景演出。夜は「月が昇る」十五夜モード、昼は淡い夕月モード */
+.container.otsukimi-active {
+    background-image: linear-gradient(rgba(18, 22, 50, 0.9), rgba(35, 30, 68, 0.9));
+    box-shadow: 0 0 30px rgba(150, 160, 230, 0.45);
+}
+
+.container.otsukimi-active h1,
+.container.otsukimi-active .main-title {
+    color: #eef0ff;
+}
+
+#otsukimi-banner {
+    background: linear-gradient(90deg, #14183a, #2a2960, #14183a);
+    border: 1px solid #aab3ff;
+    color: #eef0ff;
+}
+
+.container.otsukimi-day {
+    background-image: linear-gradient(rgba(255, 248, 227, 0.85), rgba(228, 222, 255, 0.85));
+}
+
+#otsukimi-day-banner {
+    background: linear-gradient(90deg, #fff7e1, #ece6ff, #fff7e1);
+    border: 1px solid #c9b8ff;
+    color: #5b4e8a;
+}
+
+/* 🌕 十五夜の「月が昇る」演出（画面右側にふわっと満月が現れる） */
+.moon-rise {
+    position: fixed;
+    right: 6vw;
+    top: 38vh;
+    font-size: 90px;
+    opacity: 0;
+    filter: drop-shadow(0 0 28px rgba(255, 255, 220, 0.85));
+    animation: moon-rise-anim 5s ease-out forwards;
+    pointer-events: none;
+    z-index: 6;
+}
+
+@keyframes moon-rise-anim {
+    0% { opacity: 0; transform: translateY(70px) scale(0.9); }
+    25% { opacity: 1; }
+    80% { opacity: 0.9; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-10px) scale(1); }
+}
+
+/* 🍁 紅葉狩り（11月）の背景演出 */
+.container.koyo-active {
+    background-image: linear-gradient(rgba(60, 24, 10, 0.18), rgba(150, 70, 15, 0.18));
+}
+
+.container.koyo-active h1,
+.container.koyo-active .main-title {
+    color: #7a2e10;
+}
+
+#koyo-banner {
+    background: linear-gradient(90deg, #4a2410, #8a4315, #4a2410);
+    border: 1px solid #ff9a4d;
+    color: #ffe3c2;
+}
+
+/* 🍁 紅葉狩りの落ち葉が画面上から舞い落ちる演出 */
+.leaf-piece {
+    position: fixed;
+    top: -30px;
+    font-size: 22px;
+    pointer-events: none;
+    z-index: 5;
+    animation: leaf-fall linear forwards;
+}
+
+@keyframes leaf-fall {
+    0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0.95; }
+    50% { transform: translateY(50vh) translateX(20px) rotate(180deg); }
+    100% { transform: translateY(105vh) translateX(-15px) rotate(360deg); opacity: 0.8; }
+}
+
+/* 🎍 お正月（1/1〜1/3）の背景演出 */
+.container.oshogatsu-active {
+    background-image: linear-gradient(rgba(255, 246, 246, 0.92), rgba(255, 226, 222, 0.92));
+    box-shadow: 0 0 30px rgba(224, 90, 90, 0.35);
+}
+
+.container.oshogatsu-active h1,
+.container.oshogatsu-active .main-title {
+    color: #a02020;
+}
+
+#oshogatsu-banner {
+    background: linear-gradient(90deg, #fff0f0, #ffd9d9, #fff0f0);
+    border: 1px solid #e05a5a;
+    color: #a02020;
+}
+
+/* 🌅 お正月の「初日の出」演出（画面下からじんわり光る） */
+.sunrise-glow {
+    position: fixed;
+    left: 50%;
+    bottom: -12vh;
+    transform: translateX(-50%);
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 160, 90, 0.55), rgba(255, 90, 90, 0.15) 60%, transparent 72%);
+    pointer-events: none;
+    z-index: 1;
+    animation: sunrise-pulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes sunrise-pulse {
+    0% { opacity: 0.5; }
+    100% { opacity: 0.95; }
+}
+
+/* 季節演出（月・落ち葉など）を画面全体に重ねて表示するための土台 */
+#season-fx-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 5;
+}
+
 
 /* 📅 運勢カレンダー */
 .calendar-section {
