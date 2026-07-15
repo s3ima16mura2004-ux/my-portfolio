@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>豪華おみくじ神社 - トップ</title>
+    <link rel="stylesheet" href="omikuji-core.css?v=1">
+    <link rel="stylesheet" href="omikuji-effects.css?v=1">
+</head>
+<body>
+    <div class="container container-wide text-center">
+        <div class="user-info">
+            👤 参拝者：<span id="user-display">ゲスト参拝者</span>様
+            <button type="button" class="logout-btn" onclick="logout()">ログアウト</button>
+        </div>
+
+        <div class="top-welcome">
+            <p class="sub-title">\一攫千金の運試し/</p>
+            <h1 class="main-title">金大黒 豪華おみくじ神社</h1>
+        </div>
+
+        <div class="entrance-hero">
+            <p class="entrance-hero-note">⛩️ 今日の運試し、あなたを待っています ⛩️</p>
+            <a href="omikuji2.html" class="enter-btn-hero">🎯 境内へ進む（おみくじを引く）</a>
+        </div>
+
+        <div class="intro-section">
+            <p class="catchphrase">「1,000円の投資で、10万円の奇跡を起こせ。」</p>
+            <p class="description">
+                当神社のおみくじは、1回1,000円で引ける特別な運試しです。<br>
+                最高100,000円の現金景品から、<br>背筋が凍る「大凶（お祓い料徴収）」まで、<br>
+                あなたの今日の運命がすべて決まります。
+            </p>
+        </div>
+
+        <div class="page-columns">
+            <div class="col-side">
+                <div id="rank-box" class="rank-box">
+                    <p id="rank-name-display" class="rank-name-display">⛩️ 参拝ランク：平参拝者</p>
+                    <p id="rank-progress-display" class="rank-progress-display">累計獲得賞金：0円</p>
+                </div>
+
+                <div id="titles-box" class="titles-box hidden">
+                    <p class="titles-title">🎖️ 獲得称号</p>
+                    <div id="titles-list" class="titles-list"></div>
+                </div>
+
+                <div class="money-box">
+                    💰 あなたの所持金：<span id="money-display">読み込み中…</span>円
+                </div>
+
+                <p class="bank-balance">🏦 賽銭箱（貯金）：<span id="bank-money-display-top">0</span>円</p>
+
+                <div id="lucky-item-box" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">🎋 本日のラッキーアイテム 🎋</p>
+                    <p id="lucky-item-name">-</p>
+                    <p id="lucky-item-desc" class="lucky-item-desc">-</p>
+                </div>
+
+                <p id="taian-status-box" class="taian-status-box hidden">-</p>
+                <p id="community-status-box" class="community-status-box hidden">-</p>
+                <p id="countdown-season-box" class="taian-status-box hidden">-</p>
+                <p id="countdown-bonus-box" class="taian-status-box hidden">-</p>
+                <p id="ushimitsu-banner" class="ushimitsu-banner hidden">🌙 ただいま「丑三つ時」…大大吉・大大凶の確率が跳ね上がっています…</p>
+            </div>
+
+            <div class="col-main">
+                <div class="calendar-section">
+                    <h2 id="calendar-title">📅 運勢カレンダー</h2>
+                    <p class="calendar-note">※その日の当選金額の合計をもとにした簡易的な目安です（参加料は含みません）</p>
+                    <div id="season-events-box" class="season-events-box"></div>
+                    <div id="calendar-grid" class="calendar-grid"></div>
+                </div>
+
+                <div class="history-section">
+                    <h2>📜 おみくじ履歴</h2>
+
+                    <table id="history-table">
+                        <thead>
+                            <tr>
+                                <th>日付</th>
+                                <th>結果</th>
+                                <th>賞金</th>
+                                <th>残高</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="ranking-section">
+                    <h2>🏆 長者番付ランキング</h2>
+
+                    <table id="ranking-table">
+                        <thead>
+                            <tr>
+                                <th>順位</th>
+                                <th>参拝者</th>
+                                <th>合計財産(所持金+貯金)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+
+                    <p id="my-rank-note" class="my-rank-note"></p>
+                </div>
+            </div>
+        </div>
+
+<script type="module" src="top.js?v=5"></script>
+        <script>
+            // 🚪 ログアウト処理：ログイン情報を消してログインページへ戻る
+            function logout() {
+                if (confirm("ログアウトしますか？")) {
+                    localStorage.removeItem("logged_in_user");
+                    window.location.href = "index.html";
+                }
+            }
+        </script>
+
+        <div class="warning-notes">
+            <p>※お賽銭（軍資金）がなくなると破産となります。計画的に参拝しましょう。</p>
+        </div>
+    </div>
+</body>
+</html>

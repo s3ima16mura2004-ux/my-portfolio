@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>豪華おみくじ神社</title>
+    <link rel="stylesheet" href="omikuji-core.css?v=1">
+    <link rel="stylesheet" href="omikuji-effects.css?v=1">
+</head>
+<body>
+
+    <a href="top.html" class="back-to-top-btn">🏠 トップに戻る</a>
+
+    <div class="container container-wide">
+        <div class="user-info">
+            👤 参拝者：<span id="user-display">ゲスト参拝者</span>様
+            <button type="button" class="logout-btn" onclick="logout()">ログアウト</button>
+        </div>
+
+        <h1>おみくじ（1回 1,000円）</h1>
+
+        <div class="page-columns">
+            <div class="col-side">
+                <div id="rank-box" class="rank-box">
+                    <p id="rank-name-display" class="rank-name-display">⛩️ 参拝ランク：平参拝者</p>
+                    <p id="rank-progress-display" class="rank-progress-display">累計獲得賞金：0円</p>
+                </div>
+
+                <div id="titles-box" class="titles-box hidden">
+                    <p class="titles-title">🎖️ 獲得称号</p>
+                    <div id="titles-list" class="titles-list"></div>
+                </div>
+
+                <div class="money-box">
+                    💰 あなたの所持金：<span id="money">10000</span>円
+                </div>
+
+                <div id="lucky-item-box" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">🎋 本日のラッキーアイテム 🎋</p>
+                    <p id="lucky-item-name">-</p>
+                    <p id="lucky-item-desc" class="lucky-item-desc">-</p>
+                </div>
+
+                <div id="active-items-box" class="active-items-box hidden">
+                    <p id="active-shop-text" class="hidden">-</p>
+                    <p id="active-equip-text" class="hidden">-</p>
+                </div>
+
+                <p id="taian-status-box" class="taian-status-box hidden">-</p>
+                <p id="birthday-ticket-box" class="taian-status-box hidden">-</p>
+                <p id="shop-fever-box" class="taian-status-box hidden">-</p>
+                <p id="community-status-box" class="community-status-box hidden">-</p>
+                <p id="countdown-season-box" class="taian-status-box hidden">-</p>
+                <p id="countdown-bonus-box" class="taian-status-box hidden">-</p>
+                <p id="ushimitsu-banner" class="ushimitsu-banner hidden">🌙 ただいま「丑三つ時」…大大吉・大大凶の確率が跳ね上がっています…</p>
+                <p id="natsumatsuri-banner" class="ushimitsu-banner hidden">🎆 ただいま「夏祭り」開催中！（夜・週末限定）収集アイテムのドロップ率が1.5倍です！</p>
+                <p id="summer-theme-banner" class="ushimitsu-banner hidden">🌻 8月の昼下がり…夏の日差しがまぶしいですね（夏祭りは夜と週末に開催されます）</p>
+
+                <div id="tanabata-box" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">🎋 七夕・短冊に願いを書く（7/1〜7/7限定） 🎋</p>
+                    <p id="tanabata-status-text" class="lucky-item-desc">-</p>
+                    <p id="tanabata-star-text" class="lucky-item-desc">-</p>
+                    <button id="tanabata-wish-btn" class="btn-equip" onclick="tanabataWish()" type="button">🎋 短冊に願いを書く</button>
+                </div>
+
+                <div id="bonus-area" style="display: none; margin-bottom: 15px;">
+                    <p style="font-size: 0.85rem; color: #d9534f; font-weight: bold; margin-bottom: 8px;">
+                        😱 資金がピンチです…！神様にお祈りしますか？
+                    </p>
+                    <button id="bonusBtn" class="btn-bonus" onclick="getBonusMoney()">🙏 神様にお祈りして3,000円貰う</button>
+                    <a href="top.html" class="btn-bonus-back">🏠 トップページに戻る</a>
+                </div>
+            </div>
+
+            <div class="col-main">
+
+        <div class="main-content">
+            
+            <div class="left-panel">
+                <div class="omikuji-box">
+                    <p id="placeholder-text">【ここに結果が表示されます】</p>
+                    <img id="fortune-image" class="hidden" src="" alt="おみくじ結果">
+                    <div id="cutin-element" class="hidden">🪘 ガサガサ…</div>
+                </div>
+
+                <div class="button-container">
+                    <button class="btn-draw" onclick="omikuji()">おみくじを引く</button>
+                    <button class="btn-draw10" id="draw10Btn" onclick="omikuji10()">🔥 10連おみくじ</button>
+                    
+                    <div style="width: 100%;">
+                        <input type="hidden" id="hiddenResult" name="result" value="未抽選">
+                        <button type="button" id="submitBtn" class="btn-submit" onclick="submitResults()">結果を送信する</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="tab-buttons">
+                    <button id="tabBtn-missions" class="tab-btn" onclick="showTab('missions')" type="button">🎯 デイリーミッション</button>
+                    <button id="tabBtn-prizes" class="tab-btn tab-active" onclick="showTab('prizes')" type="button">🏆 景品・等級一覧</button>
+                    <button id="tabBtn-shop" class="tab-btn" onclick="showTab('shop')" type="button">🛍️ アイテムショップ</button>
+                    <button id="tabBtn-collect" class="tab-btn" onclick="showTab('collect')" type="button">🎒 収集品・貯金</button>
+                    <button id="tabBtn-dex" class="tab-btn" onclick="showTab('dex')" type="button">📖 図鑑</button>
+                </div>
+
+                <div id="tab-missions" class="hidden">
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">🎯 本日のデイリーミッション（ランダム5個）</h3>
+                        <p id="missions-summary" class="missions-summary">-</p>
+                        <div id="missions-list" class="missions-list"></div>
+                    </div>
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">🌙 常設ミッション</h3>
+                        <div id="missions-always-list" class="missions-list"></div>
+                    </div>
+                </div>
+
+                <div id="tab-prizes">
+                    <table class="prize-table">
+                        <thead>
+                            <tr>
+                                <th colspan="3" class="table-title">景品・等級一覧</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="row-kamikichi-unlocked">
+                                <td class="rank">特神</td>
+                                <td class="fortune">😊神吉</td>
+                                <td class="prize">777,777円<br><span style="font-size: 0.7rem;">(全枠中最高額・最もレア・引くたび大吉運が永久+0.5%)</span></td>
+                            </tr>
+                            <tr class="row-kamikichi-unlocked">
+                                <td class="rank">特上</td>
+                                <td class="fortune">☀️大大吉</td>
+                                <td class="prize">500,000円<br><span style="font-size: 0.7rem;">(超激レア・丑三つ時は確率10倍)</span></td>
+                            </tr>
+                            <tr>
+                                <td class="rank">1等</td>
+                                <td class="fortune">大吉</td>
+                                <td class="prize">100,000円</td>
+                            </tr>
+                            <tr>
+                                <td class="rank">2等</td>
+                                <td class="fortune">吉</td>
+                                <td class="prize">10,000円</td>
+                            </tr>
+                            <tr>
+                                <td class="rank">3等</td>
+                                <td class="fortune">中吉</td>
+                                <td class="prize">2,000円</td>
+                            </tr>
+                            <tr>
+                                <td class="rank">4等</td>
+                                <td class="fortune">小吉</td>
+                                <td class="prize">1,000円</td>
+                            </tr>
+                            <tr>
+                                <td class="rank">5等</td>
+                                <td class="fortune">末吉</td>
+                                <td class="prize">500円</td>
+                            </tr>
+                            <tr class="row-kyo">
+                                <td class="rank">6等</td>
+                                <td class="fortune">凶</td>
+                                <td class="prize">はずれ！</td>
+                            </tr>
+                            <tr class="row-daikyo">
+                                <td class="rank">7等</td>
+                                <td class="fortune">⚔️神の試練</td>
+                                <td class="prize">
+                                    単発：挑戦(2倍 or 半額没収)か穏便に断るか選択！<br>
+                                    10連：自動判定（20%免除、それ以外は半額徴収）<br>
+                                    <span style="font-size: 0.75rem; font-weight: bold; color: #ff4d4d;">🔥引いた後は3回「大吉確率10倍」発動！</span>
+                                </td>
+                            </tr>
+                            <tr class="row-daikyo">
+                                <td class="rank">特凶</td>
+                                <td class="fortune">💀大大凶</td>
+                                <td class="prize">
+                                    免除なしで残金の80%没収（超激レア・丑三つ時は確率10倍）<br>
+                                    <span style="font-size: 0.75rem; font-weight: bold; color: #ff4d4d;">🔥引いた後は5回「大吉確率20倍」発動！</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="tab-shop" class="hidden">
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">🛍️ 購入アイテム（一定回数だけ効果）</h3>
+
+                        <div class="shop-item-card" data-key="manekineko">
+                            <div class="shop-item-info">
+                                <p class="shop-item-name">🐱 開運招き猫 <span class="shop-item-price">10,000円</span></p>
+                                <p class="shop-item-desc">大吉確率が一時的にアップ！<br>（おみくじ5回分）</p>
+                            </div>
+                            <button class="btn-shop-buy" onclick="buyShopItem('manekineko')" type="button">購入する</button>
+                            <p class="shop-item-lock hidden">-</p>
+                        </div>
+
+                        <div class="shop-item-card" data-key="gofu">
+                            <div class="shop-item-info">
+                                <p class="shop-item-name">📜 金運の護符 <span class="shop-item-price">5,000円</span></p>
+                                <p class="shop-item-desc">獲得賞金が1.1倍に！<br>（おみくじ5回分）</p>
+                            </div>
+                            <button class="btn-shop-buy" onclick="buyShopItem('gofu')" type="button">購入する</button>
+                            <p class="shop-item-lock hidden">-</p>
+                        </div>
+
+                        <div class="shop-item-card" data-key="suzu">
+                            <div class="shop-item-info">
+                                <p class="shop-item-name">🔔 破邪の鈴 <span class="shop-item-price">3,000円</span></p>
+                                <p class="shop-item-desc">大凶時の没収額が軽減される！<br>（おみくじ5回分）</p>
+                            </div>
+                            <button class="btn-shop-buy" onclick="buyShopItem('suzu')" type="button">購入する</button>
+                            <p class="shop-item-lock hidden">-</p>
+                        </div>
+
+                        <div class="shop-item-card" data-key="oogi">
+                            <div class="shop-item-info">
+                                <p class="shop-item-name">🪭 招福の扇 <span class="shop-item-price">15,000円</span></p>
+                                <p class="shop-item-desc">獲得賞金が1.15倍に！<br>（護符より強力・おみくじ5回分）</p>
+                            </div>
+                            <button class="btn-shop-buy" onclick="buyShopItem('oogi')" type="button">購入する</button>
+                            <p class="shop-item-lock hidden">-</p>
+                        </div>
+
+                        <div class="shop-item-card" data-key="gohei">
+                            <div class="shop-item-info">
+                                <p class="shop-item-name">🎏 五色の幣 <span class="shop-item-price">25,000円</span></p>
+                                <p class="shop-item-desc">大吉確率が大きくアップ！<br>（招き猫より強力・おみくじ5回分）</p>
+                            </div>
+                            <button class="btn-shop-buy" onclick="buyShopItem('gohei')" type="button">購入する</button>
+                            <p class="shop-item-lock hidden">-</p>
+                        </div>
+
+                        <div class="shop-item-card" data-key="ryujin">
+                            <div class="shop-item-info">
+                                <p class="shop-item-name">🐉 龍神の逆鱗 <span class="shop-item-price">50,000円</span></p>
+                                <p class="shop-item-desc">「神の試練」が確認なしで<br>自動的に成功する！<br>（おみくじ3回分）</p>
+                            </div>
+                            <button class="btn-shop-buy" onclick="buyShopItem('ryujin')" type="button">購入する</button>
+                            <p class="shop-item-lock hidden">-</p>
+                        </div>
+
+                        <div class="shop-item-card" data-key="amaterasu">
+                            <div class="shop-item-info">
+                                <p class="shop-item-name">🌟 天照の玉 <span class="shop-item-price">100,000円</span></p>
+                                <p class="shop-item-desc">大吉確率アップ＋獲得賞金1.2倍が<br>同時発動！<br>（おみくじ5回分）</p>
+                            </div>
+                            <button class="btn-shop-buy" onclick="buyShopItem('amaterasu')" type="button">購入する</button>
+                            <p class="shop-item-lock hidden">-</p>
+                        </div>
+
+                        <div class="shop-item-card" data-key="ikigami">
+                            <div class="shop-item-info">
+                                <p class="shop-item-name">🕊️ 生き神の御札 <span class="shop-item-price">300,000円</span></p>
+                                <p class="shop-item-desc">大吉確率が最大級にアップ＋神の試練の<br>没収額を大幅軽減！<br>（おみくじ5回分）</p>
+                            </div>
+                            <button class="btn-shop-buy" onclick="buyShopItem('ikigami')" type="button">購入する</button>
+                            <p class="shop-item-lock hidden">-</p>
+                        </div>
+
+                        <p id="shop-active-status" class="shop-active-status hidden">-</p>
+                    </div>
+
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">🏺 おみくじの壺（永続強化）</h3>
+                        <p id="urn-current-text" class="urn-current-text">現在の壺：普通の壺（大吉ボーナス +0.0%）</p>
+                        <div id="urn-next-box" class="urn-next-box">
+                            <p id="urn-next-text">-</p>
+                            <button id="urn-upgrade-btn" class="btn-shop-buy" onclick="upgradeUrn()" type="button">壺をランクアップする</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="tab-collect" class="hidden">
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">🎒 収集アイテム（おみくじで低確率ドロップ）</h3>
+
+                        <div class="collect-item-row">
+                            <span>🪙 黄金の小判 × <span id="count-koban">0</span></span>
+                            <button id="equipBtn-koban" class="btn-equip" onclick="equipCollectible('koban')" type="button">装備する</button>
+                        </div>
+                        <p class="collect-item-desc">装備中、大凶を引いても確定で「出世大凶（免除）」に！</p>
+
+                        <div class="collect-item-row">
+                            <span>🌳 神社の神木 × <span id="count-shinboku">0</span></span>
+                            <button id="equipBtn-shinboku" class="btn-equip" onclick="equipCollectible('shinboku')" type="button">装備する</button>
+                        </div>
+                        <p class="collect-item-desc">装備中、大凶を引いた時のフィーバー回数が+1回に！</p>
+
+                        <div id="tanzaku-row" class="collect-item-row hidden">
+                            <span>🎏 五色の短冊 × <span id="count-tanzaku">0</span></span>
+                            <button id="equipBtn-tanzaku" class="btn-equip" onclick="equipCollectible('tanzaku')" type="button">装備する</button>
+                        </div>
+                        <p id="tanzaku-desc" class="collect-item-desc hidden">装備中、大吉ボーナスが+1%に！（神社改築で解放）</p>
+
+                        <div class="collect-item-row">
+                            <span>🪨 謎の石ころ × <span id="count-ishikoro">0</span></span>
+                            <span class="collect-item-note">100個で称号／500個で永久ボーナス／1000個ごとにガチャ券</span>
+                        </div>
+
+                        <div id="seasonal-items-box" class="hidden"></div>
+
+                        <div class="collect-item-row">
+                            <span>🎰 ガチャ券 × <span id="gacha-ticket-count">0</span></span>
+                            <button id="gacha-draw-btn" class="btn-equip" onclick="drawGacha()" type="button">ガチャを引く</button>
+                        </div>
+                        <p class="collect-item-desc">1枚消費して、黄金の小判か神社の神木のどちらかがランダムで1個手に入ります。</p>
+
+                        <div class="collect-item-row">
+                            <span>🎟️ ブースト券 × <span id="boost-ticket-count">0</span></span>
+                            <button id="boost-ticket-use-btn" class="btn-equip" onclick="useBoostTicket()" type="button">使う</button>
+                        </div>
+                        <p class="collect-item-desc">1枚消費して、その場で所持金が1.1倍になります。（デイリーミッション「連勝街道」の報酬）</p>
+
+                        <button id="equipBtn-none" class="btn-equip-none" onclick="equipCollectible('')" type="button">装備を外す</button>
+                        <p id="equip-status" class="equip-status">現在の装備：なし</p>
+                    </div>
+
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">🏦 賽銭箱（貯金）</h3>
+                        <p class="bank-desc">預けたお金はおみくじには使えませんが、大凶（神の試練）で失うこともありません。いつでも自由に出し入れできます。</p>
+                        <p class="bank-balance">賽銭箱の残高：<span id="bank-money-display">0</span>円</p>
+                        <input type="number" id="bank-amount-input" class="bank-amount-input" placeholder="金額を入力" min="1" step="1">
+                        <div class="bank-btn-row">
+                            <button class="btn-shop-buy" onclick="depositBank()" type="button">預ける</button>
+                            <button class="btn-equip" onclick="withdrawBank()" type="button">引き出す</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-dex" class="hidden">
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">📖 おみくじ図鑑</h3>
+                        <p id="dex-progress" class="dex-progress">達成状況：0 / 10</p>
+                        <div id="dex-grid" class="dex-grid"></div>
+                        <p id="dex-reward-status" class="dex-reward-status hidden">-</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer-debug">
+            ⚙️ デバッグ用乱数：<span id="randomNumber">まだ引いていません (通常モード)
+        </div>
+
+            </div>
+        </div>
+    </div>
+
+    <audio id="se-coin" src="coin2.mp3" preload="auto"></audio>
+    <audio id="se-shuffle" src="shuffle.mp3" preload="auto"></audio>
+    <audio id="se-win" src="win.mp3" preload="auto"></audio>
+    <audio id="se-lose" src="lose.mp3" preload="auto"></audio>
+    <audio id="se-doom" src="doom.mp3" preload="auto"></audio>
+    <div id="confetti-overlay"></div>
+    <div id="doom-overlay"></div>
+
+    <!-- Firebaseの初期化（top.htmlと同じプロジェクトを使用） -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            doc,
+            getDoc,
+            updateDoc,
+            setDoc,
+            increment
+        } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDKvro8iNDBPKVlTEXVp5A8r-OyEJoRgZk",
+            authDomain: "omikujisite.firebaseapp.com",
+            projectId: "omikujisite",
+            storageBucket: "omikujisite.firebasestorage.app",
+            messagingSenderId: "213364923898",
+            appId: "1:213364923898:web:b8a0a55eef1491bde15843",
+            measurementId: "G-BKVJTZKJBQ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 通常の<script>（omikuji2.js）から呼べるようにwindowへ公開
+        window.omikujiDB = db;
+        window.omikujiCollectionRef = collection(db, "history");
+        window.omikujiAddDoc = addDoc;
+        window.omikujiDoc = doc;
+        window.omikujiGetDoc = getDoc;
+        window.omikujiUpdateDoc = updateDoc;
+        window.omikujiSetDoc = setDoc;
+        window.omikujiIncrement = increment;
+        window.omikujiCommunityRef = doc(db, "global", "community");
+    </script>
+
+    <script src="omikuji-seasonal.js?v=1"></script>
+    <script src="omikuji-countdown.js?v=1"></script>
+    <script src="omikuji-data.js?v=1"></script>
+    <script src="omikuji-state.js?v=1"></script>
+    <script src="omikuji-ui.js?v=1"></script>
+    <script src="omikuji-shop.js?v=1"></script>
+    <script src="omikuji-missions.js?v=1"></script>
+    <script src="omikuji-draw-helpers.js?v=1"></script>
+    <script src="omikuji-draw-single.js?v=1"></script>
+    <script src="omikuji-draw-multi.js?v=1"></script>
+    <script src="omikuji-main.js?v=1"></script>
+    <script src="omikuji-phantom.js?v=1"></script>
+    <script>
+        // 🚪 ログアウト処理：ログイン情報を消してログインページへ戻る
+        function logout() {
+            if (confirm("ログアウトしますか？")) {
+                localStorage.removeItem("logged_in_user");
+                window.location.href = "index.html";
+            }
+        }
+    </script>
+</body>
+</html>
