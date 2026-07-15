@@ -71,6 +71,7 @@ function omikuji10() {
 
             // 🕛 隠し要素：ゾロ目時刻の「神様の気まぐれ」チェック（10連は1回だけ判定）
             checkKimagureTime();
+            trackMissionDraw10(); // 🎯「大盤振る舞い」ミッションの進捗を更新
 
             for (let i = 0; i < 10; i++) {
                 let okj = Math.random();
@@ -95,38 +96,48 @@ function omikuji10() {
 
                 let prize = 0;
                 let isExtremeTier10 = false;
+                let resultName10 = "";
 
                 if (okj >= KAMIKICHI_THRESHOLD) {
                     resultsCount["神吉"]++;
+                    resultName10 = "神吉";
                     prize = KAMIKICHI_PRIZE;
                     isExtremeTier10 = true;
                     gotKamikichi = true;
             kamikichiBonus += KAMIKICHI_BONUS_PER_DRAW;
                 } else if (okj >= daidaikichiThreshold10) {
                     resultsCount["大大吉"]++;
+                    resultName10 = "大大吉";
                     prize = DAIDAIKICHI_PRIZE;
                     isExtremeTier10 = true;
                     gotDaidaikichi = true;
                 } else if (okj >= 0.99) {
                     resultsCount["大吉"]++;
+                    resultName10 = "大吉";
                     prize = 100000;
                 } else if (okj >= 0.95) {
                     resultsCount["吉"]++;
+                    resultName10 = "吉";
                     prize = 10000;
                 } else if (okj >= 0.85) {
                     resultsCount["中吉"]++;
+                    resultName10 = "中吉";
                     prize = 2000;
                 } else if (okj >= 0.7) {
                     resultsCount["小吉"]++;
+                    resultName10 = "小吉";
                     prize = 1000;
                 } else if (okj >= 0.6) {
                     resultsCount["末吉"]++;
+                    resultName10 = "末吉";
                     prize = 500;
                 } else if (okj >= 0.1) {
                     resultsCount["凶"]++;
+                    resultName10 = "凶";
                     prize = 0;
                 } else if (okj >= daidaikyouThreshold10) {
                     resultsCount["大凶"]++;
+                    resultName10 = "大凶";
                     gotDaikyouIn10 = true;
 
                     // 🪙装備中なら「黄金の小判」で確定免除
@@ -143,6 +154,7 @@ function omikuji10() {
                         if (hasEffect("tax_half")) tax = Math.floor(tax / 2);
                         if (hasShopEffect("suzu")) tax = Math.floor(tax / 2);
                 if (hasShopEffect("ikigami")) tax = Math.floor(tax / 2);
+                        if (kiyomeShioActive) tax = Math.floor(tax / 2); // 🧂「清めの塩」ミッション報酬効果
 
                         totalDoomTax += tax;
                         prize = -tax;
@@ -150,6 +162,7 @@ function omikuji10() {
                 } else {
                     // 💀 激レア「大大凶」：免除なしで、その時点の残高の80%を没収
                     resultsCount["大大凶"]++;
+                    resultName10 = "大大凶";
                     isExtremeTier10 = true;
                     gotDaidaikyou = true;
                     gotDaidaikyouIn10 = true;
@@ -210,6 +223,7 @@ function omikuji10() {
 
                 totalPrize += prize;
                 checkZoromeBonus(okj);
+                trackMissionDraw(resultName10, prize); // 🎯 デイリーミッション（参拝回数・凶克服・連勝街道・大金稼ぎ等）の進捗を更新
             }
 
             if (gotDaidaikyouIn10 || gotDaikyouIn10) {
