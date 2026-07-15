@@ -53,7 +53,11 @@ const DROP_ITEMS = [
     { key: "kakigori", emoji: "🍧", name: "かき氷", rate: 0.05, desc: "夏祭り開催中（8月の夜・週末）限定ドロップ", minCommunityTier: 0, seasonal: "natsumatsuri" },
     { key: "hanabi_tama", emoji: "🎆", name: "打ち上げ花火の玉", rate: 0.04, desc: "夏祭り開催中（8月の夜・週末）限定ドロップ", minCommunityTier: 0, seasonal: "natsumatsuri" },
     { key: "tsukimi_mochi", emoji: "🐰", name: "月見うさぎの餅", rate: 0.05, desc: "お月見（9/15〜9/30）限定ドロップ。10個で称号「お月見上手」", minCommunityTier: 0, seasonal: "otsukimi" },
+    { key: "susuki_hoshi", emoji: "🌾", name: "すすきの穂", rate: 0.05, desc: "お月見（9/15〜9/30）限定ドロップ。夜空に月見だんごと一緒に飾ろう", minCommunityTier: 0, seasonal: "otsukimi" },
+    { key: "tsukimi_dango", emoji: "🍡", name: "月見団子", rate: 0.05, desc: "お月見（9/15〜9/30）限定ドロップ。十五夜のお供え物", minCommunityTier: 0, seasonal: "otsukimi" },
     { key: "momiji_shiori", emoji: "🍁", name: "紅葉のしおり", rate: 0.05, desc: "紅葉狩り（11月）限定ドロップ。10個で称号「紅葉狩り名人」", minCommunityTier: 0, seasonal: "koyo" },
+    { key: "icho_leaf", emoji: "🍂", name: "黄金の銀杏の葉", rate: 0.05, desc: "紅葉狩り（11月）限定ドロップ。山を彩る黄金色の葉", minCommunityTier: 0, seasonal: "koyo" },
+    { key: "kuri", emoji: "🌰", name: "山の恵み・栗", rate: 0.05, desc: "紅葉狩り（11月）限定ドロップ。秋の味覚の代表格", minCommunityTier: 0, seasonal: "koyo" },
     { key: "hatsuyume_fuji", emoji: "🗻", name: "初夢の富士", rate: 0.04, desc: "お正月（1/1〜1/3）限定ドロップ。鷹・茄子と揃うと縁起物コンプリート！", minCommunityTier: 0, seasonal: "oshogatsu" },
     { key: "hatsuyume_taka", emoji: "🦅", name: "初夢の鷹", rate: 0.04, desc: "お正月（1/1〜1/3）限定ドロップ。富士・茄子と揃うと縁起物コンプリート！", minCommunityTier: 0, seasonal: "oshogatsu" },
     { key: "hatsuyume_nasu", emoji: "🍆", name: "初夢の茄子", rate: 0.04, desc: "お正月（1/1〜1/3）限定ドロップ。富士・鷹と揃うと縁起物コンプリート！", minCommunityTier: 0, seasonal: "oshogatsu" }
@@ -153,7 +157,15 @@ const TITLES = [
         return ((oi.natsumatsuri_lantern || 0) + (oi.kingyo || 0) + (oi.kakigori || 0) + (oi.hanabi_tama || 0)) >= 20;
     } },
     { key: "tsukimi_lover", emoji: "🌕", name: "お月見上手", desc: "月見うさぎの餅を10個集めた", condition: s => (s.ownedItems && s.ownedItems.tsukimi_mochi || 0) >= 10 },
+    { key: "otsukimi_master", emoji: "🌕✨", name: "名月の智者", desc: "お月見の限定アイテムを合計15個集めた", condition: s => {
+        const oi = s.ownedItems || {};
+        return ((oi.tsukimi_mochi || 0) + (oi.susuki_hoshi || 0) + (oi.tsukimi_dango || 0)) >= 15;
+    } },
     { key: "koyo_master", emoji: "🍁", name: "紅葉狩り名人", desc: "紅葉のしおりを10個集めた", condition: s => (s.ownedItems && s.ownedItems.momiji_shiori || 0) >= 10 },
+    { key: "koyo_grandmaster", emoji: "🍁✨", name: "錦秋の匠", desc: "紅葉狩りの限定アイテムを合計15個集めた", condition: s => {
+        const oi = s.ownedItems || {};
+        return ((oi.momiji_shiori || 0) + (oi.icho_leaf || 0) + (oi.kuri || 0)) >= 15;
+    } },
     { key: "hatsuyume_complete", emoji: "🗻", name: "一富士二鷹三茄子", desc: "初夢の縁起物（富士・鷹・茄子）を揃えた", condition: s => s.hatsuyumeComplete === true },
     { key: "steady_visitor", emoji: "💼", name: "堅実な参拝者", desc: "デイリーミッション「お財布の達人」を達成（破産せずに1日を終えた）", condition: s => s.steadyVisitorEarned === true }
 ];
