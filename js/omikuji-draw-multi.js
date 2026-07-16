@@ -90,6 +90,7 @@ function omikuji10() {
         if (hasShopEffect("amaterasu")) daikichiBonus += 0.08;
         if (hasShopEffect("ikigami")) daikichiBonus += 0.15;
                 daikichiBonus += URN_LEVELS[urnLevel].bonus;
+                daikichiBonus += COMPANION_LEVELS[getCompanionLevelIndex()].bonus; // 🐱 相棒「招き猫」の成長ボーナス
         daikichiBonus += kamikichiBonus;
                 if (taianActive) daikichiBonus += 0.002;
                 if (dexRewardClaimed) daikichiBonus += 0.01;

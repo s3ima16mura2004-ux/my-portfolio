@@ -73,6 +73,7 @@ window.addEventListener("DOMContentLoaded", async () => {
             totalProfit = typeof data.totalProfit === "number" ? data.totalProfit : 0;
             totalWinnings = typeof data.totalWinnings === "number" ? data.totalWinnings : 0;
             urnLevel = typeof data.urnLevel === "number" ? data.urnLevel : 0;
+            companionExp = typeof data.companionExp === "number" ? data.companionExp : 0;
 
             const today = todayStr();
             taianActive = (data.taianDate === today) && data.taianActive === true;
@@ -144,6 +145,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         updateTitlesUI();
         updateDexUI();
         updateBankUI();
+        updateCompanionUI(); // 🐱 相棒「招き猫」の成長状況を表示
         updateBirthdayTicketUI();
         updateShopFeverUI();
         updateTanabataUI();

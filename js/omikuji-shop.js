@@ -35,12 +35,24 @@ async function buyShopItem(itemKey) {
     shopItemKey = item.key;
     shopItemRemaining = item.duration;
 
+    // 🐱 相棒「招き猫」は効果アイテムを購入するたびに育つ
+    const prevCompanionLevel = getCompanionLevelIndex();
+    companionExp++;
+    const grownCompanion = getCompanionLevelIndex() > prevCompanionLevel ? COMPANION_LEVELS[getCompanionLevelIndex()] : null;
+    updateCompanionUI();
+
     updateMoneyDisplay();
     playSE("se-coin");
     trackMissionShopBuy(); // 🎯「ショップの常連」ミッションの進捗を更新
     await saveUserState();
 
     alert("🛍️ 「" + item.name + "」を購入しました！\n" + item.desc + "\n(効果はこれから" + item.duration + "回のおみくじに適用されます)" + (price !== item.price ? "\n😲 神の気まぐれフィーバーで半額の" + price.toLocaleString() + "円でした！" : ""));
+
+    if (grownCompanion) {
+        setTimeout(() => {
+            alert("🐱✨【招き猫が成長しました！】✨🐱\n" + grownCompanion.emoji + " 「" + grownCompanion.name + "」になりました！\n" + grownCompanion.desc);
+        }, 400);
+    }
 }
 
 // 収集アイテムを装備／解除する

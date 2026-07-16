@@ -106,6 +106,15 @@ const URN_LEVELS = [
     { level: 5, name: "伝説の壺", cost: 300000, bonus: 0.03 }
 ];
 
+// 🐱 相棒「招き猫」の成長段階（ショップの効果アイテムを購入するたびに経験値(companionExp)が+1され、育っていく）
+const COMPANION_LEVELS = [
+    { level: 0, name: "小さな招き猫", emoji: "🐱", threshold: 0, bonus: 0, desc: "まだ小さくてあどけない招き猫。これから一緒に育っていく。" },
+    { level: 1, name: "元気な招き猫", emoji: "😺", threshold: 10, bonus: 0, desc: "少し貫禄が出てきた。効果アイテムの扱いにも慣れてきた様子。" },
+    { level: 2, name: "頼れる招き猫", emoji: "😸", threshold: 25, bonus: 0, desc: "堂々とした佇まいになり、参拝者からも一目置かれる存在に。" },
+    { level: 3, name: "貫禄の招き猫", emoji: "🐈", threshold: 50, bonus: 0.01, desc: "貫禄十分。そばにいるだけで大吉運を少しだけ後押ししてくれる。" },
+    { level: 4, name: "黄金招き猫", emoji: "🐈‍⬛", threshold: 100, bonus: 0.03, desc: "全身が黄金に輝く伝説級の招き猫。大吉運を大きく後押ししてくれる。" }
+];
+
 // 🗺️ 境内マップ（所持金を使って1マスずつ買い進め、少しずつ神社の境内図を完成させていく大型の金策先）
 // 順番に購入するしかない（マップの端から埋まっていくイメージ）。金額は後半になるほど跳ね上がる
 const MAP_TILES = [
@@ -575,6 +584,7 @@ const TITLES = [
     { key: "regular", emoji: "🙏", name: "常連参拝者", desc: "累計参拝回数100回を達成", condition: s => s.totalDraws >= 100 },
     { key: "first_visit", emoji: "🔰", name: "初参拝", desc: "はじめての参拝を達成", condition: s => s.totalDraws >= 1 },
     { key: "urn_master", emoji: "🏺", name: "壺のマイスター", desc: "おみくじの壺を最大までランクアップ", condition: s => s.urnLevel >= URN_LEVELS.length - 1 },
+    { key: "companion_master", emoji: "🐈‍⬛", name: "黄金招き猫の主", desc: "相棒の招き猫を最大まで育てた", condition: s => (s.companionExp || 0) >= COMPANION_LEVELS[COMPANION_LEVELS.length - 1].threshold },
     { key: "stone_collector", emoji: "🪨", name: "石ころコレクター", desc: "謎の石ころを100個集めた", condition: s => (s.ownedItems && s.ownedItems.ishikoro || 0) >= 100 },
     { key: "sages_stone", emoji: "🪨✨", name: "賢者の石の使い手", desc: "謎の石ころを500個集め「賢者の石」に変化させた", condition: s => s.ishikoro500Claimed === true },
     { key: "dex_complete", emoji: "📖", name: "図鑑コンプリート", desc: "大吉〜大凶(神の試練)まで全種類を達成", condition: s => s.dexRewardClaimed === true },

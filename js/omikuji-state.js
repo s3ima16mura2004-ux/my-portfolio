@@ -44,6 +44,7 @@ let totalProfit = 0;      // 累計収支（参加料込みの実質損益）
 let totalWinnings = 0;    // 累計獲得賞金額（プラスの当選金のみの合計。参拝ランク判定に使用）
 let urnLevel = 0;         // おみくじの壺のランクアップ段階
 let kamikichiBonus = 0;   // 神吉を引くたびに永久に積み重なる大吉ボーナス（神様との契約）
+let companionExp = 0;     // 🐱 相棒「招き猫」の成長値。ショップの効果アイテムを購入するたびに+1される
 
 let taianActive = false;  // 本日が「大安吉日」かどうか（ログイン時に個人ごとに抽選済み）
 let bankMoney = 0;        // 賽銭箱（貯金）の残高。おみくじには使えないが大凶等のリスクからは守られる
@@ -70,6 +71,15 @@ function hasEffect(key) {
 // 指定したキーのショップアイテムが現在発動中かどうか
 function hasShopEffect(key) {
     return shopItemKey === key && shopItemRemaining > 0;
+}
+
+// 🐱 現在の相棒（招き猫）の成長段階のインデックスを、companionExpから求める
+function getCompanionLevelIndex() {
+    let index = 0;
+    for (let i = 0; i < COMPANION_LEVELS.length; i++) {
+        if (companionExp >= COMPANION_LEVELS[i].threshold) index = i;
+    }
+    return index;
 }
 
 function todayStr() {
@@ -104,6 +114,7 @@ async function saveUserState() {
             totalProfit: totalProfit,
             totalWinnings: totalWinnings,
             urnLevel: urnLevel,
+            companionExp: companionExp,
             bankMoney: bankMoney,
             dexAchieved: dexAchieved,
             dexRewardClaimed: dexRewardClaimed,

@@ -140,6 +140,7 @@ function updateShopUI() {
 
     updateActiveItemsUI();
     updateUrnUI();
+    updateCompanionUI();
     updateRankUI();
     updateShrineMapUI();
 }
@@ -171,6 +172,41 @@ function updateUrnUI() {
         upgradeBtn.disabled = currentMoney < next.cost;
     }
 }
+// 🐱 相棒「招き猫」の成長段階の表示を更新する
+function updateCompanionUI() {
+    const index = getCompanionLevelIndex();
+    const current = COMPANION_LEVELS[index];
+    const next = COMPANION_LEVELS[index + 1];
+
+    const currentText = document.querySelector("#companion-current-text");
+    if (currentText) {
+        currentText.textContent = current.emoji + " 現在の相棒：" + current.name +
+            (current.bonus > 0 ? "（大吉ボーナス +" + (current.bonus * 100).toFixed(0) + "%）" : "");
+    }
+
+    const descText = document.querySelector("#companion-desc-text");
+    if (descText) descText.textContent = current.desc;
+
+    const progressOuter = document.querySelector("#companion-progress-outer");
+    const progressInner = document.querySelector("#companion-progress-inner");
+    const nextText = document.querySelector("#companion-next-text");
+
+    if (!next) {
+        if (progressOuter) progressOuter.classList.add("hidden");
+        if (nextText) nextText.textContent = "🏆 相棒はすでに最大まで成長しています！";
+        return;
+    }
+
+    if (progressOuter) progressOuter.classList.remove("hidden");
+    const gained = companionExp - current.threshold;
+    const needed = next.threshold - current.threshold;
+    const pct = Math.min(100, Math.floor((gained / needed) * 100));
+    if (progressInner) progressInner.style.width = pct + "%";
+    if (nextText) {
+        nextText.textContent = "次は「" + next.name + "」" + next.emoji + "（あと" + (next.threshold - companionExp) + "回、効果アイテムを購入）";
+    }
+}
+
 function getVisitorRank(winnings) {
     let tier = 0;
     VISITOR_RANKS.forEach(r => { if (winnings >= r.threshold) tier = r.tier; });
@@ -210,7 +246,7 @@ function updateTitlesUI() {
         communityDraws, orihimeHikoboshiMeetCount, hatsuyumeComplete, steadyVisitorEarned,
         hanamiDangoTotalCollected, gotKodomonohiExtreme, mamemakiSuccessCount, nagoshiLastResetYear,
         shrineMapLevel, japanShrineOwnedCount: getJapanShrineOwnedCount(), japanPrefCompleteCount: getJapanPrefectureCompleteCount(),
-        japanShrinePartsOwnedCount: getJapanShrinePartsTotalOwnedCount()
+        japanShrinePartsOwnedCount: getJapanShrinePartsTotalOwnedCount(), companionExp
     };
     const earned = TITLES.filter(t => t.condition(stats));
 
