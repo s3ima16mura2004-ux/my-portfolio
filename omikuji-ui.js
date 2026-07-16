@@ -282,7 +282,8 @@ function updateTitlesUI() {
         gotDaidaikichi, gotKamikichi, gotDaidaikyou, gotUshimitsuDraw, ishikoro500Claimed,
         communityDraws, orihimeHikoboshiMeetCount, hatsuyumeComplete, steadyVisitorEarned,
         hanamiDangoTotalCollected, gotKodomonohiExtreme, mamemakiSuccessCount, nagoshiLastResetYear,
-        shrineMapLevel, japanShrineOwnedCount: getJapanShrineOwnedCount(), japanPrefCompleteCount: getJapanPrefectureCompleteCount()
+        shrineMapLevel, japanShrineOwnedCount: getJapanShrineOwnedCount(), japanPrefCompleteCount: getJapanPrefectureCompleteCount(),
+        japanShrinePartsOwnedCount: getJapanShrinePartsTotalOwnedCount()
     };
     const earned = TITLES.filter(t => t.condition(stats));
 
@@ -1148,7 +1149,7 @@ function updateShrineMapJapanUI() {
     const grid = document.querySelector("#map-japan-grid");
     if (grid) {
         grid.innerHTML = JAPAN_PREFECTURES.map(pref => {
-            const ownedCount = pref.shrines.filter(s => japanShrinesOwned[s.key]).length;
+            const ownedCount = pref.shrines.filter(isJapanShrineComplete).length;
             const total = pref.shrines.length;
             const complete = ownedCount === total;
             const partial = ownedCount > 0 && !complete;
@@ -1178,25 +1179,36 @@ function updateShrineMapJapanUI() {
             "🗾 コンプリートした都道府県：" + prefCount + " / " + JAPAN_PREFECTURES.length + "県";
     }
 
-    // 🗾 選択中の都道府県の詳細（神社ごとの参拝ボタン）を表示する
+    // 🗾 選択中の都道府県の詳細（神社ごとのパーツ組み立て状況）を表示する
     const detailBox = document.querySelector("#map-japan-detail");
     if (detailBox) {
         const pref = JAPAN_PREFECTURES.find(p => p.key === selectedJapanPrefKey);
         if (!pref) {
             detailBox.innerHTML = '<p class="collect-item-desc">👆 上の地図から、好きな都道府県をタップして参拝先を選びましょう。</p>';
         } else {
-            const rows = pref.shrines.map(s => {
-                const owned = !!japanShrinesOwned[s.key];
-                const actionHtml = owned
-                    ? '<span class="mission-status-tag mission-status-done">✅ 参拝済み</span>'
-                    : '<button class="btn-shop-buy" onclick="buyJapanShrine(\'' + pref.key + '\',\'' + s.key + '\')" type="button"' +
-                      (currentMoney < s.cost ? " disabled" : "") + '>' + s.cost.toLocaleString() + '円で参拝</button>';
-                return '<div class="collect-item-row"><span>' + s.emoji + ' ' + s.name + '</span>' + actionHtml + '</div>';
+            const shrinesHtml = pref.shrines.map(shrine => {
+                const complete = isJapanShrineComplete(shrine);
+                const ownedParts = getJapanShrinePartsOwnedCount(shrine);
+                const partsHtml = SHRINE_BUILD_PARTS.map(part => {
+                    const owned = isJapanShrinePartOwned(shrine, part);
+                    const cost = getShrinePartCost(shrine, part);
+                    const actionHtml = owned
+                        ? '<span class="mission-status-tag mission-status-done">✅</span>'
+                        : '<button class="btn-shop-buy" onclick="buyJapanShrinePart(\'' + pref.key + '\',\'' + shrine.key + '\',\'' + part.key + '\')" type="button"' +
+                          (currentMoney < cost ? " disabled" : "") + '>' + cost.toLocaleString() + '円</button>';
+                    return '<div class="map-japan-part-row"><span>' + part.emoji + ' ' + part.name + '</span>' + actionHtml + '</div>';
+                }).join("");
+                return (
+                    '<div class="map-japan-shrine-block' + (complete ? " map-japan-shrine-complete" : "") + '">' +
+                    '<p class="map-japan-shrine-title">' + shrine.emoji + ' ' + shrine.name +
+                    (complete ? ' <span class="mission-status-tag mission-status-done">⛩️ 完成</span>' : ' <span class="map-japan-shrine-progress">(' + ownedParts + '/' + SHRINE_BUILD_PARTS.length + ')</span>') +
+                    '</p>' + partsHtml + '</div>'
+                );
             }).join("");
             const completeTag = isJapanPrefectureComplete(pref) ? '<span class="mission-status-tag mission-status-done">🎏 コンプリート！</span>' : "";
             detailBox.innerHTML =
                 '<p class="shop-section-title" style="margin-top:0;">' + pref.name + " " + completeTag + '</p>' +
-                rows;
+                shrinesHtml;
         }
     }
 

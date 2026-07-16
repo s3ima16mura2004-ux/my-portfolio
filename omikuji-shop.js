@@ -509,7 +509,9 @@ async function buyNextMapTile() {
 
 // 🗾 全国神社巡りマップ（境内マップ完成後に解放される第2段階）の次の1県を購入する
 // 🗾 全国神社巡りマップ（境内マップ完成後に解放される第2段階）の神社を1つ参拝する（どの都道府県・神社からでも自由な順番でOK）
-async function buyJapanShrine(prefKey, shrineKey) {
+// 🔨 全国神社巡りマップ（境内マップ完成後に解放される第2段階）の神社パーツを1つ組み立てる。
+// 1つの神社は「鳥居→参道→手水舎→社殿」の4パーツすべてが揃うと完成（参拝済み）になる
+async function buyJapanShrinePart(prefKey, shrineKey, partKey) {
     if (!isShrineMapComplete()) {
         alert("🙅 全国神社巡りマップは、境内マップを完成させると解放されます。");
         return;
@@ -519,49 +521,62 @@ async function buyJapanShrine(prefKey, shrineKey) {
     if (!pref) return;
     const shrine = pref.shrines.find(s => s.key === shrineKey);
     if (!shrine) return;
+    const part = SHRINE_BUILD_PARTS.find(p => p.key === partKey);
+    if (!part) return;
 
-    if (japanShrinesOwned[shrine.key]) {
-        alert("⛩️ 「" + shrine.name + "」にはすでに参拝済みです。");
-        return;
-    }
-    if (currentMoney < shrine.cost) {
-        alert("🙅 所持金が足りません！\n「" + shrine.name + "」への参拝には" + shrine.cost.toLocaleString() + "円必要です。");
+    if (isJapanShrinePartOwned(shrine, part)) {
+        alert("🔨 「" + shrine.name + "」の" + part.name + "はすでに組み立て済みです。");
         return;
     }
 
-    currentMoney -= shrine.cost;
-    japanShrinesOwned[shrine.key] = true;
+    const cost = getShrinePartCost(shrine, part);
+    if (currentMoney < cost) {
+        alert("🙅 所持金が足りません！\n「" + shrine.name + "」の" + part.name + "の建立には" + cost.toLocaleString() + "円必要です。");
+        return;
+    }
+
+    currentMoney -= cost;
+    japanShrinePartsOwned[shrine.key + ":" + part.key] = true;
 
     updateMoneyDisplay();
     playSE("se-coin");
 
-    // 🎉 節目（コンプリートした神社の数）に到達したらお祝い金を授与する
-    const newCount = getJapanShrineOwnedCount();
+    // ⛩️ このパーツで神社がちょうど完成したかを確認する
+    const shrineJustCompleted = isJapanShrineComplete(shrine);
+    let shrineCompleteMsg = "";
     let milestoneMsg = "";
-    const milestone = MAP_JAPAN_MILESTONES.find(m => m.count === newCount);
-    if (milestone) {
-        currentMoney += milestone.prize;
-        totalWinnings += milestone.prize;
-        updateMoneyDisplay();
-        recordHistory("🗾全国神社巡り・節目ボーナス", milestone.prize, currentMoney);
-        milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n参拝した神社が" + newCount + "社に達したお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
-    }
-
-    // 🎏 その都道府県の神社をすべて参拝し終えたらお祝いメッセージ
     let prefCompleteMsg = "";
-    if (isJapanPrefectureComplete(pref)) {
-        prefCompleteMsg = "\n\n🎏【" + pref.name + "コンプリート！】🎏\n" + pref.name + "の神社をすべて参拝し終えました！";
-    }
+    let completeMsg = "";
 
-    const completeMsg = isShrineMapJapanComplete()
-        ? "\n\n👑🗾【日本全国制覇！】🗾👑\n全国" + JAPAN_SHRINE_COUNT + "社すべての神社を参拝し終えました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_JAPAN_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！"
-        : "";
+    if (shrineJustCompleted) {
+        shrineCompleteMsg = "\n\n⛩️【" + shrine.name + "、完成！】⛩️\n社殿が組み上がり、正式にご参拝いただけるようになりました！";
+
+        // 🎉 節目（コンプリートした神社の数）に到達したらお祝い金を授与する
+        const newCount = getJapanShrineOwnedCount();
+        const milestone = MAP_JAPAN_MILESTONES.find(m => m.count === newCount);
+        if (milestone) {
+            currentMoney += milestone.prize;
+            totalWinnings += milestone.prize;
+            updateMoneyDisplay();
+            recordHistory("🗾全国神社巡り・節目ボーナス", milestone.prize, currentMoney);
+            milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n完成した神社が" + newCount + "社に達したお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
+        }
+
+        // 🎏 その都道府県の神社をすべて完成し終えたらお祝いメッセージ
+        if (isJapanPrefectureComplete(pref)) {
+            prefCompleteMsg = "\n\n🎏【" + pref.name + "コンプリート！】🎏\n" + pref.name + "の神社をすべて完成させました！";
+        }
+
+        completeMsg = isShrineMapJapanComplete()
+            ? "\n\n👑🗾【日本全国制覇！】🗾👑\n全国" + JAPAN_SHRINE_COUNT + "社すべての神社を完成させました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_JAPAN_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！"
+            : "";
+    }
 
     updateShrineMapUI();
     updateTitlesUI();
     await saveUserState();
 
-    alert("⛩️ 「" + shrine.emoji + " " + shrine.name + "」に参拝しました！\n（" + pref.name + "）" + milestoneMsg + prefCompleteMsg + completeMsg);
+    alert("🔨 「" + shrine.name + "」の" + part.emoji + part.name + "が組み上がりました！\n（" + pref.name + "）" + shrineCompleteMsg + milestoneMsg + prefCompleteMsg + completeMsg);
 }
 
 // 🌾 夏越の大祓（6/25〜6/30）限定：「茅の輪くぐり」ボタン。半年分の「凶」「大凶」の累計を清算してご褒美を得る

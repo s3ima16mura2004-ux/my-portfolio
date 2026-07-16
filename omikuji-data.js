@@ -499,6 +499,14 @@ const MAP_JAPAN_MILESTONES = [
 ];
 const SHRINE_MAP_JAPAN_COMPLETE_BONUS = 0.02; // 全国制覇後、さらに永続的に大吉ボーナス+2%（境内マップ分と合算で+3%）
 
+// 🔨 神社を少しずつ組み立てていくための共通パーツ（全国どの神社にも同じ4パーツを使い回し、神社ごとの金額を配分する）
+const SHRINE_BUILD_PARTS = [
+    { key: "torii", emoji: "⛩️", name: "鳥居", weight: 0.15 },
+    { key: "sando", emoji: "🪨", name: "参道", weight: 0.15 },
+    { key: "chozuya", emoji: "💧", name: "手水舎", weight: 0.2 },
+    { key: "haiden", emoji: "🛕", name: "社殿", weight: 0.5 }
+];
+
 // 📖 図鑑（これまでに引いた結果を記録するコレクション。7種類すべて達成で永続ボーナス）
 const DEX_ENTRIES = [
     { key: "daidaikichi", emoji: "☀️", name: "大大吉", match: r => r === "大大吉" },
@@ -651,6 +659,7 @@ const TITLES = [
     { key: "japan_map_quarter", emoji: "🗾", name: "神社巡りの旅人", desc: "全国神社巡りマップで25社を参拝した", condition: s => (s.japanShrineOwnedCount || 0) >= 25 },
     { key: "japan_map_half", emoji: "🗾✨", name: "神社巡りの達人", desc: "全国神社巡りマップで50社を参拝した", condition: s => (s.japanShrineOwnedCount || 0) >= 50 },
     { key: "japan_pref_master", emoji: "🎏", name: "都道府県制覇の証", desc: "全国神社巡りマップで20都道府県をコンプリートした", condition: s => (s.japanPrefCompleteCount || 0) >= 20 },
+    { key: "shrine_builder", emoji: "🔨", name: "宮大工の心得", desc: "全国神社巡りマップで神社のパーツを100個組み立てた", condition: s => (s.japanShrinePartsOwnedCount || 0) >= 100 },
     { key: "japan_map_complete", emoji: "🗾👑", name: "日本全国制覇", desc: "全国のすべての神社（" + JAPAN_SHRINE_COUNT + "社）を参拝し終えた", condition: s => (s.japanShrineOwnedCount || 0) >= JAPAN_SHRINE_COUNT }
 ];
 

@@ -864,6 +864,48 @@ h1 {
     border-radius: 8px;
     padding: 10px 12px;
 }
+
+.map-japan-shrine-block {
+    border: 1px solid #e8dcc8;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    background: #fff;
+}
+
+.map-japan-shrine-block:last-child {
+    margin-bottom: 0;
+}
+
+.map-japan-shrine-block.map-japan-shrine-complete {
+    background: linear-gradient(135deg, #fff8e0, #fff2cc);
+    border-color: #d8860b;
+}
+
+.map-japan-shrine-title {
+    font-weight: bold;
+    margin: 0 0 6px;
+    font-size: 0.9rem;
+}
+
+.map-japan-shrine-progress {
+    font-weight: normal;
+    font-size: 0.75rem;
+    color: #a06a00;
+}
+
+.map-japan-part-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 0.82rem;
+    border-top: 1px dashed #eadfc8;
+}
+
+.map-japan-part-row:first-of-type {
+    border-top: none;
+}
 /* 🎯 デイリーミッション */
 .missions-summary {
     font-size: 0.85rem;

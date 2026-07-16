@@ -121,7 +121,21 @@ window.addEventListener("DOMContentLoaded", async () => {
             nagoshiBadCount = typeof data.nagoshiBadCount === "number" ? data.nagoshiBadCount : 0;
             nagoshiLastResetYear = typeof data.nagoshiLastResetYear === "number" ? data.nagoshiLastResetYear : 0;
             shrineMapLevel = typeof data.shrineMapLevel === "number" ? data.shrineMapLevel : 0;
-            japanShrinesOwned = (data.japanShrinesOwned && typeof data.japanShrinesOwned === "object") ? data.japanShrinesOwned : {};
+
+            // 🔨 神社パーツ単位の所持データを読み込む。旧形式（神社ごとのtrue/false）が残っていた場合は、
+            // その神社の全パーツを完成済みとして自動的に引き継ぐ（過去の参拝実績を失わないための移行措置）
+            japanShrinePartsOwned = (data.japanShrinePartsOwned && typeof data.japanShrinePartsOwned === "object") ? data.japanShrinePartsOwned : {};
+            if (data.japanShrinesOwned && typeof data.japanShrinesOwned === "object") {
+                JAPAN_PREFECTURES.forEach(pref => {
+                    pref.shrines.forEach(shrine => {
+                        if (data.japanShrinesOwned[shrine.key]) {
+                            SHRINE_BUILD_PARTS.forEach(part => {
+                                japanShrinePartsOwned[shrine.key + ":" + part.key] = true;
+                            });
+                        }
+                    });
+                });
+            }
         }
 
         refreshDailyMissions(); // 🎯 日付が変わっていればデイリーミッションをリセット（前日分の「お財布の達人」判定も含む）
