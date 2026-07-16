@@ -75,6 +75,44 @@ function showTab(tabName) {
             if (t.btn) t.btn.classList.remove("tab-active");
         }
     });
+
+    // 📂 図鑑・境内マップはモバイルでは「もっと」ドロワー配下にあるので、
+    // 選択状態を「もっと」ボタン側にも反映させる
+    const moreBtn = document.querySelector("#tabBtn-more");
+    const moreDexBtn = document.querySelector("#moreBtn-dex");
+    const moreMapBtn = document.querySelector("#moreBtn-map");
+    const isMoreTab = (tabName === "dex" || tabName === "map");
+
+    if (moreBtn) moreBtn.classList.toggle("tab-active", isMoreTab);
+    if (moreDexBtn) moreDexBtn.classList.toggle("more-menu-item-active", tabName === "dex");
+    if (moreMapBtn) moreMapBtn.classList.toggle("more-menu-item-active", tabName === "map");
+}
+
+// 📂 モバイル用サイドメニュー（図鑑・境内マップ）の開閉
+function toggleMoreMenu() {
+    const drawer = document.querySelector("#more-menu-drawer");
+    const overlay = document.querySelector("#more-menu-overlay");
+    if (!drawer || !overlay) return;
+
+    if (drawer.classList.contains("open")) {
+        closeMoreMenu();
+    } else {
+        drawer.classList.add("open");
+        overlay.classList.add("open");
+    }
+}
+
+function closeMoreMenu() {
+    const drawer = document.querySelector("#more-menu-drawer");
+    const overlay = document.querySelector("#more-menu-overlay");
+    if (drawer) drawer.classList.remove("open");
+    if (overlay) overlay.classList.remove("open");
+}
+
+// 📖🗺️ サイドメニューから図鑑／境内マップを選んだ時の処理
+function selectMoreTab(tabName) {
+    showTab(tabName);
+    closeMoreMenu();
 }
 function updateShopUI() {
     const rank = getVisitorRank(totalWinnings);

@@ -135,6 +135,7 @@
                     <button id="tabBtn-collect" class="tab-btn" onclick="showTab('collect')" type="button">🎒 収集品・貯金</button>
                     <button id="tabBtn-dex" class="tab-btn" onclick="showTab('dex')" type="button">📖 図鑑</button>
                     <button id="tabBtn-map" class="tab-btn" onclick="showTab('map')" type="button">🗺️ 境内マップ</button>
+                    <button id="tabBtn-more" class="tab-btn tab-btn-more" onclick="toggleMoreMenu()" type="button">☰ もっと（図鑑・マップ）</button>
                 </div>
 
                 <div id="tab-missions" class="hidden">
@@ -435,6 +436,16 @@
     <audio id="se-win" src="../sounds/win.mp3" preload="auto"></audio>
     <audio id="se-lose" src="../sounds/lose.mp3" preload="auto"></audio>
     <audio id="se-doom" src="../sounds/doom.mp3" preload="auto"></audio>
+    <div id="more-menu-overlay" class="more-menu-overlay" onclick="closeMoreMenu()"></div>
+    <div id="more-menu-drawer" class="more-menu-drawer">
+        <div class="more-menu-header">
+            <span>📂 メニュー</span>
+            <button class="more-menu-close" onclick="closeMoreMenu()" type="button">✕</button>
+        </div>
+        <button id="moreBtn-dex" class="more-menu-item" onclick="selectMoreTab('dex')" type="button">📖 図鑑</button>
+        <button id="moreBtn-map" class="more-menu-item" onclick="selectMoreTab('map')" type="button">🗺️ 境内マップ</button>
+    </div>
+
     <div id="confetti-overlay"></div>
     <div id="doom-overlay"></div>
     <div id="season-fx-overlay"></div>
