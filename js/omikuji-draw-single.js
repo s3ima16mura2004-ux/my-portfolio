@@ -124,7 +124,7 @@ function omikuji() {
         if (usedBirthdayTicket) {
             birthdayTicket = false;
             isExtremeTier = true;
-            imgSrc = "omikuji_daidaikichi.jpg";
+            imgSrc = "../images/omikuji_daidaikichi.jpg";
             resultName = "大大吉";
             prizeMoney = DAIDAIKICHI_PRIZE;
             gotDaidaikichi = true;
@@ -132,7 +132,7 @@ function omikuji() {
         } else if (okj >= kamikichiThreshold) {
             // 😊 超激レア「神吉」（大大吉よりもさらに珍しい特別枠）
             isExtremeTier = true;
-            imgSrc = "omikuji_kamikichi.jpg";
+            imgSrc = "../images/omikuji_kamikichi.jpg";
             resultName = "神吉";
             prizeMoney = KAMIKICHI_PRIZE;
             gotKamikichi = true;
@@ -141,33 +141,33 @@ function omikuji() {
         } else if (okj >= daidaikichiThreshold) {
             // ☀️ 激レア「大大吉」
             isExtremeTier = true;
-            imgSrc = "omikuji_daidaikichi.jpg";
+            imgSrc = "../images/omikuji_daidaikichi.jpg";
             resultName = "大大吉";
             prizeMoney = DAIDAIKICHI_PRIZE;
             gotDaidaikichi = true;
             if (kodomonohiActive) gotKodomonohiExtreme = true; // 🎏 こどもの日の称号判定
         } else if (okj >= 0.99) {
-            imgSrc = "omikuji_daikichi.png";
+            imgSrc = "../images/omikuji_daikichi.png";
             resultName = "大吉";
             prizeMoney = 100000;
         } else if (okj >= 0.95) {
-            imgSrc = "omikuji_kichi.png";
+            imgSrc = "../images/omikuji_kichi.png";
             resultName = "吉";
             prizeMoney = 10000;
         } else if (okj >= 0.85) {
-            imgSrc = "omikuji_chuukichi.png";
+            imgSrc = "../images/omikuji_chuukichi.png";
             resultName = "中吉";
             prizeMoney = 2000;
         } else if (okj >= 0.7) {
-            imgSrc = "omikuji_syoukichi.png";
+            imgSrc = "../images/omikuji_syoukichi.png";
             resultName = "小吉";
             prizeMoney = 1000;
         } else if (okj >= 0.6) {
-            imgSrc = "omikuji_suekichi.png";
+            imgSrc = "../images/omikuji_suekichi.png";
             resultName = "末吉";
             prizeMoney = 500;
         } else if (okj >= 0.1) {
-            imgSrc = "omikuji_kyou.png";
+            imgSrc = "../images/omikuji_kyou.png";
             resultName = "凶";
             prizeMoney = 0;
         } else if (okj >= daidaikyouThreshold) {
@@ -181,7 +181,7 @@ function omikuji() {
         } else {
             // 💀 激レア「大大凶」：免除なしで所持金の80%を没収する代わりに、大きなフィーバーで挽回のチャンスを与える
             isExtremeTier = true;
-            imgSrc = "omikuji_daidaikyou.jpg";
+            imgSrc = "../images/omikuji_daidaikyou.jpg";
             resultName = "大大凶";
             const tax = Math.floor(currentMoney * 0.8);
             prizeMoney = -tax;

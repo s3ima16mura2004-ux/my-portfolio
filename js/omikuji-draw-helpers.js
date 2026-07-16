@@ -149,7 +149,7 @@ function resolveTrial() {
         const winAmount = currentMoney;
         outcome = {
             resultName: "神の試練(龍神の加護)",
-            imgSrc: "omikuji_daikichi.png",
+            imgSrc: "../images/omikuji_daikichi.png",
             prizeMoney: winAmount,
             extraMsg: "🐉【龍神の逆鱗】🐉\n龍神の力で、確認するまでもなく試練に打ち勝ちました！\n所持金が2倍になりました！",
             feverAwarded: false
@@ -159,7 +159,7 @@ function resolveTrial() {
         const winAmount = currentMoney;
         outcome = {
             resultName: "神の試練(小判の加護)",
-            imgSrc: "omikuji_daikichi.png",
+            imgSrc: "../images/omikuji_daikichi.png",
             prizeMoney: winAmount,
             extraMsg: "🪙【黄金の小判の加護】🪙\n戦わずして試練に打ち勝ちました！\n所持金が2倍になりました！",
             feverAwarded: false
@@ -179,7 +179,7 @@ function resolveTrial() {
                 const winAmount = currentMoney;
                 outcome = {
                     resultName: "神の試練(成功)",
-                    imgSrc: "omikuji_daikichi.png",
+                    imgSrc: "../images/omikuji_daikichi.png",
                     prizeMoney: winAmount,
                     extraMsg: "⚔️【試練達成】⚔️\n見事に打ち勝ちました！所持金が2倍になりました！",
                     feverAwarded: false
@@ -192,7 +192,7 @@ function resolveTrial() {
                 if (kiyomeShioActive) tax = Math.floor(tax / 2); // 🧂「清めの塩」ミッション報酬効果
                 outcome = {
                     resultName: "神の試練(失敗)",
-                    imgSrc: "omikuji_daikyou.png",
+                    imgSrc: "../images/omikuji_daikyou.png",
                     prizeMoney: -tax,
                     extraMsg: "💥【試練失敗】💥\n試練に敗れました…所持金の半分【" + tax.toLocaleString() + "円】を没収されました。",
                     feverAwarded: true
@@ -203,7 +203,7 @@ function resolveTrial() {
             if (Math.random() < 0.2) {
                 outcome = {
                     resultName: "神の試練(回避)",
-                    imgSrc: "omikuji_daikyou.png",
+                    imgSrc: "../images/omikuji_daikyou.png",
                     prizeMoney: 0,
                     extraMsg: "🌟【出世大凶】🌟\n挑戦を避けましたが、神様の温情でお祓い料は免除されました。",
                     feverAwarded: false
@@ -216,7 +216,7 @@ function resolveTrial() {
                 if (kiyomeShioActive) tax = Math.floor(tax / 2); // 🧂「清めの塩」ミッション報酬効果
                 outcome = {
                     resultName: "神の試練(回避)",
-                    imgSrc: "omikuji_daikyou.png",
+                    imgSrc: "../images/omikuji_daikyou.png",
                     prizeMoney: -tax,
                     extraMsg: "🙏 挑戦を避け、お祓い料として【" + tax.toLocaleString() + "円】を納めました。",
                     feverAwarded: true

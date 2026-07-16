@@ -7,16 +7,16 @@
 // ============================================================
 
 const omikujiImages = [
-    "omikuji_daikichi.png",
-    "omikuji_kichi.png",
-    "omikuji_chuukichi.png",
-    "omikuji_syoukichi.png",
-    "omikuji_suekichi.png",
-    "omikuji_kyou.png",
-    "omikuji_daikyou.png",
-    "omikuji_daidaikichi.jpg",
-    "omikuji_kamikichi.jpg",
-    "omikuji_daidaikyou.jpg"
+    "../images/omikuji_daikichi.png",
+    "../images/omikuji_kichi.png",
+    "../images/omikuji_chuukichi.png",
+    "../images/omikuji_syoukichi.png",
+    "../images/omikuji_suekichi.png",
+    "../images/omikuji_kyou.png",
+    "../images/omikuji_daikyou.png",
+    "../images/omikuji_daidaikichi.jpg",
+    "../images/omikuji_kamikichi.jpg",
+    "../images/omikuji_daidaikyou.jpg"
 ];
 
 // 🎋 ラッキーアイテムの一覧（毎日ログイン時に1個抽選・無料）
