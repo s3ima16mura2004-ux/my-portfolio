@@ -53,8 +53,13 @@ function omikuji10() {
     // 🌙 現在の時間帯を判定（丑三つ時は大大吉・大大凶の確率が跳ね上がる。10連は1回だけ判定）
     const timePeriod10 = getTimePeriod();
     if (timePeriod10 === "ushimitsu") gotUshimitsuDraw = true;
-    const daidaikichiThreshold10 = timePeriod10 === "ushimitsu" ? DAIDAIKICHI_THRESHOLD_USHIMITSU : DAIDAIKICHI_THRESHOLD_NORMAL;
+    // 🎏 こどもの日（5/1〜5/5）は昇り龍にあやかり、大大吉以上ランクのしきい値が少し下がる（＝出現率アップ）
+    const kodomonohiActive10 = isKodomonohiActive();
+    const setsubunActive10 = isSetsubunActive();
+    const daidaikichiThreshold10 = (timePeriod10 === "ushimitsu" ? DAIDAIKICHI_THRESHOLD_USHIMITSU : DAIDAIKICHI_THRESHOLD_NORMAL)
+        - (kodomonohiActive10 ? KODOMONOHI_DAIDAIKICHI_REDUCTION : 0);
     const daidaikyouThreshold10 = timePeriod10 === "ushimitsu" ? DAIDAIKYOU_THRESHOLD_USHIMITSU : DAIDAIKYOU_THRESHOLD_NORMAL;
+    const kamikichiThreshold10 = KAMIKICHI_THRESHOLD - (kodomonohiActive10 ? KODOMONOHI_KAMIKICHI_REDUCTION : 0);
 
     let shuffleCount = 0;
     const shuffleInterval = setInterval(() => {
@@ -91,6 +96,8 @@ function omikuji10() {
         if (ishikoro500Claimed) daikichiBonus += 0.01;
         if (equippedCollectible === "tanzaku") daikichiBonus += 0.01;
         if (isTanabataLuckActive()) daikichiBonus += TANABATA_DAIKICHI_BONUS; // 🎋 七夕の願いが叶った日
+        if (hasShopEffect("wakaba_omamori")) daikichiBonus += 0.04; // 🌱 春の芽吹き限定ショップアイテム
+        if (isShrineMapComplete()) daikichiBonus += SHRINE_MAP_COMPLETE_BONUS; // 🗺️ 境内マップ完成の永続ボーナス
                 if (daikichiBonus > 0) okj = Math.min(1, okj + daikichiBonus);
 
                 if (i === 9) lastRandomNum = okj;
@@ -99,19 +106,21 @@ function omikuji10() {
                 let isExtremeTier10 = false;
                 let resultName10 = "";
 
-                if (okj >= KAMIKICHI_THRESHOLD) {
+                if (okj >= kamikichiThreshold10) {
                     resultsCount["神吉"]++;
                     resultName10 = "神吉";
                     prize = KAMIKICHI_PRIZE;
                     isExtremeTier10 = true;
                     gotKamikichi = true;
             kamikichiBonus += KAMIKICHI_BONUS_PER_DRAW;
+            if (kodomonohiActive10) gotKodomonohiExtreme = true; // 🎏 こどもの日の称号判定
                 } else if (okj >= daidaikichiThreshold10) {
                     resultsCount["大大吉"]++;
                     resultName10 = "大大吉";
                     prize = DAIDAIKICHI_PRIZE;
                     isExtremeTier10 = true;
                     gotDaidaikichi = true;
+                    if (kodomonohiActive10) gotKodomonohiExtreme = true; // 🎏 こどもの日の称号判定
                 } else if (okj >= 0.99) {
                     resultsCount["大吉"]++;
                     resultName10 = "大吉";
@@ -142,10 +151,12 @@ function omikuji10() {
                     gotDaikyouIn10 = true;
 
                     // 🪙装備中なら「黄金の小判」で確定免除
+                    // 🫘 節分期間中は、10連では豆まきミニゲームを個別にできない代わりに免除率を底上げする
+                    const exemptionChance10 = 0.2 + (setsubunActive10 ? SETSUBUN_MULTI_EXEMPTION_BONUS : 0);
                     if (equippedCollectible === "koban") {
                         exemptedCount++;
                         consumeCollectible("koban");
-                    } else if (Math.random() < 0.2) {
+                    } else if (Math.random() < exemptionChance10) {
                         exemptedCount++; // 免除！
                     } else {
                         // 半分持っていかれる（連続で大凶が出ると、その都度残り金額の半分が減っていきます）
@@ -196,7 +207,7 @@ function omikuji10() {
                 allDropped = allDropped.concat(rollDrops());
 
                 // 📖 図鑑に記録
-                if (okj >= KAMIKICHI_THRESHOLD) markDex("神吉");
+                if (okj >= kamikichiThreshold10) markDex("神吉");
                 else if (okj >= daidaikichiThreshold10) markDex("大大吉");
                 else if (okj >= 0.99) markDex("大吉");
                 else if (okj >= 0.95) markDex("吉");
@@ -231,6 +242,7 @@ function omikuji10() {
                 totalPrize += prize;
                 checkZoromeBonus(okj);
                 trackMissionDraw(resultName10, prize); // 🎯 デイリーミッション（参拝回数・凶克服・連勝街道・大金稼ぎ等）の進捗を更新
+                trackNagoshiBadLuck(resultName10, prize); // 🌾 夏越の大祓「茅の輪くぐり」用の凶事カウントを更新
             }
 
             if (gotDaidaikyouIn10 || gotDaikyouIn10) {

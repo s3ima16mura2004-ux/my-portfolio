@@ -762,6 +762,45 @@ h1 {
     color: #d8860b;
     text-align: center;
 }
+
+/* 🗺️ 境内マップ */
+.map-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+    gap: 8px;
+    margin: 10px 0 14px;
+}
+
+.map-tile {
+    border-radius: 8px;
+    padding: 10px 6px;
+    text-align: center;
+    border: 1px solid #e0d0c0;
+    background: #f0f0f0;
+    color: #aaa;
+}
+
+.map-tile.map-tile-owned {
+    background: linear-gradient(135deg, #fff2cc, #ffd700);
+    border-color: #d8860b;
+    color: #4a3728;
+}
+
+.map-tile.map-tile-next {
+    border: 2px dashed #d8860b;
+    background: #fffaf0;
+    color: #b8860b;
+    animation: map-tile-pulse 1.6s infinite alternate;
+}
+
+@keyframes map-tile-pulse {
+    0% { box-shadow: 0 0 3px rgba(216, 134, 11, 0.3); }
+    100% { box-shadow: 0 0 10px rgba(216, 134, 11, 0.8); }
+}
+
+.map-tile-emoji {
+    font-size: 1.6rem;
+}
 /* 🎯 デイリーミッション */
 .missions-summary {
     font-size: 0.85rem;

@@ -106,6 +106,40 @@ const URN_LEVELS = [
     { level: 5, name: "伝説の壺", cost: 300000, bonus: 0.03 }
 ];
 
+// 🗺️ 境内マップ（所持金を使って1マスずつ買い進め、少しずつ神社の境内図を完成させていく大型の金策先）
+// 順番に購入するしかない（マップの端から埋まっていくイメージ）。金額は後半になるほど跳ね上がる
+const MAP_TILES = [
+    { key: "torii", emoji: "⛩️", name: "鳥居", cost: 3000, desc: "境内の入り口に立つ鳥居" },
+    { key: "sandou", emoji: "🪨", name: "参道の敷石", cost: 5000, desc: "鳥居から続く石畳の参道" },
+    { key: "komainu_a", emoji: "🐕", name: "狛犬（阿形）", cost: 8000, desc: "参道を守る狛犬（口を開けた阿形）" },
+    { key: "komainu_b", emoji: "🐕‍🦺", name: "狛犬（吽形）", cost: 12000, desc: "参道を守る狛犬（口を閉じた吽形）" },
+    { key: "chozuya", emoji: "💧", name: "手水舎", cost: 18000, desc: "参拝前に手と口を清める手水舎" },
+    { key: "lantern_a", emoji: "🏮", name: "石灯籠（東）", cost: 25000, desc: "参道を照らす石灯籠" },
+    { key: "lantern_b", emoji: "🏮", name: "石灯籠（西）", cost: 32000, desc: "参道を照らすもう一つの石灯籠" },
+    { key: "sacred_tree", emoji: "🌳", name: "御神木", cost: 42000, desc: "境内にそびえる大きな御神木" },
+    { key: "ema", emoji: "🪧", name: "絵馬掛け", cost: 55000, desc: "願いごとを書いた絵馬が並ぶ場所" },
+    { key: "omikuji_stand", emoji: "🎋", name: "おみくじ結び所", cost: 70000, desc: "引いたおみくじを結ぶための場所" },
+    { key: "bridge", emoji: "🌉", name: "太鼓橋", cost: 90000, desc: "境内の池にかかる小さな太鼓橋" },
+    { key: "koi_pond", emoji: "🎏", name: "鯉の泳ぐ池", cost: 115000, desc: "色とりどりの鯉が泳ぐ池" },
+    { key: "drum_tower", emoji: "🥁", name: "太鼓楼", cost: 145000, desc: "祭礼で太鼓が打ち鳴らされる太鼓楼" },
+    { key: "miko", emoji: "👘", name: "巫女舞の舞台", cost: 180000, desc: "神楽や巫女舞が奉納される舞台" },
+    { key: "stalls", emoji: "🏯", name: "縁日の屋台通り", cost: 220000, desc: "祭りの日ににぎわう屋台通り" },
+    { key: "haiden", emoji: "🛕", name: "拝殿", cost: 270000, desc: "参拝者がお参りをする拝殿" },
+    { key: "honden", emoji: "🏛️", name: "本殿", cost: 330000, desc: "御神体が祀られる神聖な本殿" },
+    { key: "treasure_hall", emoji: "🏺", name: "宝物殿", cost: 400000, desc: "神社に伝わる宝物を収めた宝物殿" },
+    { key: "starry_sky", emoji: "🌌", name: "夜空と星々", cost: 500000, desc: "境内を包む満天の星空" },
+    { key: "golden_shrine", emoji: "✨", name: "黄金の御社", cost: 650000, desc: "すべてが完成した証、黄金に輝く御社" }
+];
+
+// 🗺️ 境内マップの節目（マス数）で贈られる祝儀。フルコンプリートで永続の大吉ボーナスも付与される
+const MAP_MILESTONES = [
+    { count: 5, prize: 15000 },
+    { count: 10, prize: 40000 },
+    { count: 15, prize: 90000 },
+    { count: 20, prize: 300000 }
+];
+const SHRINE_MAP_COMPLETE_BONUS = 0.01; // 境内マップ完成後、永続的に大吉ボーナス+1%
+
 // 📖 図鑑（これまでに引いた結果を記録するコレクション。7種類すべて達成で永続ボーナス）
 const DEX_ENTRIES = [
     { key: "daidaikichi", emoji: "☀️", name: "大大吉", match: r => r === "大大吉" },
@@ -252,7 +286,9 @@ const TITLES = [
     { key: "nagoshi_collector", emoji: "🌾✨", name: "夏越の清め手", desc: "夏越の大祓の限定アイテムを合計15個集めた", condition: s => {
         const oi = s.ownedItems || {};
         return ((oi.chinowa_kaya || 0) + (oi.minazuki_gashi || 0) + (oi.oharai_no_gohei || 0)) >= 15;
-    } }
+    } },
+    { key: "shrine_map_halfway", emoji: "🗺️", name: "境内図の道半ば", desc: "境内マップを半分（10マス）まで埋めた", condition: s => (s.shrineMapLevel || 0) >= 10 },
+    { key: "shrine_map_complete", emoji: "🗺️✨", name: "境内マップ完成", desc: "境内マップをすべて（20マス）埋め、神社を完成させた", condition: s => (s.shrineMapLevel || 0) >= MAP_TILES.length }
 ];
 
 // 🎂 誕生日ボーナス（ログイン画面で任意設定。誕生日当日のログインで「大大吉確定チケット」を1枚獲得）

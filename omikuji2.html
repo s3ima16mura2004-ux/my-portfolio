@@ -66,6 +66,10 @@
                 <p id="nenmatsu-banner" class="ushimitsu-banner hidden">🔔 ただいま「年末」の夜…除夜の鐘が静かに響いています</p>
                 <p id="nenmatsu-day-banner" class="ushimitsu-banner hidden">❄️ 年の瀬の昼下がり…今年一年を振り返りながら雪が降っています</p>
                 <p id="valentine-banner" class="ushimitsu-banner hidden">💝 ただいま「バレンタイン」シーズン！チョコおみくじで良いご縁を占いましょう</p>
+                <p id="setsubun-banner" class="ushimitsu-banner hidden">🫘 ただいま「節分」シーズン！大凶（神の試練）で厄を負いそうになっても、豆まきで祓えるかもしれません</p>
+                <p id="haru-banner" class="ushimitsu-banner hidden">🌱 ただいま「春の芽吹き」シーズン！ショップに新生活を応援する「若葉のお守り」が並んでいます</p>
+                <p id="hanami-banner" class="ushimitsu-banner hidden">🌸 ただいま「桜満開・花見」シーズン！境内に桜吹雪が舞い、「お花見団子」が手に入ることも</p>
+                <p id="kodomonohi-banner" class="ushimitsu-banner hidden">🎏 ただいま「こどもの日」シーズン！黄金の鯉のぼりが空を泳ぎ、大大吉以上の出現率がアップ中！</p>
 
                 <div id="tanabata-box" class="lucky-item-box hidden">
                     <p class="lucky-item-title">🎋 七夕・短冊に願いを書く（7/1〜7/7限定） 🎋</p>
@@ -78,6 +82,12 @@
                     <p class="lucky-item-title">💝 バレンタイン・チョコおみくじ（2/1〜2/14限定） 💝</p>
                     <p id="choco-status-text" class="lucky-item-desc">-</p>
                     <button id="choco-omikuji-btn" class="btn-equip" onclick="chocoOmikuji()" type="button">🍫 チョコおみくじを引く</button>
+                </div>
+
+                <div id="nagoshi-box" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">⛩️ 夏越の大祓・茅の輪くぐり（6/25〜6/30限定） ⛩️</p>
+                    <p id="nagoshi-status-text" class="lucky-item-desc">-</p>
+                    <button id="nagoshi-btn" class="btn-equip" onclick="nagoshiChinowaKuguri()" type="button">⛩️ 茅の輪をくぐる</button>
                 </div>
 
                 <div id="nenmatsu-bell-box" class="lucky-item-box hidden">
@@ -124,6 +134,7 @@
                     <button id="tabBtn-shop" class="tab-btn" onclick="showTab('shop')" type="button">🛍️ アイテムショップ</button>
                     <button id="tabBtn-collect" class="tab-btn" onclick="showTab('collect')" type="button">🎒 収集品・貯金</button>
                     <button id="tabBtn-dex" class="tab-btn" onclick="showTab('dex')" type="button">📖 図鑑</button>
+                    <button id="tabBtn-map" class="tab-btn" onclick="showTab('map')" type="button">🗺️ 境内マップ</button>
                 </div>
 
                 <div id="tab-missions" class="hidden">
@@ -333,6 +344,12 @@
                             <span class="collect-item-note">100個で称号／500個で永久ボーナス／1000個ごとにガチャ券</span>
                         </div>
 
+                        <div id="hanami-dango-row" class="collect-item-row hidden">
+                            <span>🍡 お花見団子 × <span id="count-hanami-dango">0</span></span>
+                            <button id="hanami-dango-use-btn" class="btn-equip" onclick="useHanamiDango()" type="button">使う</button>
+                        </div>
+                        <p class="collect-item-desc">使うと、次の1回の単発おみくじだけ大吉運が少しアップします。（お花見シーズン限定ドロップ）</p>
+
                         <div id="seasonal-items-box" class="hidden"></div>
 
                         <div class="collect-item-row">
@@ -369,6 +386,17 @@
                         <p id="dex-progress" class="dex-progress">達成状況：0 / 10</p>
                         <div id="dex-grid" class="dex-grid"></div>
                         <p id="dex-reward-status" class="dex-reward-status hidden">-</p>
+                    </div>
+                </div>
+
+                <div id="tab-map" class="hidden">
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">🗺️ 境内マップを完成させよう</h3>
+                        <p class="bank-desc">所持金を使って1マスずつ購入し、少しずつ神社の境内図を完成させていきましょう。マスは端から順番に埋まっていきます（後半になるほど費用が上がります）。節目（5・10・15・20マス）でお祝い金、コンプリートで永続の大吉ボーナスがもらえます。</p>
+                        <p id="map-progress" class="dex-progress">完成状況：0 / 20マス</p>
+                        <div id="map-grid" class="map-grid"></div>
+                        <p id="map-next-text" class="collect-item-desc">-</p>
+                        <button id="map-buy-btn" class="btn-shop-buy" onclick="buyNextMapTile()" type="button">このマスを購入する</button>
                     </div>
                 </div>
             </div>

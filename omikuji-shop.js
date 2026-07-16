@@ -230,6 +230,8 @@ function rollDrops() {
             ownedItems[item.key] = (ownedItems[item.key] || 0) + 1;
             dropped.push(item);
 
+            if (item.key === "hanami_dango") hanamiDangoTotalCollected++; // 🍡 称号「花見団子の達人」判定用（使っても減らない累計）
+
             if (item.key === "ishikoro") {
                 if (ownedItems.ishikoro === 100) {
                     setTimeout(() => {
@@ -441,6 +443,100 @@ async function chocoOmikuji() {
         "今日の運勢は【" + tier.name + "】！【" + tier.prize.toLocaleString() + "円】を授かりました。\n" +
         "そしてあなたの「ペア運勢」は…" + pair.emoji + "【" + pair.label + "】でした！\n" +
         "良いご縁がありますように…♡"
+    );
+}
+
+// 🍡 お花見団子を1個使って、次の1回の単発おみくじだけ大吉運を少しアップさせる（花見シーズン以外でも所持していれば使用可）
+async function useHanamiDango() {
+    if (!(ownedItems.hanami_dango > 0)) {
+        alert("🙅 お花見団子を持っていません！お花見（4月）シーズン中のおみくじで手に入るかもしれません。");
+        return;
+    }
+    if (hanamiDangoActive) {
+        alert("🍡 すでに1個、効果の準備ができています。次の単発おみくじで発動します。");
+        return;
+    }
+
+    ownedItems.hanami_dango--;
+    hanamiDangoActive = true;
+
+    updateShopUI();
+    playSE("se-coin");
+    await saveUserState();
+
+    alert("🍡【お花見団子、実食！】🍡\n次の単発おみくじで、大吉運が少しだけアップします！");
+}
+
+// 🗺️ 境内マップの次の1マスを購入する（所持金を使って少しずつマップを完成させていく大型の金策先）
+async function buyNextMapTile() {
+    const tile = MAP_TILES[shrineMapLevel];
+    if (!tile) {
+        alert("🗺️ 境内マップはすでに完成しています！");
+        return;
+    }
+    if (currentMoney < tile.cost) {
+        alert("🙅 所持金が足りません！\n「" + tile.name + "」の購入には" + tile.cost.toLocaleString() + "円必要です。");
+        return;
+    }
+
+    currentMoney -= tile.cost;
+    shrineMapLevel++;
+
+    updateMoneyDisplay();
+    playSE("se-coin");
+
+    // 🎉 節目（5・10・15・20マス）に到達したらお祝い金を授与する
+    let milestoneMsg = "";
+    const milestone = MAP_MILESTONES.find(m => m.count === shrineMapLevel);
+    if (milestone) {
+        currentMoney += milestone.prize;
+        totalWinnings += milestone.prize;
+        updateMoneyDisplay();
+        recordHistory("🗺️境内マップ・節目ボーナス", milestone.prize, currentMoney);
+        milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n境内マップが" + shrineMapLevel + "マス埋まったお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
+    }
+
+    const completeMsg = isShrineMapComplete()
+        ? "\n\n🏆✨【境内マップ完成！】✨🏆\nすべてのマスが埋まり、神社の境内図が完成しました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！"
+        : "";
+
+    updateShrineMapUI();
+    updateTitlesUI();
+    await saveUserState();
+
+    alert("🗺️ 「" + tile.emoji + " " + tile.name + "」のマスが埋まりました！\n" + tile.desc + milestoneMsg + completeMsg);
+}
+
+// 🌾 夏越の大祓（6/25〜6/30）限定：「茅の輪くぐり」ボタン。半年分の「凶」「大凶」の累計を清算してご褒美を得る
+async function nagoshiChinowaKuguri() {
+    if (!isSeasonalEventActive("nagoshi")) return;
+
+    if (nagoshiBadCount <= 0) {
+        alert("🌾 まだ祓うべき凶事が記録されていません。ここまで清らかな参拝でしたね！");
+        return;
+    }
+
+    unlockAllAudio();
+    const clearedCount = nagoshiBadCount;
+    const prize = Math.min(clearedCount * NAGOSHI_PRIZE_PER_BAD, NAGOSHI_PRIZE_CAP);
+
+    currentMoney += prize;
+    totalWinnings += prize;
+    nagoshiBadCount = 0;
+    nagoshiLastResetYear = new Date().getFullYear();
+
+    updateMoneyDisplay();
+    playSE("se-win");
+    recordHistory("🌾夏越の大祓・茅の輪くぐり", prize, currentMoney);
+    updateNagoshiUI();
+    updateTitlesUI();
+    await saveUserState();
+
+    alert(
+        "⛩️🌾【夏越の大祓・茅の輪くぐり】🌾⛩️\n" +
+        "半年間の「凶」「大凶」の穢れ、合計" + clearedCount + "回分をすべて祓い清めました！\n" +
+        "神様から清めの証として【" + prize.toLocaleString() + "円】を授かりました！\n" +
+        "（称号「茅の輪をくぐりし者」を獲得！）"
     );
 }
 

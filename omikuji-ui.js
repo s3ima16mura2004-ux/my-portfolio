@@ -48,18 +48,21 @@ function showTab(tabName) {
     const shopTab = document.querySelector("#tab-shop");
     const collectTab = document.querySelector("#tab-collect");
     const dexTab = document.querySelector("#tab-dex");
+    const mapTab = document.querySelector("#tab-map");
     const missionsBtn = document.querySelector("#tabBtn-missions");
     const prizeBtn = document.querySelector("#tabBtn-prizes");
     const shopBtn = document.querySelector("#tabBtn-shop");
     const collectBtn = document.querySelector("#tabBtn-collect");
     const dexBtn = document.querySelector("#tabBtn-dex");
+    const mapBtn = document.querySelector("#tabBtn-map");
 
     const tabs = [
         { name: "missions", el: missionsTab, btn: missionsBtn },
         { name: "prizes", el: prizeTab, btn: prizeBtn },
         { name: "shop", el: shopTab, btn: shopBtn },
         { name: "collect", el: collectTab, btn: collectBtn },
-        { name: "dex", el: dexTab, btn: dexBtn }
+        { name: "dex", el: dexTab, btn: dexBtn },
+        { name: "map", el: mapTab, btn: mapBtn }
     ];
 
     tabs.forEach(t => {
@@ -211,6 +214,7 @@ function updateShopUI() {
     updateActiveItemsUI();
     updateUrnUI();
     updateRankUI();
+    updateShrineMapUI();
 }
 function updateUrnUI() {
     const current = URN_LEVELS[urnLevel];
@@ -273,7 +277,13 @@ function updateTitlesUI() {
     const list = document.querySelector("#titles-list");
     if (!box || !list) return;
 
-    const stats = { totalDraws, totalDaikichi, totalProfit, urnLevel, ownedItems, dexRewardClaimed, gotDaidaikichi, gotKamikichi, gotDaidaikyou, gotUshimitsuDraw, ishikoro500Claimed, communityDraws, orihimeHikoboshiMeetCount, hatsuyumeComplete, steadyVisitorEarned };
+    const stats = {
+        totalDraws, totalDaikichi, totalProfit, urnLevel, ownedItems, dexRewardClaimed,
+        gotDaidaikichi, gotKamikichi, gotDaidaikyou, gotUshimitsuDraw, ishikoro500Claimed,
+        communityDraws, orihimeHikoboshiMeetCount, hatsuyumeComplete, steadyVisitorEarned,
+        hanamiDangoTotalCollected, gotKodomonohiExtreme, mamemakiSuccessCount, nagoshiLastResetYear,
+        shrineMapLevel
+    };
     const earned = TITLES.filter(t => t.condition(stats));
 
     if (earned.length === 0) {
@@ -1074,5 +1084,48 @@ function updateNagoshiUI() {
         statusText.textContent = nagoshiBadCount > 0
             ? "🌾 半年間で祓うべき凶事：" + nagoshiBadCount + "回（茅の輪をくぐると清められます）"
             : "🌾 現在、祓うべき凶事は記録されていません。清らかな半年でしたね！";
+    }
+}
+
+// 🗺️ 境内マップタブの表示を更新する（所持金を使って1マスずつ買い進めるマップの完成状況）
+function updateShrineMapUI() {
+    const grid = document.querySelector("#map-grid");
+    if (!grid) return;
+
+    grid.innerHTML = MAP_TILES.map((tile, i) => {
+        const owned = i < shrineMapLevel;
+        const isNext = i === shrineMapLevel;
+        const tooltip = owned
+            ? tile.name + "：" + tile.desc
+            : (isNext ? "次に購入できるマス：" + tile.name + "（" + tile.cost.toLocaleString() + "円）" : "？？？（未購入）");
+        return (
+            '<div class="map-tile' + (owned ? " map-tile-owned" : "") + (isNext ? " map-tile-next" : "") + '" title="' +
+            tooltip.replace(/"/g, "&quot;") + '">' +
+            '<div class="map-tile-emoji">' + (owned ? tile.emoji : "❔") + '</div>' +
+            '</div>'
+        );
+    }).join("");
+
+    const progressEl = document.querySelector("#map-progress");
+    if (progressEl) {
+        progressEl.textContent = "完成状況：" + shrineMapLevel + " / " + MAP_TILES.length + "マス";
+    }
+
+    const nextText = document.querySelector("#map-next-text");
+    const buyBtn = document.querySelector("#map-buy-btn");
+    const next = MAP_TILES[shrineMapLevel];
+
+    if (!next) {
+        if (nextText) nextText.textContent = "🏆 境内マップが完成しました！永続的に大吉ボーナス+" + (SHRINE_MAP_COMPLETE_BONUS * 100).toFixed(1) + "%を授かっています。";
+        if (buyBtn) buyBtn.classList.add("hidden");
+        return;
+    }
+
+    if (nextText) {
+        nextText.textContent = "次のマス：" + next.emoji + " " + next.name + "（" + next.cost.toLocaleString() + "円）　" + next.desc;
+    }
+    if (buyBtn) {
+        buyBtn.classList.remove("hidden");
+        buyBtn.disabled = currentMoney < next.cost;
     }
 }

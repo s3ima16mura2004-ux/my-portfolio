@@ -120,6 +120,7 @@ window.addEventListener("DOMContentLoaded", async () => {
             mamemakiSuccessCount = typeof data.mamemakiSuccessCount === "number" ? data.mamemakiSuccessCount : 0;
             nagoshiBadCount = typeof data.nagoshiBadCount === "number" ? data.nagoshiBadCount : 0;
             nagoshiLastResetYear = typeof data.nagoshiLastResetYear === "number" ? data.nagoshiLastResetYear : 0;
+            shrineMapLevel = typeof data.shrineMapLevel === "number" ? data.shrineMapLevel : 0;
         }
 
         refreshDailyMissions(); // 🎯 日付が変わっていればデイリーミッションをリセット（前日分の「お財布の達人」判定も含む）
@@ -163,6 +164,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         updateKodomonohiUI();
         setInterval(updateKodomonohiUI, 60000); // 🎏 こどもの日（鯉のぼり演出）の開催状況を定期的に再チェック
         updateNagoshiUI(); // 🌾 夏越の大祓（茅の輪くぐり）の進捗表示を初期化
+        updateShrineMapUI(); // 🗺️ 境内マップの進捗表示を初期化
         checkKannazukiReturn(); // ⛩️ 11月になっていれば、神無月に貯めた賽銭箱の預け入れ額を「倍返し」する
         startCountdownTimers(); // ⏳ 次の季節イベント／次のボーナスタイムまでのカウントダウンを開始
         if (typeof schedulePhantomSpawn === "function") schedulePhantomSpawn(); // 🐱🐸 幻の参拝客の出現スケジュールを開始

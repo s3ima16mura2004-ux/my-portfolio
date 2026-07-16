@@ -87,7 +87,12 @@ function omikuji() {
         if (ishikoro500Claimed) daikichiBonus += 0.01;
         if (equippedCollectible === "tanzaku") daikichiBonus += 0.01;
         if (isTanabataLuckActive()) daikichiBonus += TANABATA_DAIKICHI_BONUS; // 🎋 七夕の願いが叶った日
+        if (hasShopEffect("wakaba_omamori")) daikichiBonus += 0.04; // 🌱 春の芽吹き限定ショップアイテム
+        if (isShrineMapComplete()) daikichiBonus += SHRINE_MAP_COMPLETE_BONUS; // 🗺️ 境内マップ完成の永続ボーナス
+        const usedHanamiDango = hanamiDangoActive;
+        if (usedHanamiDango) daikichiBonus += HANAMI_DANGO_BONUS; // 🍡 お花見団子（次の1回だけ有効）
         if (daikichiBonus > 0) okj = Math.min(1, okj + daikichiBonus);
+        if (usedHanamiDango) hanamiDangoActive = false; // 使用済みとして予約状態を解除
 
         if (randomNumSpan) {
             const feverMultiplierText = feverTier === 2 ? "20倍" : "10倍";
@@ -106,8 +111,12 @@ function omikuji() {
         // 🌙 現在の時間帯を判定（丑三つ時は大大吉・大大凶の確率が跳ね上がる）
         const timePeriod = getTimePeriod();
         if (timePeriod === "ushimitsu") gotUshimitsuDraw = true;
-        const daidaikichiThreshold = timePeriod === "ushimitsu" ? DAIDAIKICHI_THRESHOLD_USHIMITSU : DAIDAIKICHI_THRESHOLD_NORMAL;
+        // 🎏 こどもの日（5/1〜5/5）は昇り龍にあやかり、大大吉以上ランクのしきい値が少し下がる（＝出現率アップ）
+        const kodomonohiActive = isKodomonohiActive();
+        const daidaikichiThreshold = (timePeriod === "ushimitsu" ? DAIDAIKICHI_THRESHOLD_USHIMITSU : DAIDAIKICHI_THRESHOLD_NORMAL)
+            - (kodomonohiActive ? KODOMONOHI_DAIDAIKICHI_REDUCTION : 0);
         const daidaikyouThreshold = timePeriod === "ushimitsu" ? DAIDAIKYOU_THRESHOLD_USHIMITSU : DAIDAIKYOU_THRESHOLD_NORMAL;
+        const kamikichiThreshold = KAMIKICHI_THRESHOLD - (kodomonohiActive ? KODOMONOHI_KAMIKICHI_REDUCTION : 0);
 
         // 🎂 誕生日の「大大吉確定チケット」があれば、確率計算を飛ばして確定で大大吉にする（単発おみくじ限定）
         const usedBirthdayTicket = birthdayTicket;
@@ -118,7 +127,8 @@ function omikuji() {
             resultName = "大大吉";
             prizeMoney = DAIDAIKICHI_PRIZE;
             gotDaidaikichi = true;
-        } else if (okj >= KAMIKICHI_THRESHOLD) {
+            if (kodomonohiActive) gotKodomonohiExtreme = true; // 🎏 こどもの日の称号判定
+        } else if (okj >= kamikichiThreshold) {
             // 😊 超激レア「神吉」（大大吉よりもさらに珍しい特別枠）
             isExtremeTier = true;
             imgSrc = "omikuji_kamikichi.jpg";
@@ -126,6 +136,7 @@ function omikuji() {
             prizeMoney = KAMIKICHI_PRIZE;
             gotKamikichi = true;
             kamikichiBonus += KAMIKICHI_BONUS_PER_DRAW;
+            if (kodomonohiActive) gotKodomonohiExtreme = true; // 🎏 こどもの日の称号判定
         } else if (okj >= daidaikichiThreshold) {
             // ☀️ 激レア「大大吉」
             isExtremeTier = true;
@@ -133,6 +144,7 @@ function omikuji() {
             resultName = "大大吉";
             prizeMoney = DAIDAIKICHI_PRIZE;
             gotDaidaikichi = true;
+            if (kodomonohiActive) gotKodomonohiExtreme = true; // 🎏 こどもの日の称号判定
         } else if (okj >= 0.99) {
             imgSrc = "omikuji_daikichi.png";
             resultName = "大吉";
@@ -202,6 +214,7 @@ function omikuji() {
         checkLuckyMoneyWhim();
 
         trackMissionDraw(resultName, prizeMoney); // 🎯 デイリーミッション（参拝回数・凶克服・連勝街道・大金稼ぎ等）の進捗を更新
+        trackNagoshiBadLuck(resultName, prizeMoney); // 🌾 夏越の大祓「茅の輪くぐり」用の凶事カウントを更新
 
         // 🛍️ ショップアイテムの残り回数を消費
         if (shopItemKey && shopItemRemaining > 0) {
