@@ -398,6 +398,22 @@
                         <p id="map-next-text" class="collect-item-desc">-</p>
                         <button id="map-buy-btn" class="btn-shop-buy" onclick="buyNextMapTile()" type="button">このマスを購入する</button>
                     </div>
+
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">🗾 全国神社巡りマップ</h3>
+
+                        <div id="map-japan-locked" class="hidden">
+                            <p class="bank-desc">🔒 境内マップを完成させると解放されます。まずは「境内マップ」を20マスすべて埋めましょう！</p>
+                        </div>
+
+                        <div id="map-japan-unlocked" class="hidden">
+                            <p class="bank-desc">境内マップの完成、おめでとうございます！ここからは所持金を使って北海道から沖縄まで、日本全国の神社を1県ずつ巡っていきましょう。後半の県ほど費用が大きくなります。12・24・36・47県の節目でお祝い金、全国制覇でさらに永続の大吉ボーナスがもらえます。</p>
+                            <p id="map-japan-progress" class="dex-progress">巡礼状況：0 / 47県</p>
+                            <div id="map-japan-grid" class="map-grid"></div>
+                            <p id="map-japan-next-text" class="collect-item-desc">-</p>
+                            <button id="map-japan-buy-btn" class="btn-shop-buy" onclick="buyNextJapanMapTile()" type="button">この県を参拝する</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 

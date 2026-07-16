@@ -297,6 +297,19 @@
     100% { left: calc(100vw + 80px); transform: translateY(0) scaleX(-1); }
 }
 
+/* 🗾👑 全国神社巡りマップ完成（47都道府県コンプリート）の特別な演出 */
+.container.japan-map-complete {
+    background: linear-gradient(135deg, rgba(255,250,235,0.97), rgba(255,215,0,0.45), rgba(255,255,255,0.55), rgba(255,215,0,0.45), rgba(255,250,235,0.97));
+    box-shadow: 0 0 55px rgba(255, 215, 0, 0.9);
+    border: 3px double #d8860b;
+    animation: japan-map-complete-glow 2.8s infinite alternate;
+}
+
+@keyframes japan-map-complete-glow {
+    0% { box-shadow: 0 0 35px rgba(255, 215, 0, 0.6); }
+    100% { box-shadow: 0 0 65px rgba(255, 180, 60, 1); }
+}
+
 /* 🫘 節分（2/1〜2/3）の背景演出（豆まき・鬼退治をイメージ） */
 .container.setsubun-active {
     background-image: linear-gradient(rgba(60, 20, 15, 0.15), rgba(120, 40, 15, 0.15));

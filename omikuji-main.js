@@ -121,6 +121,7 @@ window.addEventListener("DOMContentLoaded", async () => {
             nagoshiBadCount = typeof data.nagoshiBadCount === "number" ? data.nagoshiBadCount : 0;
             nagoshiLastResetYear = typeof data.nagoshiLastResetYear === "number" ? data.nagoshiLastResetYear : 0;
             shrineMapLevel = typeof data.shrineMapLevel === "number" ? data.shrineMapLevel : 0;
+            shrineMapJapanLevel = typeof data.shrineMapJapanLevel === "number" ? data.shrineMapJapanLevel : 0;
         }
 
         refreshDailyMissions(); // 🎯 日付が変わっていればデイリーミッションをリセット（前日分の「お財布の達人」判定も含む）

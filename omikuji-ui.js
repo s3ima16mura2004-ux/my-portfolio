@@ -282,7 +282,7 @@ function updateTitlesUI() {
         gotDaidaikichi, gotKamikichi, gotDaidaikyou, gotUshimitsuDraw, ishikoro500Claimed,
         communityDraws, orihimeHikoboshiMeetCount, hatsuyumeComplete, steadyVisitorEarned,
         hanamiDangoTotalCollected, gotKodomonohiExtreme, mamemakiSuccessCount, nagoshiLastResetYear,
-        shrineMapLevel
+        shrineMapLevel, shrineMapJapanLevel
     };
     const earned = TITLES.filter(t => t.condition(stats));
 
@@ -1118,6 +1118,7 @@ function updateShrineMapUI() {
     if (!next) {
         if (nextText) nextText.textContent = "🏆 境内マップが完成しました！永続的に大吉ボーナス+" + (SHRINE_MAP_COMPLETE_BONUS * 100).toFixed(1) + "%を授かっています。";
         if (buyBtn) buyBtn.classList.add("hidden");
+        updateShrineMapJapanUI(); // 🗾 境内マップ完成後も、全国神社巡りマップの表示更新は続ける
         return;
     }
 
@@ -1128,4 +1129,60 @@ function updateShrineMapUI() {
         buyBtn.classList.remove("hidden");
         buyBtn.disabled = currentMoney < next.cost;
     }
+
+    updateShrineMapJapanUI(); // 🗾 境内マップの状態が変わるたびに、全国神社巡りマップの解放状況も一緒に見直す
+}
+
+// 🗾 全国神社巡りマップ（境内マップ完成後に解放される第2段階）の表示を更新する
+function updateShrineMapJapanUI() {
+    const lockedBox = document.querySelector("#map-japan-locked");
+    const unlockedBox = document.querySelector("#map-japan-unlocked");
+    if (!lockedBox || !unlockedBox) return;
+
+    const unlocked = isShrineMapComplete();
+    lockedBox.classList.toggle("hidden", unlocked);
+    unlockedBox.classList.toggle("hidden", !unlocked);
+    if (!unlocked) return;
+
+    const grid = document.querySelector("#map-japan-grid");
+    if (grid) {
+        grid.innerHTML = MAP_TILES_JAPAN.map((tile, i) => {
+            const owned = i < shrineMapJapanLevel;
+            const isNext = i === shrineMapJapanLevel;
+            const tooltip = owned
+                ? tile.name + "：" + tile.desc
+                : (isNext ? "次に巡れる県：" + tile.name + "（" + tile.cost.toLocaleString() + "円）" : "？？？（未訪問）");
+            return (
+                '<div class="map-tile' + (owned ? " map-tile-owned" : "") + (isNext ? " map-tile-next" : "") + '" title="' +
+                tooltip.replace(/"/g, "&quot;") + '">' +
+                '<div class="map-tile-emoji">' + (owned ? tile.emoji : "❔") + '</div>' +
+                '</div>'
+            );
+        }).join("");
+    }
+
+    const progressEl = document.querySelector("#map-japan-progress");
+    if (progressEl) {
+        progressEl.textContent = "巡礼状況：" + shrineMapJapanLevel + " / " + MAP_TILES_JAPAN.length + "県";
+    }
+
+    const nextText = document.querySelector("#map-japan-next-text");
+    const buyBtn = document.querySelector("#map-japan-buy-btn");
+    const next = MAP_TILES_JAPAN[shrineMapJapanLevel];
+
+    if (!next) {
+        if (nextText) nextText.textContent = "🏆👑 全国47都道府県すべての神社を巡り終えました！永続的に大吉ボーナス+" + (SHRINE_MAP_JAPAN_COMPLETE_BONUS * 100).toFixed(1) + "%を授かっています。";
+        if (buyBtn) buyBtn.classList.add("hidden");
+    } else {
+        if (nextText) {
+            nextText.textContent = "次の目的地：" + next.emoji + " " + next.name + "（" + next.cost.toLocaleString() + "円）　" + next.desc;
+        }
+        if (buyBtn) {
+            buyBtn.classList.remove("hidden");
+            buyBtn.disabled = currentMoney < next.cost;
+        }
+    }
+
+    const container = document.querySelector(".container");
+    if (container) container.classList.toggle("japan-map-complete", isShrineMapJapanComplete());
 }

@@ -98,6 +98,7 @@ function omikuji10() {
         if (isTanabataLuckActive()) daikichiBonus += TANABATA_DAIKICHI_BONUS; // 🎋 七夕の願いが叶った日
         if (hasShopEffect("wakaba_omamori")) daikichiBonus += 0.04; // 🌱 春の芽吹き限定ショップアイテム
         if (isShrineMapComplete()) daikichiBonus += SHRINE_MAP_COMPLETE_BONUS; // 🗺️ 境内マップ完成の永続ボーナス
+        if (isShrineMapJapanComplete()) daikichiBonus += SHRINE_MAP_JAPAN_COMPLETE_BONUS; // 🗾 全国神社巡り完成の永続ボーナス
                 if (daikichiBonus > 0) okj = Math.min(1, okj + daikichiBonus);
 
                 if (i === 9) lastRandomNum = okj;

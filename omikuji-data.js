@@ -140,6 +140,66 @@ const MAP_MILESTONES = [
 ];
 const SHRINE_MAP_COMPLETE_BONUS = 0.01; // 境内マップ完成後、永続的に大吉ボーナス+1%
 
+// 🗾 全国神社巡りマップ（境内マップ完成後に解放される第2段階。47都道府県を1県ずつ巡っていく超長期の金策先）
+const MAP_TILES_JAPAN = [
+    { key: "hokkaido", emoji: "🦌", name: "北海道・北海道神宮", cost: 80000, desc: "北海道を代表する「北海道神宮」" },
+    { key: "aomori", emoji: "🍎", name: "青森県・岩木山神社", cost: 90000, desc: "青森県を代表する「岩木山神社」" },
+    { key: "iwate", emoji: "🐎", name: "岩手県・盛岡八幡宮", cost: 95000, desc: "岩手県を代表する「盛岡八幡宮」" },
+    { key: "miyagi", emoji: "🌾", name: "宮城県・大崎八幡宮", cost: 105000, desc: "宮城県を代表する「大崎八幡宮」" },
+    { key: "akita", emoji: "🐕", name: "秋田県・太平山三吉神社", cost: 115000, desc: "秋田県を代表する「太平山三吉神社」" },
+    { key: "yamagata", emoji: "🍒", name: "山形県・出羽三山神社", cost: 125000, desc: "山形県を代表する「出羽三山神社」" },
+    { key: "fukushima", emoji: "🍑", name: "福島県・開成山大神宮", cost: 135000, desc: "福島県を代表する「開成山大神宮」" },
+    { key: "ibaraki", emoji: "⚔️", name: "茨城県・鹿島神宮", cost: 150000, desc: "茨城県を代表する「鹿島神宮」" },
+    { key: "tochigi", emoji: "🐒", name: "栃木県・日光東照宮", cost: 165000, desc: "栃木県を代表する「日光東照宮」" },
+    { key: "gunma", emoji: "♨️", name: "群馬県・一之宮貫前神社", cost: 180000, desc: "群馬県を代表する「一之宮貫前神社」" },
+    { key: "saitama", emoji: "🏯", name: "埼玉県・氷川神社", cost: 195000, desc: "埼玉県を代表する「氷川神社」" },
+    { key: "chiba", emoji: "✈️", name: "千葉県・香取神宮", cost: 220000, desc: "千葉県を代表する「香取神宮」" },
+    { key: "tokyo", emoji: "🗼", name: "東京都・明治神宮", cost: 240000, desc: "東京都を代表する「明治神宮」" },
+    { key: "kanagawa", emoji: "⛵", name: "神奈川県・鶴岡八幡宮", cost: 260000, desc: "神奈川県を代表する「鶴岡八幡宮」" },
+    { key: "niigata", emoji: "🍶", name: "新潟県・彌彦神社", cost: 280000, desc: "新潟県を代表する「彌彦神社」" },
+    { key: "toyama", emoji: "🏔️", name: "富山県・高瀬神社", cost: 310000, desc: "富山県を代表する「高瀬神社」" },
+    { key: "ishikawa", emoji: "🥇", name: "石川県・尾山神社", cost: 340000, desc: "石川県を代表する「尾山神社」" },
+    { key: "fukui", emoji: "🦕", name: "福井県・氣比神宮", cost: 370000, desc: "福井県を代表する「氣比神宮」" },
+    { key: "yamanashi", emoji: "🗻", name: "山梨県・北口本宮冨士浅間神社", cost: 400000, desc: "山梨県を代表する「北口本宮冨士浅間神社」" },
+    { key: "nagano", emoji: "🍎", name: "長野県・諏訪大社", cost: 440000, desc: "長野県を代表する「諏訪大社」" },
+    { key: "gifu", emoji: "🦆", name: "岐阜県・南宮大社", cost: 480000, desc: "岐阜県を代表する「南宮大社」" },
+    { key: "shizuoka", emoji: "🍵", name: "静岡県・富士山本宮浅間大社", cost: 530000, desc: "静岡県を代表する「富士山本宮浅間大社」" },
+    { key: "aichi", emoji: "⚔️", name: "愛知県・熱田神宮", cost: 580000, desc: "愛知県を代表する「熱田神宮」" },
+    { key: "mie", emoji: "🦞", name: "三重県・伊勢神宮", cost: 630000, desc: "三重県を代表する「伊勢神宮」" },
+    { key: "shiga", emoji: "🐒", name: "滋賀県・日吉大社", cost: 690000, desc: "滋賀県を代表する「日吉大社」" },
+    { key: "kyoto", emoji: "🦊", name: "京都府・伏見稲荷大社", cost: 760000, desc: "京都府を代表する「伏見稲荷大社」" },
+    { key: "osaka", emoji: "🐙", name: "大阪府・住吉大社", cost: 830000, desc: "大阪府を代表する「住吉大社」" },
+    { key: "hyogo", emoji: "🐄", name: "兵庫県・廣田神社", cost: 910000, desc: "兵庫県を代表する「廣田神社」" },
+    { key: "nara", emoji: "🦌", name: "奈良県・春日大社", cost: 990000, desc: "奈良県を代表する「春日大社」" },
+    { key: "wakayama", emoji: "🍊", name: "和歌山県・熊野本宮大社", cost: 1100000, desc: "和歌山県を代表する「熊野本宮大社」" },
+    { key: "tottori", emoji: "🐫", name: "鳥取県・宇倍神社", cost: 1200000, desc: "鳥取県を代表する「宇倍神社」" },
+    { key: "shimane", emoji: "💑", name: "島根県・出雲大社", cost: 1300000, desc: "島根県を代表する「出雲大社」" },
+    { key: "okayama", emoji: "🍑", name: "岡山県・吉備津神社", cost: 1400000, desc: "岡山県を代表する「吉備津神社」" },
+    { key: "hiroshima", emoji: "⛩️", name: "広島県・厳島神社", cost: 1550000, desc: "広島県を代表する「厳島神社」" },
+    { key: "yamaguchi", emoji: "🐡", name: "山口県・住吉神社", cost: 1700000, desc: "山口県を代表する「住吉神社」" },
+    { key: "tokushima", emoji: "🌪️", name: "徳島県・大麻比古神社", cost: 1850000, desc: "徳島県を代表する「大麻比古神社」" },
+    { key: "kagawa", emoji: "🍜", name: "香川県・金刀比羅宮", cost: 2050000, desc: "香川県を代表する「金刀比羅宮」" },
+    { key: "ehime", emoji: "🍊", name: "愛媛県・大山祇神社", cost: 2250000, desc: "愛媛県を代表する「大山祇神社」" },
+    { key: "kochi", emoji: "🐟", name: "高知県・土佐神社", cost: 2450000, desc: "高知県を代表する「土佐神社」" },
+    { key: "fukuoka", emoji: "📚", name: "福岡県・太宰府天満宮", cost: 2650000, desc: "福岡県を代表する「太宰府天満宮」" },
+    { key: "saga", emoji: "🏺", name: "佐賀県・佐嘉神社", cost: 2900000, desc: "佐賀県を代表する「佐嘉神社」" },
+    { key: "nagasaki", emoji: "🐳", name: "長崎県・諏訪神社", cost: 3200000, desc: "長崎県を代表する「諏訪神社」" },
+    { key: "kumamoto", emoji: "🌋", name: "熊本県・阿蘇神社", cost: 3500000, desc: "熊本県を代表する「阿蘇神社」" },
+    { key: "oita", emoji: "♨️", name: "大分県・宇佐神宮", cost: 3800000, desc: "大分県を代表する「宇佐神宮」" },
+    { key: "miyazaki", emoji: "🐉", name: "宮崎県・高千穂神社", cost: 4200000, desc: "宮崎県を代表する「高千穂神社」" },
+    { key: "kagoshima", emoji: "🌋", name: "鹿児島県・鹿児島神宮", cost: 4550000, desc: "鹿児島県を代表する「鹿児島神宮」" },
+    { key: "okinawa", emoji: "🌺", name: "沖縄県・波上宮", cost: 5000000, desc: "沖縄県を代表する「波上宮」" },
+];
+
+// 🗾 全国神社巡りマップの節目（都道府県数）で贈られる祝儀
+const MAP_JAPAN_MILESTONES = [
+    { count: 12, prize: 500000 },
+    { count: 24, prize: 1500000 },
+    { count: 36, prize: 3000000 },
+    { count: 47, prize: 10000000 }
+];
+const SHRINE_MAP_JAPAN_COMPLETE_BONUS = 0.02; // 全国制覇後、さらに永続的に大吉ボーナス+2%（境内マップ分と合算で+3%）
+
 // 📖 図鑑（これまでに引いた結果を記録するコレクション。7種類すべて達成で永続ボーナス）
 const DEX_ENTRIES = [
     { key: "daidaikichi", emoji: "☀️", name: "大大吉", match: r => r === "大大吉" },
@@ -288,7 +348,10 @@ const TITLES = [
         return ((oi.chinowa_kaya || 0) + (oi.minazuki_gashi || 0) + (oi.oharai_no_gohei || 0)) >= 15;
     } },
     { key: "shrine_map_halfway", emoji: "🗺️", name: "境内図の道半ば", desc: "境内マップを半分（10マス）まで埋めた", condition: s => (s.shrineMapLevel || 0) >= 10 },
-    { key: "shrine_map_complete", emoji: "🗺️✨", name: "境内マップ完成", desc: "境内マップをすべて（20マス）埋め、神社を完成させた", condition: s => (s.shrineMapLevel || 0) >= MAP_TILES.length }
+    { key: "shrine_map_complete", emoji: "🗺️✨", name: "境内マップ完成", desc: "境内マップをすべて（20マス）埋め、神社を完成させた", condition: s => (s.shrineMapLevel || 0) >= MAP_TILES.length },
+    { key: "japan_map_quarter", emoji: "🗾", name: "神社巡りの旅人", desc: "全国神社巡りマップで12県を巡った", condition: s => (s.shrineMapJapanLevel || 0) >= 12 },
+    { key: "japan_map_half", emoji: "🗾✨", name: "神社巡りの達人", desc: "全国神社巡りマップで24県を巡った", condition: s => (s.shrineMapJapanLevel || 0) >= 24 },
+    { key: "japan_map_complete", emoji: "🗾👑", name: "日本全国制覇", desc: "全国47都道府県すべての神社を巡り終えた", condition: s => (s.shrineMapJapanLevel || 0) >= MAP_TILES_JAPAN.length }
 ];
 
 // 🎂 誕生日ボーナス（ログイン画面で任意設定。誕生日当日のログインで「大大吉確定チケット」を1枚獲得）
