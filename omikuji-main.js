@@ -49,10 +49,16 @@ window.addEventListener("DOMContentLoaded", async () => {
             luckyItemKey = data.luckyItem || "";
             ownedItems = Object.assign({
                 koban: 0, shinboku: 0, ishikoro: 0, tanzaku: 0,
-                orihime_thread: 0, hikoboshi_star: 0,
+                orihime_thread: 0, hikoboshi_star: 0, amanogawa_kirameki: 0,
                 natsumatsuri_lantern: 0, kingyo: 0, kakigori: 0, hanabi_tama: 0,
-                tsukimi_mochi: 0, momiji_shiori: 0,
-                hatsuyume_fuji: 0, hatsuyume_taka: 0, hatsuyume_nasu: 0
+                tsukimi_mochi: 0, susuki_hoshi: 0, tsukimi_dango: 0,
+                momiji_shiori: 0, icho_leaf: 0, kuri: 0,
+                hatsuyume_fuji: 0, hatsuyume_taka: 0, hatsuyume_nasu: 0,
+                izumo_omamori: 0, kamisama_wasuremono: 0, kagura_suzu: 0,
+                chitose_fukuro: 0, orizuru_negai: 0, kinchaku_omamori: 0,
+                christmas_ribbon: 0, seiya_candle: 0, snowman_charm: 0,
+                choco_kakera: 0, akai_ito: 0, love_letter: 0,
+                joya_kane_hibiki: 0, toshikoshi_soba: 0, susuharai_houki: 0
             }, data.ownedItems || {});
             equippedCollectible = data.equippedCollectible || "";
             shopItemKey = data.shopItemKey || "";
@@ -95,6 +101,14 @@ window.addEventListener("DOMContentLoaded", async () => {
             steadyVisitorEarned = data.steadyVisitorEarned === true;
             kiyomeShioActive = data.kiyomeShioActive === true;
             boostTicketCount = typeof data.boostTicketCount === "number" ? data.boostTicketCount : 0;
+            kannazukiDeposits = typeof data.kannazukiDeposits === "number" ? data.kannazukiDeposits : 0;
+            kannazukiRewardedYear = typeof data.kannazukiRewardedYear === "number" ? data.kannazukiRewardedYear : 0;
+            santaBagCount = typeof data.santaBagCount === "number" ? data.santaBagCount : 0;
+            chocoDrawDate = data.chocoDrawDate || "";
+            chocoDrawCount = typeof data.chocoDrawCount === "number" ? data.chocoDrawCount : 0;
+            joyaBellDate = data.joyaBellDate || "";
+            joyaBellCount = typeof data.joyaBellCount === "number" ? data.joyaBellCount : 0;
+            joyaBellCompleteYear = typeof data.joyaBellCompleteYear === "number" ? data.joyaBellCompleteYear : 0;
         }
 
         refreshDailyMissions(); // 🎯 日付が変わっていればデイリーミッションをリセット（前日分の「お財布の達人」判定も含む）
@@ -112,6 +126,24 @@ window.addEventListener("DOMContentLoaded", async () => {
         setInterval(applyTimeTheme, 60000); // 1分ごとに時間帯を再チェック（長時間開いたままでも自動で切り替わる）
         setInterval(updateShopFeverUI, 30000); // 😲 神の気まぐれフィーバーの残り時間を定期的に更新
         setInterval(updateNatsumatsuriUI, 60000); // 🎆 夏祭り（夜・週末）の切り替わりを定期的に再チェック
+        updateOtsukimiUI();
+        setInterval(updateOtsukimiUI, 60000); // 🌕 お月見（夜・昼の切り替わり／月が昇る演出）を定期的に再チェック
+        updateKoyoUI();
+        setInterval(updateKoyoUI, 60000); // 🍁 紅葉狩り（落ち葉演出）の開催状況を定期的に再チェック
+        updateOshogatsuUI();
+        setInterval(updateOshogatsuUI, 60000); // 🎍 お正月（初日の出演出）の開催状況を定期的に再チェック
+        updateKannazukiUI();
+        setInterval(updateKannazukiUI, 60000); // 🌫️ 神無月（寂しい演出）の開催状況を定期的に再チェック
+        updateShichigosanUI();
+        setInterval(updateShichigosanUI, 60000); // 👘 七五三（千歳飴バナー）の開催状況を定期的に再チェック
+        updateChristmasUI();
+        setInterval(updateChristmasUI, 60000); // 🎄 クリスマス（昼は雪・夜はイルミネーション）の開催状況を定期的に再チェック
+        updateNenmatsuUI();
+        setInterval(updateNenmatsuUI, 60000); // 🎊 年末（昼は雪・夜は除夜の鐘）の開催状況を定期的に再チェック
+        updateJoyaBellUI(); // 🔔 除夜の鐘の進捗表示を初期化
+        updateValentineUI();
+        setInterval(updateValentineUI, 60000); // 💝 バレンタイン（チョコおみくじ欄）の開催状況を定期的に再チェック
+        checkKannazukiReturn(); // ⛩️ 11月になっていれば、神無月に貯めた賽銭箱の預け入れ額を「倍返し」する
         startCountdownTimers(); // ⏳ 次の季節イベント／次のボーナスタイムまでのカウントダウンを開始
         if (typeof schedulePhantomSpawn === "function") schedulePhantomSpawn(); // 🐱🐸 幻の参拝客の出現スケジュールを開始
 

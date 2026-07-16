@@ -37,7 +37,8 @@ const SHOP_ITEMS = [
     { key: "gohei", emoji: "🎏", name: "五色の幣", price: 25000, duration: 5, desc: "大吉確率が大きくアップ！（招き猫より強力）", minRank: 2 },
     { key: "ryujin", emoji: "🐉", name: "龍神の逆鱗", price: 50000, duration: 3, desc: "「神の試練」が確認なしで自動的に成功する！", minRank: 3 },
     { key: "amaterasu", emoji: "🌟", name: "天照の玉", price: 100000, duration: 5, desc: "大吉確率アップ＋獲得賞金1.2倍の両方が発動！", minRank: 4 },
-    { key: "ikigami", emoji: "🕊️", name: "生き神の御札", price: 300000, duration: 5, desc: "大吉確率が最大級にアップ＋大凶(試練)の没収額を大幅軽減！", minRank: 5 }
+    { key: "ikigami", emoji: "🕊️", name: "生き神の御札", price: 300000, duration: 5, desc: "大吉確率が最大級にアップ＋大凶(試練)の没収額を大幅軽減！", minRank: 5 },
+    { key: "chitose_ame", emoji: "🍬", name: "千歳飴", price: 12000, duration: 5, desc: "装備中、大凶(神の試練)や大大凶で発動するフィーバーの回数が+2回に！（七五三シーズン限定販売）", minRank: 0, seasonal: "shichigosan" }
 ];
 
 // 🎒 おみくじを引くと低確率で手に入る収集アイテム（ドロップ率は独立判定）
@@ -48,15 +49,35 @@ const DROP_ITEMS = [
     { key: "tanzaku", emoji: "🎏", name: "五色の短冊", rate: 0.02, desc: "装備中、大吉ボーナスが+1%になる（神社改築で本殿完成後に解放）", minCommunityTier: 4 },
     { key: "orihime_thread", emoji: "🎐", name: "織姫の五色糸", rate: 0.06, desc: "七夕（7/1〜7/7）限定ドロップ。彦星の一等星と両方揃うと特別なご縁が結ばれる", minCommunityTier: 0, seasonal: "tanabata" },
     { key: "hikoboshi_star", emoji: "🌠", name: "彦星の一等星", rate: 0.06, desc: "七夕（7/1〜7/7）限定ドロップ。織姫の五色糸と両方揃うと特別なご縁が結ばれる", minCommunityTier: 0, seasonal: "tanabata" },
+    { key: "amanogawa_kirameki", emoji: "🌌", name: "天の川のきらめき", rate: 0.05, desc: "七夕（7/1〜7/7）限定ドロップ。夜空を彩る天の川の輝き", minCommunityTier: 0, seasonal: "tanabata" },
     { key: "natsumatsuri_lantern", emoji: "🏮", name: "夏祭りの提灯", rate: 0.05, desc: "夏祭り開催中（8月の夜・週末）限定ドロップ。集めるほど夏祭りが盛り上がる", minCommunityTier: 0, seasonal: "natsumatsuri" },
     { key: "kingyo", emoji: "🐠", name: "金魚すくいの金魚", rate: 0.05, desc: "夏祭り開催中（8月の夜・週末）限定ドロップ", minCommunityTier: 0, seasonal: "natsumatsuri" },
     { key: "kakigori", emoji: "🍧", name: "かき氷", rate: 0.05, desc: "夏祭り開催中（8月の夜・週末）限定ドロップ", minCommunityTier: 0, seasonal: "natsumatsuri" },
     { key: "hanabi_tama", emoji: "🎆", name: "打ち上げ花火の玉", rate: 0.04, desc: "夏祭り開催中（8月の夜・週末）限定ドロップ", minCommunityTier: 0, seasonal: "natsumatsuri" },
     { key: "tsukimi_mochi", emoji: "🐰", name: "月見うさぎの餅", rate: 0.05, desc: "お月見（9/15〜9/30）限定ドロップ。10個で称号「お月見上手」", minCommunityTier: 0, seasonal: "otsukimi" },
+    { key: "susuki_hoshi", emoji: "🌾", name: "すすきの穂", rate: 0.05, desc: "お月見（9/15〜9/30）限定ドロップ。夜空に月見だんごと一緒に飾ろう", minCommunityTier: 0, seasonal: "otsukimi" },
+    { key: "tsukimi_dango", emoji: "🍡", name: "月見団子", rate: 0.05, desc: "お月見（9/15〜9/30）限定ドロップ。十五夜のお供え物", minCommunityTier: 0, seasonal: "otsukimi" },
     { key: "momiji_shiori", emoji: "🍁", name: "紅葉のしおり", rate: 0.05, desc: "紅葉狩り（11月）限定ドロップ。10個で称号「紅葉狩り名人」", minCommunityTier: 0, seasonal: "koyo" },
+    { key: "icho_leaf", emoji: "🍂", name: "黄金の銀杏の葉", rate: 0.05, desc: "紅葉狩り（11月）限定ドロップ。山を彩る黄金色の葉", minCommunityTier: 0, seasonal: "koyo" },
+    { key: "kuri", emoji: "🌰", name: "山の恵み・栗", rate: 0.05, desc: "紅葉狩り（11月）限定ドロップ。秋の味覚の代表格", minCommunityTier: 0, seasonal: "koyo" },
     { key: "hatsuyume_fuji", emoji: "🗻", name: "初夢の富士", rate: 0.04, desc: "お正月（1/1〜1/3）限定ドロップ。鷹・茄子と揃うと縁起物コンプリート！", minCommunityTier: 0, seasonal: "oshogatsu" },
     { key: "hatsuyume_taka", emoji: "🦅", name: "初夢の鷹", rate: 0.04, desc: "お正月（1/1〜1/3）限定ドロップ。富士・茄子と揃うと縁起物コンプリート！", minCommunityTier: 0, seasonal: "oshogatsu" },
-    { key: "hatsuyume_nasu", emoji: "🍆", name: "初夢の茄子", rate: 0.04, desc: "お正月（1/1〜1/3）限定ドロップ。富士・鷹と揃うと縁起物コンプリート！", minCommunityTier: 0, seasonal: "oshogatsu" }
+    { key: "hatsuyume_nasu", emoji: "🍆", name: "初夢の茄子", rate: 0.04, desc: "お正月（1/1〜1/3）限定ドロップ。富士・鷹と揃うと縁起物コンプリート！", minCommunityTier: 0, seasonal: "oshogatsu" },
+    { key: "izumo_omamori", emoji: "⛩️", name: "出雲土産のお守り", rate: 0.05, desc: "神無月（10月）限定ドロップ。出雲に集った神様からのお土産", minCommunityTier: 0, seasonal: "kannazuki" },
+    { key: "kamisama_wasuremono", emoji: "👣", name: "神様の忘れ物", rate: 0.05, desc: "神無月（10月）限定ドロップ。出雲へ向かう道すがら落としていったもの", minCommunityTier: 0, seasonal: "kannazuki" },
+    { key: "kagura_suzu", emoji: "🔔", name: "神楽の鈴", rate: 0.05, desc: "神無月（10月）限定ドロップ。出雲での神議りを彩る神楽の音色", minCommunityTier: 0, seasonal: "kannazuki" },
+    { key: "chitose_fukuro", emoji: "👝", name: "千歳飴の松竹梅袋", rate: 0.05, desc: "七五三（11月）限定ドロップ。縁起の良い松竹梅柄の袋", minCommunityTier: 0, seasonal: "shichigosan" },
+    { key: "orizuru_negai", emoji: "🕊️", name: "願いの折り鶴", rate: 0.05, desc: "七五三（11月）限定ドロップ。健やかな成長を願って折られた鶴", minCommunityTier: 0, seasonal: "shichigosan" },
+    { key: "kinchaku_omamori", emoji: "👛", name: "縁起の巾着", rate: 0.05, desc: "七五三（11月）限定ドロップ。小さな巾着に詰まった縁起物", minCommunityTier: 0, seasonal: "shichigosan" },
+    { key: "christmas_ribbon", emoji: "🎀", name: "クリスマスの飾りリボン", rate: 0.05, desc: "クリスマス（12/1〜12/25）限定ドロップ。ツリーを彩る飾りリボン", minCommunityTier: 0, seasonal: "christmas" },
+    { key: "seiya_candle", emoji: "🕯️", name: "聖夜のキャンドル", rate: 0.05, desc: "クリスマス（12/1〜12/25）限定ドロップ。静かに揺れる聖夜の灯", minCommunityTier: 0, seasonal: "christmas" },
+    { key: "snowman_charm", emoji: "⛄", name: "小さな雪だるまのチャーム", rate: 0.05, desc: "クリスマス（12/1〜12/25）限定ドロップ。境内にちょこんと現れた雪だるま", minCommunityTier: 0, seasonal: "christmas" },
+    { key: "choco_kakera", emoji: "🍫", name: "板チョコのかけら", rate: 0.05, desc: "バレンタイン（2/1〜2/14）限定ドロップ。甘い香りのする板チョコ", minCommunityTier: 0, seasonal: "valentine" },
+    { key: "akai_ito", emoji: "🧵", name: "運命の赤い糸", rate: 0.05, desc: "バレンタイン（2/1〜2/14）限定ドロップ。良縁を結ぶと言われる赤い糸", minCommunityTier: 0, seasonal: "valentine" },
+    { key: "love_letter", emoji: "💌", name: "秘密のラブレター", rate: 0.05, desc: "バレンタイン（2/1〜2/14）限定ドロップ。誰かの想いが込められた手紙", minCommunityTier: 0, seasonal: "valentine" },
+    { key: "joya_kane_hibiki", emoji: "🔔", name: "除夜の鐘の残響", rate: 0.05, desc: "年末（12/26〜12/31）限定ドロップ。夜空に響いた鐘の音の余韻", minCommunityTier: 0, seasonal: "nenmatsu" },
+    { key: "toshikoshi_soba", emoji: "🍜", name: "年越しそば", rate: 0.05, desc: "年末（12/26〜12/31）限定ドロップ。細く長く…健康長寿を願う一杯", minCommunityTier: 0, seasonal: "nenmatsu" },
+    { key: "susuharai_houki", emoji: "🧹", name: "煤払いの箒", rate: 0.05, desc: "年末（12/26〜12/31）限定ドロップ。一年の汚れを払う大掃除の箒", minCommunityTier: 0, seasonal: "nenmatsu" }
 ];
 
 // 🏺 おみくじの壺のランクアップ（永続的に大吉ボーナスが増える・所持金で購入）
@@ -153,9 +174,45 @@ const TITLES = [
         return ((oi.natsumatsuri_lantern || 0) + (oi.kingyo || 0) + (oi.kakigori || 0) + (oi.hanabi_tama || 0)) >= 20;
     } },
     { key: "tsukimi_lover", emoji: "🌕", name: "お月見上手", desc: "月見うさぎの餅を10個集めた", condition: s => (s.ownedItems && s.ownedItems.tsukimi_mochi || 0) >= 10 },
+    { key: "otsukimi_master", emoji: "🌕✨", name: "名月の智者", desc: "お月見の限定アイテムを合計15個集めた", condition: s => {
+        const oi = s.ownedItems || {};
+        return ((oi.tsukimi_mochi || 0) + (oi.susuki_hoshi || 0) + (oi.tsukimi_dango || 0)) >= 15;
+    } },
     { key: "koyo_master", emoji: "🍁", name: "紅葉狩り名人", desc: "紅葉のしおりを10個集めた", condition: s => (s.ownedItems && s.ownedItems.momiji_shiori || 0) >= 10 },
+    { key: "koyo_grandmaster", emoji: "🍁✨", name: "錦秋の匠", desc: "紅葉狩りの限定アイテムを合計15個集めた", condition: s => {
+        const oi = s.ownedItems || {};
+        return ((oi.momiji_shiori || 0) + (oi.icho_leaf || 0) + (oi.kuri || 0)) >= 15;
+    } },
     { key: "hatsuyume_complete", emoji: "🗻", name: "一富士二鷹三茄子", desc: "初夢の縁起物（富士・鷹・茄子）を揃えた", condition: s => s.hatsuyumeComplete === true },
-    { key: "steady_visitor", emoji: "💼", name: "堅実な参拝者", desc: "デイリーミッション「お財布の達人」を達成（破産せずに1日を終えた）", condition: s => s.steadyVisitorEarned === true }
+    { key: "steady_visitor", emoji: "💼", name: "堅実な参拝者", desc: "デイリーミッション「お財布の達人」を達成（破産せずに1日を終えた）", condition: s => s.steadyVisitorEarned === true },
+    { key: "kannazuki_faithful", emoji: "🌫️⛩️", name: "神無月の信心", desc: "神無月に賽銭を貯め、神様の「倍返し」を受け取った", condition: s => !!s.kannazukiRewardedYear },
+    { key: "christmas_santa", emoji: "🎅✨", name: "サンタの相棒", desc: "クリスマスに「サンタの袋」を5回開けた", condition: s => (s.santaBagCount || 0) >= 5 },
+    { key: "valentine_matchmaker", emoji: "💝", name: "縁結びの達人", desc: "チョコおみくじを5回引いた", condition: s => (s.chocoDrawCount || 0) >= 5 },
+    { key: "tanabata_stargazer", emoji: "🌌", name: "星降る夜の参拝者", desc: "七夕の限定アイテムを合計15個集めた", condition: s => {
+        const oi = s.ownedItems || {};
+        return ((oi.orihime_thread || 0) + (oi.hikoboshi_star || 0) + (oi.amanogawa_kirameki || 0)) >= 15;
+    } },
+    { key: "kannazuki_collector", emoji: "⛩️👣", name: "出雲詣での証", desc: "神無月の限定アイテムを合計15個集めた", condition: s => {
+        const oi = s.ownedItems || {};
+        return ((oi.izumo_omamori || 0) + (oi.kamisama_wasuremono || 0) + (oi.kagura_suzu || 0)) >= 15;
+    } },
+    { key: "shichigosan_collector", emoji: "👘✨", name: "健やかな成長の証", desc: "七五三の限定アイテムを合計15個集めた", condition: s => {
+        const oi = s.ownedItems || {};
+        return ((oi.chitose_fukuro || 0) + (oi.orizuru_negai || 0) + (oi.kinchaku_omamori || 0)) >= 15;
+    } },
+    { key: "christmas_collector", emoji: "🎄✨", name: "聖夜の飾り師", desc: "クリスマスの限定アイテムを合計15個集めた", condition: s => {
+        const oi = s.ownedItems || {};
+        return ((oi.christmas_ribbon || 0) + (oi.seiya_candle || 0) + (oi.snowman_charm || 0)) >= 15;
+    } },
+    { key: "valentine_collector", emoji: "💝🍫", name: "恋心の収集家", desc: "バレンタインの限定アイテムを合計15個集めた", condition: s => {
+        const oi = s.ownedItems || {};
+        return ((oi.choco_kakera || 0) + (oi.akai_ito || 0) + (oi.love_letter || 0)) >= 15;
+    } },
+    { key: "nenmatsu_collector", emoji: "🎊🧹", name: "一年の締めくくり", desc: "年末の限定アイテムを合計15個集めた", condition: s => {
+        const oi = s.ownedItems || {};
+        return ((oi.joya_kane_hibiki || 0) + (oi.toshikoshi_soba || 0) + (oi.susuharai_houki || 0)) >= 15;
+    } },
+    { key: "joya_kane_title", emoji: "🔔✨", name: "百八の煩悩祓い", desc: "除夜の鐘を108回ついた", condition: s => !!s.joyaBellCompleteYear }
 ];
 
 // 🎂 誕生日ボーナス（ログイン画面で任意設定。誕生日当日のログインで「大大吉確定チケット」を1枚獲得）
@@ -185,3 +242,37 @@ const NATSUMATSURI_NIGHT_END_HOUR = 5;
 
 // 🗻🦅🍆 お正月（1/1〜1/3）：初夢の縁起物「一富士二鷹三茄子」が3つ揃った時のご褒美
 const HATSUYUME_COMPLETE_PRIZE = 50000;
+
+// 🌫️ 神無月（10月）：期間中に賽銭箱へ預けた金額は、11月に神様が戻った時「倍返し」される
+const KANNAZUKI_MONTH = 10;
+
+// 👘 七五三（11月）：ショップ限定アイテム「千歳飴」装備中はフィーバー回数が+2回になる
+const CHITOSE_AME_FEVER_BONUS = 2;
+
+// 🎅 クリスマス（12/1〜12/25）：低確率で「サンタの袋」が現れ、開けると所持金が大きく増える
+const SANTA_BAG_RATE = 0.04;
+const SANTA_BAG_MIN_PRIZE = 3000;
+const SANTA_BAG_MAX_PRIZE = 30000;
+
+// 🔔 年末（12/26〜12/31）：「除夜の鐘」を108回つくと煩悩祓いのご褒美がもらえる
+const JOYA_BELL_TARGET = 108;
+const JOYA_BELL_COMPLETE_PRIZE = 10800;
+
+// 💝 バレンタイン（2/1〜2/14）：「チョコおみくじ」を1日1回引くと、運勢＋ペア運勢がもらえる（ハズレなしの縁結びイベント）
+const CHOCO_PAIR_TYPES = [
+    { emoji: "🔥", label: "情熱タイプ" },
+    { emoji: "🌊", label: "癒し系タイプ" },
+    { emoji: "🍀", label: "堅実タイプ" },
+    { emoji: "🌪️", label: "自由奔放タイプ" },
+    { emoji: "🌙", label: "ミステリアスタイプ" },
+    { emoji: "☀️", label: "太陽のような明るいタイプ" },
+    { emoji: "📚", label: "知的タイプ" },
+    { emoji: "🎨", label: "芸術家タイプ" }
+];
+const CHOCO_TIERS = [
+    { min: 0.97, name: "運命の大吉", prize: 10000 },
+    { min: 0.85, name: "大吉", prize: 3000 },
+    { min: 0.6, name: "吉", prize: 1000 },
+    { min: 0.3, name: "中吉", prize: 300 },
+    { min: 0, name: "小吉", prize: 100 }
+];

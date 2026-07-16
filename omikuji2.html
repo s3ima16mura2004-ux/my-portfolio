@@ -55,12 +55,35 @@
                 <p id="ushimitsu-banner" class="ushimitsu-banner hidden">🌙 ただいま「丑三つ時」…大大吉・大大凶の確率が跳ね上がっています…</p>
                 <p id="natsumatsuri-banner" class="ushimitsu-banner hidden">🎆 ただいま「夏祭り」開催中！（夜・週末限定）収集アイテムのドロップ率が1.5倍です！</p>
                 <p id="summer-theme-banner" class="ushimitsu-banner hidden">🌻 8月の昼下がり…夏の日差しがまぶしいですね（夏祭りは夜と週末に開催されます）</p>
+                <p id="otsukimi-banner" class="ushimitsu-banner hidden">🌕 ただいま「十五夜」…美しい満月が夜空に昇っています…</p>
+                <p id="otsukimi-day-banner" class="ushimitsu-banner hidden">🌕 お月見の季節です。日が暮れると美しい月が見られるでしょう</p>
+                <p id="koyo-banner" class="ushimitsu-banner hidden">🍁 ただいま「紅葉狩り」シーズン！山々が赤や橙色に色づいています</p>
+                <p id="oshogatsu-banner" class="ushimitsu-banner hidden">🎍 謹賀新年！初日の出とともに、新しい一年が始まりました</p>
+                <p id="kannazuki-banner" class="ushimitsu-banner hidden">🌫️ ただいま「神無月」…神様は出雲へお出かけ中です</p>
+                <p id="shichigosan-banner" class="ushimitsu-banner hidden">👘 ただいま「七五三」シーズン！ショップに「千歳飴」が並んでいます</p>
+                <p id="christmas-banner" class="ushimitsu-banner hidden">🎄 ただいま「クリスマス」の夜…イルミネーションが輝いています！低確率で「サンタの袋」が見つかるかも…？</p>
+                <p id="christmas-day-banner" class="ushimitsu-banner hidden">❄️ クリスマスシーズンの昼下がり…静かに雪がちらついています</p>
+                <p id="nenmatsu-banner" class="ushimitsu-banner hidden">🔔 ただいま「年末」の夜…除夜の鐘が静かに響いています</p>
+                <p id="nenmatsu-day-banner" class="ushimitsu-banner hidden">❄️ 年の瀬の昼下がり…今年一年を振り返りながら雪が降っています</p>
+                <p id="valentine-banner" class="ushimitsu-banner hidden">💝 ただいま「バレンタイン」シーズン！チョコおみくじで良いご縁を占いましょう</p>
 
                 <div id="tanabata-box" class="lucky-item-box hidden">
                     <p class="lucky-item-title">🎋 七夕・短冊に願いを書く（7/1〜7/7限定） 🎋</p>
                     <p id="tanabata-status-text" class="lucky-item-desc">-</p>
                     <p id="tanabata-star-text" class="lucky-item-desc">-</p>
                     <button id="tanabata-wish-btn" class="btn-equip" onclick="tanabataWish()" type="button">🎋 短冊に願いを書く</button>
+                </div>
+
+                <div id="valentine-box" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">💝 バレンタイン・チョコおみくじ（2/1〜2/14限定） 💝</p>
+                    <p id="choco-status-text" class="lucky-item-desc">-</p>
+                    <button id="choco-omikuji-btn" class="btn-equip" onclick="chocoOmikuji()" type="button">🍫 チョコおみくじを引く</button>
+                </div>
+
+                <div id="nenmatsu-bell-box" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">🔔 年末・除夜の鐘をつく（12/26〜12/31限定） 🔔</p>
+                    <p id="joya-bell-status-text" class="lucky-item-desc">-</p>
+                    <button id="joya-bell-btn" class="btn-equip" onclick="ringJoyaBell()" type="button">🔔 鐘をつく</button>
                 </div>
 
                 <div id="bonus-area" style="display: none; margin-bottom: 15px;">
@@ -260,6 +283,15 @@
                             <p class="shop-item-lock hidden">-</p>
                         </div>
 
+                        <div class="shop-item-card hidden" data-key="chitose_ame">
+                            <div class="shop-item-info">
+                                <p class="shop-item-name">🍬 千歳飴 <span class="shop-item-price">12,000円</span></p>
+                                <p class="shop-item-desc">装備中、発動したフィーバーの回数が<br>+2回に！（七五三シーズン限定販売・おみくじ5回分）</p>
+                            </div>
+                            <button class="btn-shop-buy" onclick="buyShopItem('chitose_ame')" type="button">購入する</button>
+                            <p class="shop-item-lock hidden">-</p>
+                        </div>
+
                         <p id="shop-active-status" class="shop-active-status hidden">-</p>
                     </div>
 
@@ -358,6 +390,8 @@
     <audio id="se-doom" src="doom.mp3" preload="auto"></audio>
     <div id="confetti-overlay"></div>
     <div id="doom-overlay"></div>
+    <div id="season-fx-overlay"></div>
+    <div id="oshogatsu-glow" class="sunrise-glow hidden"></div>
 
     <!-- Firebaseの初期化（top.htmlと同じプロジェクトを使用） -->
     <script type="module">

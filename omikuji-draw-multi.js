@@ -48,6 +48,7 @@ function omikuji10() {
     let exemptedCount = 0; // 💡10連の中で免除された大凶(試練)の数
     let allDropped = []; // 10連まとめてのドロップ一覧
     let totalFukuDaruma = 0; // 10連の中で発生した福だるまボーナスの合計
+    let totalSantaBag = 0; // 10連の中で発生した「サンタの袋」ボーナスの合計
 
     // 🌙 現在の時間帯を判定（丑三つ時は大大吉・大大凶の確率が跳ね上がる。10連は1回だけ判定）
     const timePeriod10 = getTimePeriod();
@@ -215,6 +216,12 @@ function omikuji10() {
                     totalFukuDaruma += fukuDarumaPull;
                 }
 
+                // 🎅 クリスマス限定「サンタの袋」の抽選
+                const santaBagPull = rollSantaBag();
+                if (santaBagPull) {
+                    totalSantaBag += santaBagPull;
+                }
+
                 // 🎖️ 称号判定用の累計データを更新（10連の1回1回もカウント）
                 totalDraws++;
                 if (okj >= 0.99 && okj < daidaikichiThreshold10) totalDaikichi++;
@@ -311,6 +318,10 @@ function omikuji10() {
 
                 if (totalFukuDaruma > 0) {
                     alertMsg += "🎊 福だるまボーナス(合計)：+" + totalFukuDaruma.toLocaleString() + "円\n";
+                }
+
+                if (totalSantaBag > 0) {
+                    alertMsg += "🎅 サンタの袋(合計)：+" + totalSantaBag.toLocaleString() + "円\n";
                 }
 
                 alertMsg += "💰 合計損益：" + totalPrize.toLocaleString() + "円！";

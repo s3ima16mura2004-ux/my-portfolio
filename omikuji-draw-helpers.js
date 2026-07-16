@@ -229,6 +229,7 @@ function resolveTrial() {
         feverCount = 3;
         feverTier = 1; // 通常の試練は大吉確率10倍のフィーバー
         if (hasEffect("fever_extra")) feverCount++;
+        if (hasShopEffect("chitose_ame")) feverCount += CHITOSE_AME_FEVER_BONUS; // 👘 七五三限定「千歳飴」でフィーバー延長
         if (equippedCollectible === "shinboku") {
             feverCount++;
             consumeCollectible("shinboku");

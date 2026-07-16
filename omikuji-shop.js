@@ -8,6 +8,12 @@ async function buyShopItem(itemKey) {
     const item = SHOP_ITEMS.find(i => i.key === itemKey);
     if (!item) return;
 
+    // 🍬 季節限定アイテムは開催期間外だと購入できない
+    if (item.seasonal && !isSeasonalEventActive(item.seasonal)) {
+        alert("🙅 「" + item.name + "」は現在販売されていません。開催シーズンにまた訪れてください。");
+        return;
+    }
+
     // 😲 神の気まぐれフィーバー中はショップ全品が半額になる
     const price = isShopFeverActive() ? Math.floor(item.price / 2) : item.price;
 
@@ -137,8 +143,9 @@ async function depositBank() {
     if (input) input.value = "";
     playSE("se-coin");
     trackMissionDeposit(amount); // 🎯「貯蓄家」ミッションの進捗を更新
+    trackKannazukiDeposit(amount); // 🌫️ 神無月期間中なら「倍返し」対象として記録
     await saveUserState();
-    alert("🏦 " + amount.toLocaleString() + "円を賽銭箱に預けました。\n（このお金はおみくじには使えませんが、大凶や神の試練で失うこともありません）");
+    alert("🏦 " + amount.toLocaleString() + "円を賽銭箱に預けました。\n（このお金はおみくじには使えませんが、大凶や神の試練で失うこともありません）" + (isSeasonalEventActive("kannazuki") ? "\n🌫️ 今は神無月…この預け入れは11月の「倍返し」の対象です！" : ""));
 }
 
 // 賽銭箱から所持金へ引き出す
@@ -351,5 +358,130 @@ async function tanabataWish() {
         alert("🎋✨【短冊の願い、叶う】✨🎋\n" + specialMsg + "短冊に書いた願いが天に届きました！\n本日1日、大吉運が+" + (TANABATA_DAIKICHI_BONUS * 100).toFixed(0) + "%アップします！");
     } else {
         alert("🎋 短冊を笹に結びました。\n今日のところは特に変化はなさそうです…また来年！");
+    }
+}
+
+// 🌫️ 神無月（10月）の間に賽銭箱へ預けた金額を記録する（depositBank()から呼ばれる）
+function trackKannazukiDeposit(amount) {
+    if (!isSeasonalEventActive("kannazuki")) return;
+    kannazukiDeposits += amount;
+}
+
+// ⛩️ 神様が出雲から戻る11月になったら、神無月に貯めた賽銭箱の預け入れ額を「倍返し」する（ログイン時に呼ぶ）
+async function checkKannazukiReturn() {
+    if ((new Date().getMonth() + 1) !== 11) return; // 11月以外は何もしない
+    if (kannazukiDeposits <= 0) return;
+
+    const currentYear = new Date().getFullYear();
+    if (kannazukiRewardedYear === currentYear) return; // 今年はもう倍返し済み
+
+    const bonus = kannazukiDeposits;
+    bankMoney += bonus;
+    kannazukiRewardedYear = currentYear;
+    kannazukiDeposits = 0;
+
+    updateBankUI();
+    updateTitlesUI();
+    await saveUserState();
+
+    setTimeout(() => {
+        alert(
+            "⛩️🎉【神様、出雲より帰還】🎉⛩️\n" +
+            "神無月の間に賽銭箱へ預けたお金を、神様が見ていてくださいました！\n" +
+            "神様のお力で預け入れ額が【倍返し】され、賽銭箱に【" + bonus.toLocaleString() + "円】が追加されました！\n" +
+            "（称号「神無月の信心」を獲得！）"
+        );
+    }, 1200);
+}
+
+// 🎅 クリスマス（12/1〜12/25）限定：低確率で「サンタの袋」が現れ、開けると所持金が大きく増える
+function rollSantaBag() {
+    if (!isSeasonalEventActive("christmas")) return 0;
+    if (Math.random() >= SANTA_BAG_RATE) return 0;
+
+    const amount = SANTA_BAG_MIN_PRIZE + Math.floor(Math.random() * (SANTA_BAG_MAX_PRIZE - SANTA_BAG_MIN_PRIZE + 1));
+    currentMoney += amount;
+    totalWinnings += amount;
+    santaBagCount++;
+    updateMoneyDisplay();
+    recordHistory("🎅サンタの袋", amount, currentMoney);
+    return amount;
+}
+
+// 💝 バレンタイン（2/1〜2/14）限定：「チョコおみくじ」を1日1回引く。ハズレなしで、運勢＋ペア運勢がもらえる
+async function chocoOmikuji() {
+    if (!isSeasonalEventActive("valentine")) return;
+
+    const today = todayStr();
+    if (chocoDrawDate === today) {
+        alert("💝 今日はもうチョコおみくじを引きました。また明日挑戦してください。");
+        return;
+    }
+
+    unlockAllAudio();
+    chocoDrawDate = today;
+
+    const roll = Math.random();
+    const tier = CHOCO_TIERS.find(t => roll >= t.min);
+    const pair = CHOCO_PAIR_TYPES[Math.floor(Math.random() * CHOCO_PAIR_TYPES.length)];
+
+    currentMoney += tier.prize;
+    totalWinnings += tier.prize;
+    chocoDrawCount++;
+
+    updateMoneyDisplay();
+    playSE("se-win");
+    recordHistory("💝チョコおみくじ：" + tier.name + "（ペア運勢：" + pair.emoji + pair.label + "）", tier.prize, currentMoney);
+    updateValentineUI();
+    updateTitlesUI();
+    await saveUserState();
+
+    alert(
+        "💝🍫【チョコおみくじ】🍫💝\n" +
+        "今日の運勢は【" + tier.name + "】！【" + tier.prize.toLocaleString() + "円】を授かりました。\n" +
+        "そしてあなたの「ペア運勢」は…" + pair.emoji + "【" + pair.label + "】でした！\n" +
+        "良いご縁がありますように…♡"
+    );
+}
+
+// 🔔 年末（12/26〜12/31）限定：「除夜の鐘をつく」ボタン。1日108回まで、つき終えると煩悩祓いのご褒美
+async function ringJoyaBell() {
+    if (!isSeasonalEventActive("nenmatsu")) return;
+
+    unlockAllAudio();
+    const today = todayStr();
+    if (joyaBellDate !== today) {
+        joyaBellDate = today;
+        joyaBellCount = 0;
+    }
+
+    if (joyaBellCount >= JOYA_BELL_TARGET) return;
+
+    joyaBellCount++;
+    playSE("se-coin");
+    updateJoyaBellUI();
+
+    if (joyaBellCount >= JOYA_BELL_TARGET) {
+        const currentYear = new Date().getFullYear();
+        currentMoney += JOYA_BELL_COMPLETE_PRIZE;
+        totalWinnings += JOYA_BELL_COMPLETE_PRIZE;
+        joyaBellCompleteYear = currentYear;
+
+        updateMoneyDisplay();
+        playSE("se-win");
+        recordHistory("🔔除夜の鐘・煩悩祓い", JOYA_BELL_COMPLETE_PRIZE, currentMoney);
+        updateTitlesUI();
+        await saveUserState();
+
+        setTimeout(() => {
+            alert(
+                "🔔✨【百八の煩悩祓い、達成！】✨🔔\n" +
+                "除夜の鐘を108回つき終え、一年の煩悩が祓われました。\n" +
+                "神様から【" + JOYA_BELL_COMPLETE_PRIZE.toLocaleString() + "円】を授かりました！\n" +
+                "（称号「百八の煩悩祓い」を獲得！）良いお年を…"
+            );
+        }, 300);
+    } else {
+        await saveUserState();
     }
 }

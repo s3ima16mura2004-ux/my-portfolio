@@ -80,6 +80,13 @@ function updateShopUI() {
         const card = document.querySelector('.shop-item-card[data-key="' + item.key + '"]');
         if (!card) return;
 
+        // 🍬 季節限定アイテムは開催期間外だとカードごと非表示にする
+        if (item.seasonal) {
+            const seasonActive = isSeasonalEventActive(item.seasonal);
+            card.classList.toggle("hidden", !seasonActive);
+            if (!seasonActive) return;
+        }
+
         const btn = card.querySelector(".btn-shop-buy");
         const lockOverlay = card.querySelector(".shop-item-lock");
         const isLocked = rank < item.minRank;
@@ -630,6 +637,258 @@ function updateSeasonalItemsUI() {
     } else {
         box.classList.remove("hidden");
         box.innerHTML = html;
+    }
+}
+
+// 🌕 十五夜「月が昇る」演出を1回発生させる（画面右側にふわっと満月を出す）
+function spawnMoonRise() {
+    const overlay = document.querySelector("#season-fx-overlay");
+    if (!overlay) return;
+    const moon = document.createElement("span");
+    moon.textContent = "🌕";
+    moon.className = "moon-rise";
+    overlay.appendChild(moon);
+    setTimeout(() => { moon.remove(); }, 5200);
+}
+
+// 最後に「月が昇る」演出を出した時刻（同じ夜に何度も出過ぎないようにする・保存はしない）
+let otsukimiMoonShownAt = 0;
+
+// 🌕 お月見（9/15〜9/30）の表示を更新する。夜間は「月が昇る」十五夜演出、昼間は淡い夕月演出にする
+function updateOtsukimiUI() {
+    const container = document.querySelector(".container");
+    const nightBanner = document.querySelector("#otsukimi-banner");
+    const dayBanner = document.querySelector("#otsukimi-day-banner");
+    const inSeason = isSeasonalEventActive("otsukimi");
+    const night = isNightHour();
+
+    if (container) {
+        container.classList.toggle("otsukimi-active", inSeason && night);
+        container.classList.toggle("otsukimi-day", inSeason && !night);
+    }
+    if (nightBanner) nightBanner.classList.toggle("hidden", !(inSeason && night));
+    if (dayBanner) dayBanner.classList.toggle("hidden", !(inSeason && !night));
+
+    // 🌕 夜間は10分に1回程度、月が昇る演出を発生させる
+    if (inSeason && night) {
+        const now = Date.now();
+        if (now - otsukimiMoonShownAt > 10 * 60 * 1000) {
+            otsukimiMoonShownAt = now;
+            spawnMoonRise();
+        }
+    }
+}
+
+// 🍁 紅葉狩り中に舞い落ちる葉っぱを1枚だけ画面に出す
+function spawnFallingLeaf() {
+    const overlay = document.querySelector("#season-fx-overlay");
+    if (!overlay) return;
+    const leaves = ["🍁", "🍂"];
+    const leaf = document.createElement("span");
+    leaf.textContent = leaves[Math.floor(Math.random() * leaves.length)];
+    leaf.className = "leaf-piece";
+    leaf.style.left = Math.random() * 100 + "vw";
+    leaf.style.animationDuration = (Math.random() * 3 + 5) + "s";
+    overlay.appendChild(leaf);
+    setTimeout(() => { leaf.remove(); }, 8500);
+}
+
+// 落ち葉を定期的に降らせるタイマー（紅葉狩り期間中だけ動かす）
+let koyoLeafInterval = null;
+
+// 🍁 紅葉狩り（11月）の表示を更新する
+function updateKoyoUI() {
+    const container = document.querySelector(".container");
+    const banner = document.querySelector("#koyo-banner");
+    const active = isSeasonalEventActive("koyo");
+
+    if (container) container.classList.toggle("koyo-active", active);
+    if (banner) banner.classList.toggle("hidden", !active);
+
+    if (active && !koyoLeafInterval) {
+        koyoLeafInterval = setInterval(spawnFallingLeaf, 900);
+    } else if (!active && koyoLeafInterval) {
+        clearInterval(koyoLeafInterval);
+        koyoLeafInterval = null;
+    }
+}
+
+// 🎍 お正月（1/1〜1/3）の表示を更新する（初日の出をイメージした演出）
+function updateOshogatsuUI() {
+    const container = document.querySelector(".container");
+    const banner = document.querySelector("#oshogatsu-banner");
+    const glow = document.querySelector("#oshogatsu-glow");
+    const active = isSeasonalEventActive("oshogatsu");
+
+    if (container) container.classList.toggle("oshogatsu-active", active);
+    if (banner) banner.classList.toggle("hidden", !active);
+    if (glow) glow.classList.toggle("hidden", !active);
+}
+
+// 🌫️ 神無月（10月）の表示を更新する（背景を少し寂しい雰囲気にする）
+function updateKannazukiUI() {
+    const container = document.querySelector(".container");
+    const banner = document.querySelector("#kannazuki-banner");
+    const active = isSeasonalEventActive("kannazuki");
+
+    if (container) container.classList.toggle("kannazuki-active", active);
+    if (banner) {
+        banner.classList.toggle("hidden", !active);
+        if (active) {
+            banner.textContent = kannazukiDeposits > 0
+                ? "🌫️ ただいま「神無月」…神様は出雲へお出かけ中です（現在の預け入れ累計：" + kannazukiDeposits.toLocaleString() + "円。11月に倍返し！）"
+                : "🌫️ ただいま「神無月」…神様は出雲へお出かけ中です。賽銭箱に預けると11月に倍返しされます";
+        }
+    }
+}
+
+// 👘 七五三（11月）の表示を更新する（バナーのみ。ショップの千歳飴はupdateShopUIで表示切替）
+function updateShichigosanUI() {
+    const banner = document.querySelector("#shichigosan-banner");
+    if (!banner) return;
+    banner.classList.toggle("hidden", !isSeasonalEventActive("shichigosan"));
+}
+
+// 🎄 クリスマス（12/1〜12/25）の表示を更新する。昼は雪、夜はイルミネーション演出にする
+function updateChristmasUI() {
+    const container = document.querySelector(".container");
+    const nightBanner = document.querySelector("#christmas-banner");
+    const dayBanner = document.querySelector("#christmas-day-banner");
+    const inSeason = isSeasonalEventActive("christmas");
+    const night = isNightHour();
+
+    if (container) {
+        container.classList.toggle("christmas-active", inSeason && night);
+        container.classList.toggle("christmas-day", inSeason && !night);
+    }
+    if (nightBanner) nightBanner.classList.toggle("hidden", !(inSeason && night));
+    if (dayBanner) dayBanner.classList.toggle("hidden", !(inSeason && !night));
+
+    updateWinterSnow();
+}
+
+// 🔔 除夜の鐘の演出を1回発生させる（画面中央にふわっと鐘が現れて揺れる）
+function spawnJoyaBell() {
+    const overlay = document.querySelector("#season-fx-overlay");
+    if (!overlay) return;
+    const bell = document.createElement("span");
+    bell.textContent = "🔔";
+    bell.className = "joya-bell";
+    overlay.appendChild(bell);
+    setTimeout(() => { bell.remove(); }, 3700);
+}
+
+// 最後に除夜の鐘の演出を出した時刻（同じ夜に何度も出過ぎないようにする・保存はしない）
+let nenmatsuBellShownAt = 0;
+
+// 🎊 年末（12/26〜12/31）の表示を更新する。昼は雪、夜は「除夜の鐘」演出にする
+function updateNenmatsuUI() {
+    const container = document.querySelector(".container");
+    const nightBanner = document.querySelector("#nenmatsu-banner");
+    const dayBanner = document.querySelector("#nenmatsu-day-banner");
+    const inSeason = isSeasonalEventActive("nenmatsu");
+    const night = isNightHour();
+
+    if (container) {
+        container.classList.toggle("nenmatsu-active", inSeason && night);
+        container.classList.toggle("nenmatsu-day", inSeason && !night);
+    }
+    if (nightBanner) nightBanner.classList.toggle("hidden", !(inSeason && night));
+    if (dayBanner) dayBanner.classList.toggle("hidden", !(inSeason && !night));
+
+    // 🔔 夜間は10分に1回程度、除夜の鐘が響く演出を発生させる
+    if (inSeason && night) {
+        const now = Date.now();
+        if (now - nenmatsuBellShownAt > 10 * 60 * 1000) {
+            nenmatsuBellShownAt = now;
+            spawnJoyaBell();
+        }
+    }
+
+    updateWinterSnow();
+    updateJoyaBellUI();
+}
+
+// ❄️ 雪を1粒だけ画面に降らせる（クリスマス・年末の「昼」で共通して使う）
+function spawnSnowflake() {
+    const overlay = document.querySelector("#season-fx-overlay");
+    if (!overlay) return;
+    const flakes = ["❄", "❅", "❆"];
+    const flake = document.createElement("span");
+    flake.textContent = flakes[Math.floor(Math.random() * flakes.length)];
+    flake.className = "snowflake-piece";
+    flake.style.left = Math.random() * 100 + "vw";
+    flake.style.fontSize = (Math.random() * 10 + 14) + "px";
+    flake.style.animationDuration = (Math.random() * 4 + 6) + "s";
+    overlay.appendChild(flake);
+    setTimeout(() => { flake.remove(); }, 10500);
+}
+
+// 雪を定期的に降らせるタイマー（クリスマス・年末どちらかの「昼」の間だけ動かす）
+let winterSnowInterval = null;
+
+// ❄️ クリスマス・年末のどちらかが「昼」表示中なら、雪を降らせ続ける（両者から呼ばれる共通処理）
+function updateWinterSnow() {
+    const container = document.querySelector(".container");
+    const snowing = !!(container && (container.classList.contains("christmas-day") || container.classList.contains("nenmatsu-day")));
+
+    if (snowing && !winterSnowInterval) {
+        winterSnowInterval = setInterval(spawnSnowflake, 500);
+    } else if (!snowing && winterSnowInterval) {
+        clearInterval(winterSnowInterval);
+        winterSnowInterval = null;
+    }
+}
+
+// 🔔 除夜の鐘（108回つき）欄の表示を更新する
+function updateJoyaBellUI() {
+    const box = document.querySelector("#nenmatsu-bell-box");
+    const btn = document.querySelector("#joya-bell-btn");
+    const statusText = document.querySelector("#joya-bell-status-text");
+    if (!box) return;
+
+    const active = isSeasonalEventActive("nenmatsu");
+    box.classList.toggle("hidden", !active);
+    if (!active) return;
+
+    const today = todayStr();
+    const count = joyaBellDate === today ? joyaBellCount : 0;
+    const done = count >= JOYA_BELL_TARGET;
+
+    if (btn) btn.disabled = done;
+    if (statusText) {
+        statusText.textContent = done
+            ? "🔔 今年の除夜の鐘は108回つき終えました。良いお年を…！"
+            : "🔔 除夜の鐘：" + count + " / " + JOYA_BELL_TARGET + "回（108回つくと煩悩祓いのご褒美があります）";
+    }
+}
+
+// 🎁 サンタの袋の演出テキストを組み立てる
+function santaBagToText(amount) {
+    if (!amount) return "";
+    return "\n\n🎅🎁【サンタの袋、開封！】🎁🎅\n袋を開けてみると…なんと【" + amount.toLocaleString() + "円】が入っていました！メリークリスマス！";
+}
+
+// 💝 バレンタイン（2/1〜2/14）「チョコおみくじ」欄の表示を更新する
+function updateValentineUI() {
+    const container = document.querySelector(".container");
+    const box = document.querySelector("#valentine-box");
+    const btn = document.querySelector("#choco-omikuji-btn");
+    const statusText = document.querySelector("#choco-status-text");
+    const active = isSeasonalEventActive("valentine");
+
+    if (container) container.classList.toggle("valentine-active", active);
+    if (!box) return;
+
+    box.classList.toggle("hidden", !active);
+    if (!active) return;
+
+    const usedToday = chocoDrawDate === todayStr();
+    if (btn) btn.disabled = usedToday;
+    if (statusText) {
+        statusText.textContent = usedToday
+            ? "💝 今日はもうチョコおみくじを引きました。また明日挑戦してください。（これまでに引いた回数：" + chocoDrawCount + "回）"
+            : "💝 チョコおみくじを引くと、運勢とあなたの「ペア運勢」がわかります！（ハズレなし・1日1回）";
     }
 }
 
