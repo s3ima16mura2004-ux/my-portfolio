@@ -282,7 +282,7 @@ function updateTitlesUI() {
         gotDaidaikichi, gotKamikichi, gotDaidaikyou, gotUshimitsuDraw, ishikoro500Claimed,
         communityDraws, orihimeHikoboshiMeetCount, hatsuyumeComplete, steadyVisitorEarned,
         hanamiDangoTotalCollected, gotKodomonohiExtreme, mamemakiSuccessCount, nagoshiLastResetYear,
-        shrineMapLevel, shrineMapJapanLevel
+        shrineMapLevel, japanShrineOwnedCount: getJapanShrineOwnedCount(), japanPrefCompleteCount: getJapanPrefectureCompleteCount()
     };
     const earned = TITLES.filter(t => t.condition(stats));
 
@@ -1144,45 +1144,68 @@ function updateShrineMapJapanUI() {
     unlockedBox.classList.toggle("hidden", !unlocked);
     if (!unlocked) return;
 
+    // 🗾 日本地図風のマス目に47都道府県を配置する（row/colは実際の位置関係を簡略化したもの）
     const grid = document.querySelector("#map-japan-grid");
     if (grid) {
-        grid.innerHTML = MAP_TILES_JAPAN.map((tile, i) => {
-            const owned = i < shrineMapJapanLevel;
-            const isNext = i === shrineMapJapanLevel;
-            const tooltip = owned
-                ? tile.name + "：" + tile.desc
-                : (isNext ? "次に巡れる県：" + tile.name + "（" + tile.cost.toLocaleString() + "円）" : "？？？（未訪問）");
+        grid.innerHTML = JAPAN_PREFECTURES.map(pref => {
+            const ownedCount = pref.shrines.filter(s => japanShrinesOwned[s.key]).length;
+            const total = pref.shrines.length;
+            const complete = ownedCount === total;
+            const partial = ownedCount > 0 && !complete;
+            const selected = selectedJapanPrefKey === pref.key;
+            const shortName = pref.name.replace(/(都|府|県)$/, "");
+            const cls = "map-japan-tile" +
+                (complete ? " map-japan-tile-complete" : "") +
+                (partial ? " map-japan-tile-partial" : "") +
+                (selected ? " map-japan-tile-selected" : "");
             return (
-                '<div class="map-tile' + (owned ? " map-tile-owned" : "") + (isNext ? " map-tile-next" : "") + '" title="' +
-                tooltip.replace(/"/g, "&quot;") + '">' +
-                '<div class="map-tile-emoji">' + (owned ? tile.emoji : "❔") + '</div>' +
-                '</div>'
+                '<button type="button" class="' + cls + '" style="grid-row:' + pref.row + ';grid-column:' + pref.col + ';" ' +
+                'onclick="selectJapanPrefecture(\'' + pref.key + '\')" title="' + pref.name + '：' + ownedCount + '/' + total + '参拝済み">' +
+                '<span class="map-japan-tile-label">' + shortName + '</span>' +
+                '<span class="map-japan-tile-count">' + ownedCount + '/' + total + '</span>' +
+                '</button>'
             );
         }).join("");
     }
 
+    // 🗾 コンプリート状況：神社の数、都道府県の数の両方を表示
+    const shrineCount = getJapanShrineOwnedCount();
+    const prefCount = getJapanPrefectureCompleteCount();
     const progressEl = document.querySelector("#map-japan-progress");
     if (progressEl) {
-        progressEl.textContent = "巡礼状況：" + shrineMapJapanLevel + " / " + MAP_TILES_JAPAN.length + "県";
+        progressEl.textContent =
+            "⛩️ コンプリートした神社：" + shrineCount + " / " + JAPAN_SHRINE_COUNT + "社　｜　" +
+            "🗾 コンプリートした都道府県：" + prefCount + " / " + JAPAN_PREFECTURES.length + "県";
     }
 
-    const nextText = document.querySelector("#map-japan-next-text");
-    const buyBtn = document.querySelector("#map-japan-buy-btn");
-    const next = MAP_TILES_JAPAN[shrineMapJapanLevel];
-
-    if (!next) {
-        if (nextText) nextText.textContent = "🏆👑 全国47都道府県すべての神社を巡り終えました！永続的に大吉ボーナス+" + (SHRINE_MAP_JAPAN_COMPLETE_BONUS * 100).toFixed(1) + "%を授かっています。";
-        if (buyBtn) buyBtn.classList.add("hidden");
-    } else {
-        if (nextText) {
-            nextText.textContent = "次の目的地：" + next.emoji + " " + next.name + "（" + next.cost.toLocaleString() + "円）　" + next.desc;
-        }
-        if (buyBtn) {
-            buyBtn.classList.remove("hidden");
-            buyBtn.disabled = currentMoney < next.cost;
+    // 🗾 選択中の都道府県の詳細（神社ごとの参拝ボタン）を表示する
+    const detailBox = document.querySelector("#map-japan-detail");
+    if (detailBox) {
+        const pref = JAPAN_PREFECTURES.find(p => p.key === selectedJapanPrefKey);
+        if (!pref) {
+            detailBox.innerHTML = '<p class="collect-item-desc">👆 上の地図から、好きな都道府県をタップして参拝先を選びましょう。</p>';
+        } else {
+            const rows = pref.shrines.map(s => {
+                const owned = !!japanShrinesOwned[s.key];
+                const actionHtml = owned
+                    ? '<span class="mission-status-tag mission-status-done">✅ 参拝済み</span>'
+                    : '<button class="btn-shop-buy" onclick="buyJapanShrine(\'' + pref.key + '\',\'' + s.key + '\')" type="button"' +
+                      (currentMoney < s.cost ? " disabled" : "") + '>' + s.cost.toLocaleString() + '円で参拝</button>';
+                return '<div class="collect-item-row"><span>' + s.emoji + ' ' + s.name + '</span>' + actionHtml + '</div>';
+            }).join("");
+            const completeTag = isJapanPrefectureComplete(pref) ? '<span class="mission-status-tag mission-status-done">🎏 コンプリート！</span>' : "";
+            detailBox.innerHTML =
+                '<p class="shop-section-title" style="margin-top:0;">' + pref.name + " " + completeTag + '</p>' +
+                rows;
         }
     }
 
     const container = document.querySelector(".container");
     if (container) container.classList.toggle("japan-map-complete", isShrineMapJapanComplete());
+}
+
+// 🗾 地図上の都道府県をタップした時の処理（同じ県を再タップすると選択解除）
+function selectJapanPrefecture(prefKey) {
+    selectedJapanPrefKey = (selectedJapanPrefKey === prefKey) ? "" : prefKey;
+    updateShrineMapJapanUI();
 }

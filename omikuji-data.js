@@ -140,63 +140,362 @@ const MAP_MILESTONES = [
 ];
 const SHRINE_MAP_COMPLETE_BONUS = 0.01; // 境内マップ完成後、永続的に大吉ボーナス+1%
 
-// 🗾 全国神社巡りマップ（境内マップ完成後に解放される第2段階。47都道府県を1県ずつ巡っていく超長期の金策先）
-const MAP_TILES_JAPAN = [
-    { key: "hokkaido", emoji: "🦌", name: "北海道・北海道神宮", cost: 80000, desc: "北海道を代表する「北海道神宮」" },
-    { key: "aomori", emoji: "🍎", name: "青森県・岩木山神社", cost: 90000, desc: "青森県を代表する「岩木山神社」" },
-    { key: "iwate", emoji: "🐎", name: "岩手県・盛岡八幡宮", cost: 95000, desc: "岩手県を代表する「盛岡八幡宮」" },
-    { key: "miyagi", emoji: "🌾", name: "宮城県・大崎八幡宮", cost: 105000, desc: "宮城県を代表する「大崎八幡宮」" },
-    { key: "akita", emoji: "🐕", name: "秋田県・太平山三吉神社", cost: 115000, desc: "秋田県を代表する「太平山三吉神社」" },
-    { key: "yamagata", emoji: "🍒", name: "山形県・出羽三山神社", cost: 125000, desc: "山形県を代表する「出羽三山神社」" },
-    { key: "fukushima", emoji: "🍑", name: "福島県・開成山大神宮", cost: 135000, desc: "福島県を代表する「開成山大神宮」" },
-    { key: "ibaraki", emoji: "⚔️", name: "茨城県・鹿島神宮", cost: 150000, desc: "茨城県を代表する「鹿島神宮」" },
-    { key: "tochigi", emoji: "🐒", name: "栃木県・日光東照宮", cost: 165000, desc: "栃木県を代表する「日光東照宮」" },
-    { key: "gunma", emoji: "♨️", name: "群馬県・一之宮貫前神社", cost: 180000, desc: "群馬県を代表する「一之宮貫前神社」" },
-    { key: "saitama", emoji: "🏯", name: "埼玉県・氷川神社", cost: 195000, desc: "埼玉県を代表する「氷川神社」" },
-    { key: "chiba", emoji: "✈️", name: "千葉県・香取神宮", cost: 220000, desc: "千葉県を代表する「香取神宮」" },
-    { key: "tokyo", emoji: "🗼", name: "東京都・明治神宮", cost: 240000, desc: "東京都を代表する「明治神宮」" },
-    { key: "kanagawa", emoji: "⛵", name: "神奈川県・鶴岡八幡宮", cost: 260000, desc: "神奈川県を代表する「鶴岡八幡宮」" },
-    { key: "niigata", emoji: "🍶", name: "新潟県・彌彦神社", cost: 280000, desc: "新潟県を代表する「彌彦神社」" },
-    { key: "toyama", emoji: "🏔️", name: "富山県・高瀬神社", cost: 310000, desc: "富山県を代表する「高瀬神社」" },
-    { key: "ishikawa", emoji: "🥇", name: "石川県・尾山神社", cost: 340000, desc: "石川県を代表する「尾山神社」" },
-    { key: "fukui", emoji: "🦕", name: "福井県・氣比神宮", cost: 370000, desc: "福井県を代表する「氣比神宮」" },
-    { key: "yamanashi", emoji: "🗻", name: "山梨県・北口本宮冨士浅間神社", cost: 400000, desc: "山梨県を代表する「北口本宮冨士浅間神社」" },
-    { key: "nagano", emoji: "🍎", name: "長野県・諏訪大社", cost: 440000, desc: "長野県を代表する「諏訪大社」" },
-    { key: "gifu", emoji: "🦆", name: "岐阜県・南宮大社", cost: 480000, desc: "岐阜県を代表する「南宮大社」" },
-    { key: "shizuoka", emoji: "🍵", name: "静岡県・富士山本宮浅間大社", cost: 530000, desc: "静岡県を代表する「富士山本宮浅間大社」" },
-    { key: "aichi", emoji: "⚔️", name: "愛知県・熱田神宮", cost: 580000, desc: "愛知県を代表する「熱田神宮」" },
-    { key: "mie", emoji: "🦞", name: "三重県・伊勢神宮", cost: 630000, desc: "三重県を代表する「伊勢神宮」" },
-    { key: "shiga", emoji: "🐒", name: "滋賀県・日吉大社", cost: 690000, desc: "滋賀県を代表する「日吉大社」" },
-    { key: "kyoto", emoji: "🦊", name: "京都府・伏見稲荷大社", cost: 760000, desc: "京都府を代表する「伏見稲荷大社」" },
-    { key: "osaka", emoji: "🐙", name: "大阪府・住吉大社", cost: 830000, desc: "大阪府を代表する「住吉大社」" },
-    { key: "hyogo", emoji: "🐄", name: "兵庫県・廣田神社", cost: 910000, desc: "兵庫県を代表する「廣田神社」" },
-    { key: "nara", emoji: "🦌", name: "奈良県・春日大社", cost: 990000, desc: "奈良県を代表する「春日大社」" },
-    { key: "wakayama", emoji: "🍊", name: "和歌山県・熊野本宮大社", cost: 1100000, desc: "和歌山県を代表する「熊野本宮大社」" },
-    { key: "tottori", emoji: "🐫", name: "鳥取県・宇倍神社", cost: 1200000, desc: "鳥取県を代表する「宇倍神社」" },
-    { key: "shimane", emoji: "💑", name: "島根県・出雲大社", cost: 1300000, desc: "島根県を代表する「出雲大社」" },
-    { key: "okayama", emoji: "🍑", name: "岡山県・吉備津神社", cost: 1400000, desc: "岡山県を代表する「吉備津神社」" },
-    { key: "hiroshima", emoji: "⛩️", name: "広島県・厳島神社", cost: 1550000, desc: "広島県を代表する「厳島神社」" },
-    { key: "yamaguchi", emoji: "🐡", name: "山口県・住吉神社", cost: 1700000, desc: "山口県を代表する「住吉神社」" },
-    { key: "tokushima", emoji: "🌪️", name: "徳島県・大麻比古神社", cost: 1850000, desc: "徳島県を代表する「大麻比古神社」" },
-    { key: "kagawa", emoji: "🍜", name: "香川県・金刀比羅宮", cost: 2050000, desc: "香川県を代表する「金刀比羅宮」" },
-    { key: "ehime", emoji: "🍊", name: "愛媛県・大山祇神社", cost: 2250000, desc: "愛媛県を代表する「大山祇神社」" },
-    { key: "kochi", emoji: "🐟", name: "高知県・土佐神社", cost: 2450000, desc: "高知県を代表する「土佐神社」" },
-    { key: "fukuoka", emoji: "📚", name: "福岡県・太宰府天満宮", cost: 2650000, desc: "福岡県を代表する「太宰府天満宮」" },
-    { key: "saga", emoji: "🏺", name: "佐賀県・佐嘉神社", cost: 2900000, desc: "佐賀県を代表する「佐嘉神社」" },
-    { key: "nagasaki", emoji: "🐳", name: "長崎県・諏訪神社", cost: 3200000, desc: "長崎県を代表する「諏訪神社」" },
-    { key: "kumamoto", emoji: "🌋", name: "熊本県・阿蘇神社", cost: 3500000, desc: "熊本県を代表する「阿蘇神社」" },
-    { key: "oita", emoji: "♨️", name: "大分県・宇佐神宮", cost: 3800000, desc: "大分県を代表する「宇佐神宮」" },
-    { key: "miyazaki", emoji: "🐉", name: "宮崎県・高千穂神社", cost: 4200000, desc: "宮崎県を代表する「高千穂神社」" },
-    { key: "kagoshima", emoji: "🌋", name: "鹿児島県・鹿児島神宮", cost: 4550000, desc: "鹿児島県を代表する「鹿児島神宮」" },
-    { key: "okinawa", emoji: "🌺", name: "沖縄県・波上宮", cost: 5000000, desc: "沖縄県を代表する「波上宮」" },
+// 🗾 全国神社巡りマップ（境内マップ完成後に解放される第2段階）
+// 日本地図風のマス目（row=北→南、col=西→東のおおよその位置）に47都道府県を配置し、
+// 各都道府県ごとに2〜3個の神社を用意。どの神社からでも自由な順番で購入できる（コンプリート型の金策先）
+const JAPAN_PREFECTURES = [
+    {
+        key: "hokkaido", name: "北海道", row: 1, col: 8,
+        shrines: [
+            { key: "hokkaido_s1", emoji: "🦌", name: "北海道神宮", cost: 50000 },
+            { key: "hokkaido_s2", emoji: "🏯", name: "北海道護國神社", cost: 80000 },
+        ]
+    },
+    {
+        key: "aomori", name: "青森県", row: 2, col: 8,
+        shrines: [
+            { key: "aomori_s1", emoji: "🍎", name: "岩木山神社", cost: 60000 },
+            { key: "aomori_s2", emoji: "⛩️", name: "善知鳥神社", cost: 90000 },
+        ]
+    },
+    {
+        key: "iwate", name: "岩手県", row: 3, col: 9,
+        shrines: [
+            { key: "iwate_s1", emoji: "🐎", name: "盛岡八幡宮", cost: 60000 },
+            { key: "iwate_s2", emoji: "⛩️", name: "駒形神社", cost: 95000 },
+        ]
+    },
+    {
+        key: "miyagi", name: "宮城県", row: 4, col: 9,
+        shrines: [
+            { key: "miyagi_s1", emoji: "🌾", name: "大崎八幡宮", cost: 70000 },
+            { key: "miyagi_s2", emoji: "⛩️", name: "鹽竈神社", cost: 105000 },
+        ]
+    },
+    {
+        key: "akita", name: "秋田県", row: 3, col: 7,
+        shrines: [
+            { key: "akita_s1", emoji: "🐕", name: "太平山三吉神社", cost: 75000 },
+            { key: "akita_s2", emoji: "⛩️", name: "秋田縣護國神社", cost: 115000 },
+        ]
+    },
+    {
+        key: "yamagata", name: "山形県", row: 4, col: 7,
+        shrines: [
+            { key: "yamagata_s1", emoji: "🍒", name: "出羽三山神社", cost: 80000 },
+            { key: "yamagata_s2", emoji: "⛩️", name: "鳥海山大物忌神社", cost: 125000 },
+        ]
+    },
+    {
+        key: "fukushima", name: "福島県", row: 5, col: 9,
+        shrines: [
+            { key: "fukushima_s1", emoji: "🍑", name: "開成山大神宮", cost: 90000 },
+            { key: "fukushima_s2", emoji: "⛩️", name: "馬場都々古別神社", cost: 135000 },
+        ]
+    },
+    {
+        key: "ibaraki", name: "茨城県", row: 6, col: 10,
+        shrines: [
+            { key: "ibaraki_s1", emoji: "⚔️", name: "鹿島神宮", cost: 100000 },
+            { key: "ibaraki_s2", emoji: "⛩️", name: "笠間稲荷神社", cost: 150000 },
+        ]
+    },
+    {
+        key: "tochigi", name: "栃木県", row: 6, col: 9,
+        shrines: [
+            { key: "tochigi_s1", emoji: "🐒", name: "日光東照宮", cost: 105000 },
+            { key: "tochigi_s2", emoji: "⛩️", name: "日光二荒山神社", cost: 165000 },
+        ]
+    },
+    {
+        key: "gunma", name: "群馬県", row: 6, col: 8,
+        shrines: [
+            { key: "gunma_s1", emoji: "♨️", name: "一之宮貫前神社", cost: 115000 },
+            { key: "gunma_s2", emoji: "⛩️", name: "赤城神社", cost: 180000 },
+        ]
+    },
+    {
+        key: "saitama", name: "埼玉県", row: 7, col: 9,
+        shrines: [
+            { key: "saitama_s1", emoji: "🏯", name: "氷川神社", cost: 125000 },
+            { key: "saitama_s2", emoji: "⛩️", name: "秩父神社", cost: 195000 },
+        ]
+    },
+    {
+        key: "chiba", name: "千葉県", row: 7, col: 10,
+        shrines: [
+            { key: "chiba_s1", emoji: "✈️", name: "香取神宮", cost: 145000 },
+            { key: "chiba_s2", emoji: "⛩️", name: "玉前神社", cost: 220000 },
+        ]
+    },
+    {
+        key: "tokyo", name: "東京都", row: 8, col: 9,
+        shrines: [
+            { key: "tokyo_s1", emoji: "🗼", name: "明治神宮", cost: 130000 },
+            { key: "tokyo_s2", emoji: "⛩️", name: "神田明神", cost: 205000 },
+            { key: "tokyo_s3", emoji: "🦊", name: "東京大神宮", cost: 310000 },
+        ]
+    },
+    {
+        key: "kanagawa", name: "神奈川県", row: 9, col: 9,
+        shrines: [
+            { key: "kanagawa_s1", emoji: "⛵", name: "鶴岡八幡宮", cost: 145000 },
+            { key: "kanagawa_s2", emoji: "⛩️", name: "寒川神社", cost: 220000 },
+            { key: "kanagawa_s3", emoji: "🏔️", name: "箱根神社", cost: 340000 },
+        ]
+    },
+    {
+        key: "niigata", name: "新潟県", row: 5, col: 7,
+        shrines: [
+            { key: "niigata_s1", emoji: "🍶", name: "彌彦神社", cost: 180000 },
+            { key: "niigata_s2", emoji: "⛩️", name: "白山神社", cost: 280000 },
+        ]
+    },
+    {
+        key: "toyama", name: "富山県", row: 6, col: 5,
+        shrines: [
+            { key: "toyama_s1", emoji: "🏔️", name: "高瀬神社", cost: 200000 },
+            { key: "toyama_s2", emoji: "⛩️", name: "雄山神社", cost: 310000 },
+        ]
+    },
+    {
+        key: "ishikawa", name: "石川県", row: 5, col: 4,
+        shrines: [
+            { key: "ishikawa_s1", emoji: "🥇", name: "尾山神社", cost: 220000 },
+            { key: "ishikawa_s2", emoji: "⛩️", name: "気多大社", cost: 340000 },
+        ]
+    },
+    {
+        key: "fukui", name: "福井県", row: 6, col: 4,
+        shrines: [
+            { key: "fukui_s1", emoji: "🦕", name: "氣比神宮", cost: 240000 },
+            { key: "fukui_s2", emoji: "⛩️", name: "劔神社", cost: 370000 },
+        ]
+    },
+    {
+        key: "yamanashi", name: "山梨県", row: 7, col: 8,
+        shrines: [
+            { key: "yamanashi_s1", emoji: "🗻", name: "北口本宮冨士浅間神社", cost: 260000 },
+            { key: "yamanashi_s2", emoji: "⛩️", name: "武田神社", cost: 400000 },
+        ]
+    },
+    {
+        key: "nagano", name: "長野県", row: 6, col: 7,
+        shrines: [
+            { key: "nagano_s1", emoji: "🍎", name: "諏訪大社", cost: 285000 },
+            { key: "nagano_s2", emoji: "⛩️", name: "戸隠神社", cost: 440000 },
+        ]
+    },
+    {
+        key: "gifu", name: "岐阜県", row: 7, col: 6,
+        shrines: [
+            { key: "gifu_s1", emoji: "🦆", name: "南宮大社", cost: 310000 },
+            { key: "gifu_s2", emoji: "⛩️", name: "飛騨一宮水無神社", cost: 480000 },
+        ]
+    },
+    {
+        key: "shizuoka", name: "静岡県", row: 8, col: 7,
+        shrines: [
+            { key: "shizuoka_s1", emoji: "🍵", name: "富士山本宮浅間大社", cost: 345000 },
+            { key: "shizuoka_s2", emoji: "⛩️", name: "三嶋大社", cost: 530000 },
+        ]
+    },
+    {
+        key: "aichi", name: "愛知県", row: 8, col: 6,
+        shrines: [
+            { key: "aichi_s1", emoji: "⚔️", name: "熱田神宮", cost: 375000 },
+            { key: "aichi_s2", emoji: "⛩️", name: "真清田神社", cost: 580000 },
+        ]
+    },
+    {
+        key: "mie", name: "三重県", row: 9, col: 6,
+        shrines: [
+            { key: "mie_s1", emoji: "🦞", name: "伊勢神宮（内宮）", cost: 345000 },
+            { key: "mie_s2", emoji: "⛩️", name: "伊勢神宮（外宮）", cost: 540000 },
+            { key: "mie_s3", emoji: "⚔️", name: "椿大神社", cost: 820000 },
+        ]
+    },
+    {
+        key: "shiga", name: "滋賀県", row: 8, col: 5,
+        shrines: [
+            { key: "shiga_s1", emoji: "🐒", name: "日吉大社", cost: 450000 },
+            { key: "shiga_s2", emoji: "⛩️", name: "多賀大社", cost: 690000 },
+        ]
+    },
+    {
+        key: "kyoto", name: "京都府", row: 8, col: 4,
+        shrines: [
+            { key: "kyoto_s1", emoji: "🦊", name: "伏見稲荷大社", cost: 420000 },
+            { key: "kyoto_s2", emoji: "⛩️", name: "八坂神社", cost: 650000 },
+            { key: "kyoto_s3", emoji: "🐉", name: "貴船神社", cost: 990000 },
+        ]
+    },
+    {
+        key: "osaka", name: "大阪府", row: 9, col: 4,
+        shrines: [
+            { key: "osaka_s1", emoji: "🐙", name: "住吉大社", cost: 455000 },
+            { key: "osaka_s2", emoji: "⛩️", name: "大阪天満宮", cost: 710000 },
+            { key: "osaka_s3", emoji: "🌸", name: "枚岡神社", cost: 1080000 },
+        ]
+    },
+    {
+        key: "hyogo", name: "兵庫県", row: 8, col: 3,
+        shrines: [
+            { key: "hyogo_s1", emoji: "🐄", name: "廣田神社", cost: 590000 },
+            { key: "hyogo_s2", emoji: "⛩️", name: "生田神社", cost: 910000 },
+        ]
+    },
+    {
+        key: "nara", name: "奈良県", row: 9, col: 5,
+        shrines: [
+            { key: "nara_s1", emoji: "🦌", name: "春日大社", cost: 540000 },
+            { key: "nara_s2", emoji: "⛩️", name: "大神神社", cost: 840000 },
+            { key: "nara_s3", emoji: "🌸", name: "石上神宮", cost: 1290000 },
+        ]
+    },
+    {
+        key: "wakayama", name: "和歌山県", row: 10, col: 4,
+        shrines: [
+            { key: "wakayama_s1", emoji: "🍊", name: "熊野本宮大社", cost: 720000 },
+            { key: "wakayama_s2", emoji: "⛩️", name: "熊野速玉大社", cost: 1100000 },
+        ]
+    },
+    {
+        key: "tottori", name: "鳥取県", row: 9, col: 3,
+        shrines: [
+            { key: "tottori_s1", emoji: "🐫", name: "宇倍神社", cost: 780000 },
+            { key: "tottori_s2", emoji: "⛩️", name: "倭文神社", cost: 1200000 },
+        ]
+    },
+    {
+        key: "shimane", name: "島根県", row: 10, col: 3,
+        shrines: [
+            { key: "shimane_s1", emoji: "💑", name: "出雲大社", cost: 720000 },
+            { key: "shimane_s2", emoji: "⛩️", name: "須佐神社", cost: 1100000 },
+            { key: "shimane_s3", emoji: "🌸", name: "美保神社", cost: 1690000 },
+        ]
+    },
+    {
+        key: "okayama", name: "岡山県", row: 9, col: 2,
+        shrines: [
+            { key: "okayama_s1", emoji: "🍑", name: "吉備津神社", cost: 910000 },
+            { key: "okayama_s2", emoji: "⛩️", name: "石上布都魂神社", cost: 1400000 },
+        ]
+    },
+    {
+        key: "hiroshima", name: "広島県", row: 10, col: 2,
+        shrines: [
+            { key: "hiroshima_s1", emoji: "⛩️", name: "厳島神社", cost: 850000 },
+            { key: "hiroshima_s2", emoji: "🌸", name: "饒津神社", cost: 1320000 },
+            { key: "hiroshima_s3", emoji: "⚔️", name: "素盞嗚神社", cost: 2020000 },
+        ]
+    },
+    {
+        key: "yamaguchi", name: "山口県", row: 11, col: 2,
+        shrines: [
+            { key: "yamaguchi_s1", emoji: "🐡", name: "住吉神社", cost: 1100000 },
+            { key: "yamaguchi_s2", emoji: "⛩️", name: "赤間神宮", cost: 1700000 },
+        ]
+    },
+    {
+        key: "tokushima", name: "徳島県", row: 11, col: 5,
+        shrines: [
+            { key: "tokushima_s1", emoji: "🌪️", name: "大麻比古神社", cost: 1200000 },
+            { key: "tokushima_s2", emoji: "⛩️", name: "阿波井神社", cost: 1850000 },
+        ]
+    },
+    {
+        key: "kagawa", name: "香川県", row: 10, col: 5,
+        shrines: [
+            { key: "kagawa_s1", emoji: "🍜", name: "金刀比羅宮", cost: 1330000 },
+            { key: "kagawa_s2", emoji: "⛩️", name: "田村神社", cost: 2050000 },
+        ]
+    },
+    {
+        key: "ehime", name: "愛媛県", row: 11, col: 4,
+        shrines: [
+            { key: "ehime_s1", emoji: "🍊", name: "大山祇神社", cost: 1240000 },
+            { key: "ehime_s2", emoji: "⛩️", name: "伊佐爾波神社", cost: 1910000 },
+            { key: "ehime_s3", emoji: "♨️", name: "石鎚神社", cost: 2920000 },
+        ]
+    },
+    {
+        key: "kochi", name: "高知県", row: 12, col: 4,
+        shrines: [
+            { key: "kochi_s1", emoji: "🐟", name: "土佐神社", cost: 1590000 },
+            { key: "kochi_s2", emoji: "⛩️", name: "潮江天満宮", cost: 2450000 },
+        ]
+    },
+    {
+        key: "fukuoka", name: "福岡県", row: 12, col: 2,
+        shrines: [
+            { key: "fukuoka_s1", emoji: "📚", name: "太宰府天満宮", cost: 1460000 },
+            { key: "fukuoka_s2", emoji: "⛩️", name: "宗像大社", cost: 2250000 },
+            { key: "fukuoka_s3", emoji: "🌊", name: "筥崎宮", cost: 3440000 },
+        ]
+    },
+    {
+        key: "saga", name: "佐賀県", row: 13, col: 1,
+        shrines: [
+            { key: "saga_s1", emoji: "🏺", name: "佐嘉神社", cost: 1880000 },
+            { key: "saga_s2", emoji: "⛩️", name: "祐徳稲荷神社", cost: 2900000 },
+        ]
+    },
+    {
+        key: "nagasaki", name: "長崎県", row: 14, col: 1,
+        shrines: [
+            { key: "nagasaki_s1", emoji: "🐳", name: "諏訪神社", cost: 2080000 },
+            { key: "nagasaki_s2", emoji: "⛩️", name: "亀山八幡宮", cost: 3200000 },
+        ]
+    },
+    {
+        key: "kumamoto", name: "熊本県", row: 13, col: 2,
+        shrines: [
+            { key: "kumamoto_s1", emoji: "🌋", name: "阿蘇神社", cost: 1930000 },
+            { key: "kumamoto_s2", emoji: "⛩️", name: "藤崎八旛宮", cost: 2980000 },
+            { key: "kumamoto_s3", emoji: "⚔️", name: "加藤神社", cost: 4550000 },
+        ]
+    },
+    {
+        key: "oita", name: "大分県", row: 12, col: 3,
+        shrines: [
+            { key: "oita_s1", emoji: "♨️", name: "宇佐神宮", cost: 2470000 },
+            { key: "oita_s2", emoji: "⛩️", name: "柞原八幡宮", cost: 3800000 },
+        ]
+    },
+    {
+        key: "miyazaki", name: "宮崎県", row: 14, col: 3,
+        shrines: [
+            { key: "miyazaki_s1", emoji: "🐉", name: "高千穂神社", cost: 2730000 },
+            { key: "miyazaki_s2", emoji: "⛩️", name: "宮崎神宮", cost: 4200000 },
+        ]
+    },
+    {
+        key: "kagoshima", name: "鹿児島県", row: 15, col: 2,
+        shrines: [
+            { key: "kagoshima_s1", emoji: "🌋", name: "鹿児島神宮", cost: 2500000 },
+            { key: "kagoshima_s2", emoji: "⛩️", name: "霧島神宮", cost: 3870000 },
+            { key: "kagoshima_s3", emoji: "⚔️", name: "照國神社", cost: 5920000 },
+        ]
+    },
+    {
+        key: "okinawa", name: "沖縄県", row: 17, col: 1,
+        shrines: [
+            { key: "okinawa_s1", emoji: "🌺", name: "波上宮", cost: 3250000 },
+            { key: "okinawa_s2", emoji: "⛩️", name: "首里観音堂", cost: 5000000 },
+        ]
+    },
 ];
 
-// 🗾 全国神社巡りマップの節目（都道府県数）で贈られる祝儀
+// 🗾 全国神社巡りマップの全神社数（106社）を数えるためのヘルパー
+const JAPAN_SHRINE_COUNT = JAPAN_PREFECTURES.reduce((sum, p) => sum + p.shrines.length, 0);
+
+// 🗾 全国神社巡りマップの節目（コンプリートした神社の数）で贈られる祝儀
 const MAP_JAPAN_MILESTONES = [
-    { count: 12, prize: 500000 },
-    { count: 24, prize: 1500000 },
-    { count: 36, prize: 3000000 },
-    { count: 47, prize: 10000000 }
+    { count: 25, prize: 300000 },
+    { count: 50, prize: 900000 },
+    { count: 75, prize: 2200000 },
+    { count: JAPAN_SHRINE_COUNT, prize: 8000000 }
 ];
 const SHRINE_MAP_JAPAN_COMPLETE_BONUS = 0.02; // 全国制覇後、さらに永続的に大吉ボーナス+2%（境内マップ分と合算で+3%）
 
@@ -349,9 +648,10 @@ const TITLES = [
     } },
     { key: "shrine_map_halfway", emoji: "🗺️", name: "境内図の道半ば", desc: "境内マップを半分（10マス）まで埋めた", condition: s => (s.shrineMapLevel || 0) >= 10 },
     { key: "shrine_map_complete", emoji: "🗺️✨", name: "境内マップ完成", desc: "境内マップをすべて（20マス）埋め、神社を完成させた", condition: s => (s.shrineMapLevel || 0) >= MAP_TILES.length },
-    { key: "japan_map_quarter", emoji: "🗾", name: "神社巡りの旅人", desc: "全国神社巡りマップで12県を巡った", condition: s => (s.shrineMapJapanLevel || 0) >= 12 },
-    { key: "japan_map_half", emoji: "🗾✨", name: "神社巡りの達人", desc: "全国神社巡りマップで24県を巡った", condition: s => (s.shrineMapJapanLevel || 0) >= 24 },
-    { key: "japan_map_complete", emoji: "🗾👑", name: "日本全国制覇", desc: "全国47都道府県すべての神社を巡り終えた", condition: s => (s.shrineMapJapanLevel || 0) >= MAP_TILES_JAPAN.length }
+    { key: "japan_map_quarter", emoji: "🗾", name: "神社巡りの旅人", desc: "全国神社巡りマップで25社を参拝した", condition: s => (s.japanShrineOwnedCount || 0) >= 25 },
+    { key: "japan_map_half", emoji: "🗾✨", name: "神社巡りの達人", desc: "全国神社巡りマップで50社を参拝した", condition: s => (s.japanShrineOwnedCount || 0) >= 50 },
+    { key: "japan_pref_master", emoji: "🎏", name: "都道府県制覇の証", desc: "全国神社巡りマップで20都道府県をコンプリートした", condition: s => (s.japanPrefCompleteCount || 0) >= 20 },
+    { key: "japan_map_complete", emoji: "🗾👑", name: "日本全国制覇", desc: "全国のすべての神社（" + JAPAN_SHRINE_COUNT + "社）を参拝し終えた", condition: s => (s.japanShrineOwnedCount || 0) >= JAPAN_SHRINE_COUNT }
 ];
 
 // 🎂 誕生日ボーナス（ログイン画面で任意設定。誕生日当日のログインで「大大吉確定チケット」を1枚獲得）

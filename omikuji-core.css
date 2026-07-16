@@ -801,6 +801,69 @@ h1 {
 .map-tile-emoji {
     font-size: 1.6rem;
 }
+
+/* 🗾 全国神社巡りマップ（日本地図風のマス目） */
+.map-japan-grid-wrap {
+    overflow-x: auto;
+    margin: 10px 0 14px;
+    padding-bottom: 4px;
+}
+
+.map-japan-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 34px);
+    grid-auto-rows: 34px;
+    gap: 3px;
+    min-width: 380px;
+}
+
+.map-japan-tile {
+    border: 1px solid #cfa96a;
+    border-radius: 5px;
+    background: #f0f0f0;
+    color: #999;
+    font-family: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.1;
+    cursor: pointer;
+    padding: 0;
+}
+
+.map-japan-tile-label {
+    font-size: 0.55rem;
+    font-weight: bold;
+}
+
+.map-japan-tile-count {
+    font-size: 0.45rem;
+}
+
+.map-japan-tile.map-japan-tile-partial {
+    background: #ffe9b3;
+    color: #a06a00;
+    border-color: #d8a83a;
+}
+
+.map-japan-tile.map-japan-tile-complete {
+    background: linear-gradient(135deg, #fff2cc, #ffd700);
+    color: #6b4a00;
+    border-color: #d8860b;
+}
+
+.map-japan-tile.map-japan-tile-selected {
+    outline: 2px solid #2a6fdb;
+    outline-offset: 1px;
+}
+
+.map-japan-detail {
+    background: #fffaf0;
+    border: 1px solid #e8dcc8;
+    border-radius: 8px;
+    padding: 10px 12px;
+}
 /* 🎯 デイリーミッション */
 .missions-summary {
     font-size: 0.85rem;

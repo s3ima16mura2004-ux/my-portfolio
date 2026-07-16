@@ -508,48 +508,60 @@ async function buyNextMapTile() {
 }
 
 // 🗾 全国神社巡りマップ（境内マップ完成後に解放される第2段階）の次の1県を購入する
-async function buyNextJapanMapTile() {
+// 🗾 全国神社巡りマップ（境内マップ完成後に解放される第2段階）の神社を1つ参拝する（どの都道府県・神社からでも自由な順番でOK）
+async function buyJapanShrine(prefKey, shrineKey) {
     if (!isShrineMapComplete()) {
         alert("🙅 全国神社巡りマップは、境内マップを完成させると解放されます。");
         return;
     }
 
-    const tile = MAP_TILES_JAPAN[shrineMapJapanLevel];
-    if (!tile) {
-        alert("🗾 全国神社巡りマップはすでに完成しています！");
+    const pref = JAPAN_PREFECTURES.find(p => p.key === prefKey);
+    if (!pref) return;
+    const shrine = pref.shrines.find(s => s.key === shrineKey);
+    if (!shrine) return;
+
+    if (japanShrinesOwned[shrine.key]) {
+        alert("⛩️ 「" + shrine.name + "」にはすでに参拝済みです。");
         return;
     }
-    if (currentMoney < tile.cost) {
-        alert("🙅 所持金が足りません！\n「" + tile.name + "」への参拝には" + tile.cost.toLocaleString() + "円必要です。");
+    if (currentMoney < shrine.cost) {
+        alert("🙅 所持金が足りません！\n「" + shrine.name + "」への参拝には" + shrine.cost.toLocaleString() + "円必要です。");
         return;
     }
 
-    currentMoney -= tile.cost;
-    shrineMapJapanLevel++;
+    currentMoney -= shrine.cost;
+    japanShrinesOwned[shrine.key] = true;
 
     updateMoneyDisplay();
     playSE("se-coin");
 
-    // 🎉 節目（12・24・36・47県）に到達したらお祝い金を授与する
+    // 🎉 節目（コンプリートした神社の数）に到達したらお祝い金を授与する
+    const newCount = getJapanShrineOwnedCount();
     let milestoneMsg = "";
-    const milestone = MAP_JAPAN_MILESTONES.find(m => m.count === shrineMapJapanLevel);
+    const milestone = MAP_JAPAN_MILESTONES.find(m => m.count === newCount);
     if (milestone) {
         currentMoney += milestone.prize;
         totalWinnings += milestone.prize;
         updateMoneyDisplay();
         recordHistory("🗾全国神社巡り・節目ボーナス", milestone.prize, currentMoney);
-        milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n全国神社巡りが" + shrineMapJapanLevel + "県に達したお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
+        milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n参拝した神社が" + newCount + "社に達したお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
+    }
+
+    // 🎏 その都道府県の神社をすべて参拝し終えたらお祝いメッセージ
+    let prefCompleteMsg = "";
+    if (isJapanPrefectureComplete(pref)) {
+        prefCompleteMsg = "\n\n🎏【" + pref.name + "コンプリート！】🎏\n" + pref.name + "の神社をすべて参拝し終えました！";
     }
 
     const completeMsg = isShrineMapJapanComplete()
-        ? "\n\n👑🗾【日本全国制覇！】🗾👑\n47都道府県すべての神社を巡り終えました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_JAPAN_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！"
+        ? "\n\n👑🗾【日本全国制覇！】🗾👑\n全国" + JAPAN_SHRINE_COUNT + "社すべての神社を参拝し終えました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_JAPAN_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！"
         : "";
 
     updateShrineMapUI();
     updateTitlesUI();
     await saveUserState();
 
-    alert("🗾 「" + tile.emoji + " " + tile.name + "」を参拝しました！\n" + tile.desc + milestoneMsg + completeMsg);
+    alert("⛩️ 「" + shrine.emoji + " " + shrine.name + "」に参拝しました！\n（" + pref.name + "）" + milestoneMsg + prefCompleteMsg + completeMsg);
 }
 
 // 🌾 夏越の大祓（6/25〜6/30）限定：「茅の輪くぐり」ボタン。半年分の「凶」「大凶」の累計を清算してご褒美を得る

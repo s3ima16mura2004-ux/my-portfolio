@@ -407,11 +407,14 @@
                         </div>
 
                         <div id="map-japan-unlocked" class="hidden">
-                            <p class="bank-desc">境内マップの完成、おめでとうございます！ここからは所持金を使って北海道から沖縄まで、日本全国の神社を1県ずつ巡っていきましょう。後半の県ほど費用が大きくなります。12・24・36・47県の節目でお祝い金、全国制覇でさらに永続の大吉ボーナスがもらえます。</p>
-                            <p id="map-japan-progress" class="dex-progress">巡礼状況：0 / 47県</p>
-                            <div id="map-japan-grid" class="map-grid"></div>
-                            <p id="map-japan-next-text" class="collect-item-desc">-</p>
-                            <button id="map-japan-buy-btn" class="btn-shop-buy" onclick="buyNextJapanMapTile()" type="button">この県を参拝する</button>
+                            <p class="bank-desc">境内マップの完成、おめでとうございます！ここからは日本地図の好きな都道府県から自由な順番で神社を参拝していきましょう。各都道府県に2〜3社ずつ、全国で106社あります。地図上の都道府県をタップすると、その土地の神社が下に表示されます。参拝した神社の数の節目でお祝い金、全国制覇でさらに永続の大吉ボーナスがもらえます。</p>
+                            <p id="map-japan-progress" class="dex-progress">⛩️ コンプリートした神社：0 / 106社　｜　🗾 コンプリートした都道府県：0 / 47県</p>
+                            <div class="map-japan-grid-wrap">
+                                <div id="map-japan-grid" class="map-japan-grid"></div>
+                            </div>
+                            <div id="map-japan-detail" class="map-japan-detail">
+                                <p class="collect-item-desc">👆 上の地図から、好きな都道府県をタップして参拝先を選びましょう。</p>
+                            </div>
                         </div>
                     </div>
                 </div>
