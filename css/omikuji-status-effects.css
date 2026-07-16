@@ -1,0 +1,341 @@
+/* ============================================================
+   omikuji-status-effects.css
+   📅🎖️🏺 運勢カレンダー・称号バッジ・壺ランクアップ・ラッキーアイテム・大吉演出オーバーレイ
+   ============================================================ */
+
+/* 📅 運勢カレンダー */
+.calendar-section {
+    margin-top: 25px;
+    text-align: left;
+}
+
+.calendar-section h2 {
+    text-align: center;
+    color: #4a3728;
+    font-size: 1.3rem;
+    border-bottom: 2px solid #8b5a2b;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+}
+
+.calendar-note {
+    text-align: center;
+    font-size: 0.78rem;
+    color: #999;
+    margin: 0 0 12px;
+}
+
+.calendar-loading {
+    text-align: center;
+    color: #999;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 4px;
+}
+
+.calendar-weekday {
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #8b5a2b;
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-day {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #555;
+    background: #f5f5f5;
+}
+
+.calendar-day-empty {
+    background: transparent;
+}
+
+.calendar-day-good {
+    background: #d9f2d9;
+    color: #2e7d32;
+}
+
+.calendar-day-bad {
+    background: #fbdede;
+    color: #d9534f;
+}
+
+.calendar-day-neutral {
+    background: #eee;
+    color: #777;
+}
+
+.calendar-day-none {
+    background: #f7f7f7;
+    color: #ccc;
+}
+
+.calendar-day-today {
+    outline: 2px solid #8b5a2b;
+    outline-offset: 1px;
+}
+
+.calendar-day {
+    position: relative;
+}
+
+.calendar-day-event-badge {
+    position: absolute;
+    top: 1px;
+    right: 2px;
+    font-size: 0.65rem;
+    line-height: 1;
+}
+
+/* 🎐 今シーズンのイベント一覧（運勢カレンダー内） */
+.season-events-box {
+    background: #fff8ee;
+    border: 1px solid #e0c9a0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+}
+
+.season-events-title {
+    font-weight: bold;
+    color: #8b5a2b;
+    margin: 0 0 6px;
+    font-size: 0.9rem;
+}
+
+.season-events-empty {
+    color: #999;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.season-event-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    margin-top: 6px;
+}
+
+.season-event-emoji {
+    font-size: 1rem;
+}
+
+.season-event-name {
+    font-weight: bold;
+    color: #4a3728;
+}
+
+.season-event-status {
+    margin-left: auto;
+    font-size: 0.78rem;
+    color: #d9534f;
+    font-weight: bold;
+}
+
+.season-event-desc {
+    font-size: 0.75rem;
+    color: #888;
+    margin: 2px 0 0;
+}
+
+/* 🎋🏮🌕🍁🎍 季節限定アイテム欄（おみくじページ・収集アイテムタブ内） */
+.seasonal-group-title {
+    font-weight: bold;
+    color: #8b5a2b;
+    margin: 14px 0 2px;
+    font-size: 0.9rem;
+}
+
+.seasonal-active-tag {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 8px;
+    background: #ff8a3d;
+    color: #fff;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    vertical-align: middle;
+}
+
+.seasonal-group-desc {
+    font-size: 0.75rem;
+    color: #888;
+    margin: 0 0 6px;
+}
+
+@media (max-width: 600px) {
+    .calendar-day {
+        font-size: 0.7rem;
+    }
+}
+
+/* 🎖️ 称号バッジ */
+.titles-box {
+    background: #fdf6e3;
+    border: 1px solid #e0c98c;
+    padding: 8px 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.titles-title {
+    font-weight: bold;
+    color: #8b5a2b;
+    margin: 0 0 6px;
+    font-size: 0.9rem;
+}
+
+.titles-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.title-badge {
+    background: linear-gradient(135deg, #fff2cc, #ffd700);
+    border: 1px solid #d8860b;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #6b4a1b;
+    white-space: nowrap;
+    cursor: help;
+}
+
+/* 🏺 壺のランクアップ */
+.urn-current-text {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #4a3728;
+    margin: 0 0 8px;
+}
+
+.urn-next-box {
+    background: #fbf8f3;
+    border: 1px solid #e8dcc8;
+    border-radius: 6px;
+    padding: 10px;
+    text-align: center;
+}
+
+#urn-next-text {
+    font-size: 0.85rem;
+    color: #666;
+    margin: 0 0 8px;
+}
+
+/* 🎉 参拝回数マイルストーンによるシャッフル演出 */
+@keyframes glow-gold-pulse {
+    0% { box-shadow: 0 0 5px 2px rgba(255, 215, 0, 0.4); border-color: #ffe08a; }
+    100% { box-shadow: 0 0 20px 6px rgba(255, 215, 0, 0.9); border-color: #ffd700; }
+}
+
+.omikuji-box.shuffle-glow-gold {
+    animation: glow-gold-pulse 0.6s infinite alternate;
+    border-style: solid;
+}
+
+@keyframes glow-rainbow-pulse {
+    0% { box-shadow: 0 0 10px 3px #ff4d4d; }
+    16% { box-shadow: 0 0 10px 3px #ff9800; }
+    33% { box-shadow: 0 0 10px 3px #ffeb3b; }
+    50% { box-shadow: 0 0 10px 3px #4caf50; }
+    66% { box-shadow: 0 0 10px 3px #2196f3; }
+    83% { box-shadow: 0 0 10px 3px #673ab7; }
+    100% { box-shadow: 0 0 10px 3px #e91e63; }
+}
+
+.omikuji-box.shuffle-glow-rainbow {
+    animation: glow-rainbow-pulse 1.2s infinite linear;
+    border-style: solid;
+    border-color: #fff;
+}
+
+@keyframes sparkle-fall {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(40px) scale(1.4); }
+}
+
+/* 🎋 ラッキーアイテム表示ボックス */
+.lucky-item-box {
+    background: #eef9f1;
+    border: 1px solid #b7e4c7;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.lucky-item-title {
+    font-weight: bold;
+    color: #2e7d32;
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+}
+
+#lucky-item-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #4a3728;
+    margin: 0 0 2px;
+}
+
+.lucky-item-desc {
+    font-size: 0.85rem;
+    color: #555;
+    margin: 0;
+}
+
+/* エフェクト用レイヤー */
+#confetti-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+#doom-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(139, 0, 0, 0.4);
+    pointer-events: none;
+    z-index: 9998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.doom-shake {
+    animation: screen-shake 0.15s infinite;
+}
+
+@keyframes screen-shake {
+    0% { transform: translate(3px, 5px) rotate(0deg); }
+    20% { transform: translate(-5px, -3px) rotate(-1deg); }
+    40% { transform: translate(-4px, 3px) rotate(1deg); }
+    60% { transform: translate(4px, -2px) rotate(0deg); }
+    80% { transform: translate(-2px, 4px) rotate(1deg); }
+    100% { transform: translate(3px, -3px) rotate(-1deg); }
+}

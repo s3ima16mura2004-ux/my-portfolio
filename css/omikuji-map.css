@@ -1,0 +1,198 @@
+/* ============================================================
+   omikuji-map.css
+   📖🗺️ 図鑑（コレクション）・境内マップ・全国神社巡りマップ
+   ============================================================ */
+
+/* 📖 図鑑 */
+.dex-progress {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #4a3728;
+    text-align: center;
+    margin: 0 0 12px;
+}
+
+.dex-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 10px;
+}
+
+.dex-slot {
+    border-radius: 8px;
+    padding: 10px 6px;
+    text-align: center;
+    border: 1px solid #e0d0c0;
+}
+
+.dex-slot.dex-achieved {
+    background: linear-gradient(135deg, #fff2cc, #ffd700);
+    border-color: #d8860b;
+}
+
+.dex-slot.dex-locked {
+    background: #f0f0f0;
+    color: #aaa;
+}
+
+.dex-emoji {
+    font-size: 1.6rem;
+    margin-bottom: 4px;
+}
+
+.dex-name {
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.dex-reward-status {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #d8860b;
+    text-align: center;
+}
+
+/* 🗺️ 境内マップ */
+.map-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+    gap: 8px;
+    margin: 10px 0 14px;
+}
+
+.map-tile {
+    border-radius: 8px;
+    padding: 10px 6px;
+    text-align: center;
+    border: 1px solid #e0d0c0;
+    background: #f0f0f0;
+    color: #aaa;
+}
+
+.map-tile.map-tile-owned {
+    background: linear-gradient(135deg, #fff2cc, #ffd700);
+    border-color: #d8860b;
+    color: #4a3728;
+}
+
+.map-tile.map-tile-next {
+    border: 2px dashed #d8860b;
+    background: #fffaf0;
+    color: #b8860b;
+    animation: map-tile-pulse 1.6s infinite alternate;
+}
+
+@keyframes map-tile-pulse {
+    0% { box-shadow: 0 0 3px rgba(216, 134, 11, 0.3); }
+    100% { box-shadow: 0 0 10px rgba(216, 134, 11, 0.8); }
+}
+
+.map-tile-emoji {
+    font-size: 1.6rem;
+}
+
+/* 🗾 全国神社巡りマップ（日本地図風のマス目） */
+.map-japan-grid-wrap {
+    overflow-x: auto;
+    margin: 10px 0 14px;
+    padding-bottom: 4px;
+}
+
+.map-japan-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 34px);
+    grid-auto-rows: 34px;
+    gap: 3px;
+    min-width: 380px;
+}
+
+.map-japan-tile {
+    border: 1px solid #cfa96a;
+    border-radius: 5px;
+    background: #f0f0f0;
+    color: #999;
+    font-family: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.1;
+    cursor: pointer;
+    padding: 0;
+}
+
+.map-japan-tile-label {
+    font-size: 0.55rem;
+    font-weight: bold;
+}
+
+.map-japan-tile-count {
+    font-size: 0.45rem;
+}
+
+.map-japan-tile.map-japan-tile-partial {
+    background: #ffe9b3;
+    color: #a06a00;
+    border-color: #d8a83a;
+}
+
+.map-japan-tile.map-japan-tile-complete {
+    background: linear-gradient(135deg, #fff2cc, #ffd700);
+    color: #6b4a00;
+    border-color: #d8860b;
+}
+
+.map-japan-tile.map-japan-tile-selected {
+    outline: 2px solid #2a6fdb;
+    outline-offset: 1px;
+}
+
+.map-japan-detail {
+    background: #fffaf0;
+    border: 1px solid #e8dcc8;
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.map-japan-shrine-block {
+    border: 1px solid #e8dcc8;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    background: #fff;
+}
+
+.map-japan-shrine-block:last-child {
+    margin-bottom: 0;
+}
+
+.map-japan-shrine-block.map-japan-shrine-complete {
+    background: linear-gradient(135deg, #fff8e0, #fff2cc);
+    border-color: #d8860b;
+}
+
+.map-japan-shrine-title {
+    font-weight: bold;
+    margin: 0 0 6px;
+    font-size: 0.9rem;
+}
+
+.map-japan-shrine-progress {
+    font-weight: normal;
+    font-size: 0.75rem;
+    color: #a06a00;
+}
+
+.map-japan-part-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 0.82rem;
+    border-top: 1px dashed #eadfc8;
+}
+
+.map-japan-part-row:first-of-type {
+    border-top: none;
+}

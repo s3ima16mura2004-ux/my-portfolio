@@ -1,0 +1,294 @@
+/* ============================================================
+   omikuji-top.css
+   🏠 top.html専用スタイル（見出し・境内へ進むボタン・おみくじ履歴・長者番付ランキング）
+   ============================================================ */
+
+/* =====================================================
+   top.html 専用スタイル（トップページ・おみくじ履歴）
+   ===================================================== */
+
+.text-center {
+    text-align: center;
+}
+
+.top-welcome {
+    margin-bottom: 10px;
+}
+
+.sub-title {
+    font-size: 1rem;
+    color: #b8860b;
+    letter-spacing: 3px;
+    margin: 0 0 5px;
+}
+
+.main-title {
+    font-size: 2rem;
+    color: #4a3728;
+    margin: 0 0 15px;
+    padding-bottom: 12px;
+    display: inline-block;
+    border-bottom: 3px double #8b5a2b;
+}
+
+.intro-section {
+    margin-bottom: 15px;
+}
+
+.catchphrase {
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: #d9534f;
+    margin-bottom: 10px;
+}
+
+.intro-section .description {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.8;
+}
+
+.entrance-area {
+    margin: 20px 0 30px;
+}
+
+/* 🎯 トップページの「境内へ進む」を目立たせるヒーローCTA */
+.entrance-hero {
+    margin: 15px 0 25px;
+    padding: 22px 20px;
+    background: linear-gradient(135deg, #fff7e6, #ffe08a, #fff7e6);
+    border: 2px solid #d8860b;
+    border-radius: 14px;
+    box-shadow: 0 0 20px rgba(218, 165, 32, 0.4);
+    text-align: center;
+}
+
+.entrance-hero-note {
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #b8620b;
+    margin: 0 0 14px;
+}
+
+.enter-btn-hero {
+    display: inline-block;
+    width: 100%;
+    max-width: 480px;
+    background: linear-gradient(90deg, #e53935, #ff7043, #e53935);
+    background-size: 200% 100%;
+    color: white !important;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    padding: 20px 24px;
+    border-radius: 12px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    transition: transform 0.1s ease;
+    animation: hero-btn-glow 1.6s ease-in-out infinite;
+}
+
+.enter-btn-hero:active {
+    transform: translateY(3px);
+}
+
+@keyframes hero-btn-glow {
+    0% { box-shadow: 0 6px 0 #b33c39, 0 0 15px rgba(229, 57, 53, 0.5); background-position: 0% 50%; }
+    50% { box-shadow: 0 6px 0 #b33c39, 0 0 35px rgba(255, 140, 0, 0.85); background-position: 100% 50%; }
+    100% { box-shadow: 0 6px 0 #b33c39, 0 0 15px rgba(229, 57, 53, 0.5); background-position: 0% 50%; }
+}
+
+@media (max-width: 600px) {
+    .enter-btn-hero {
+        font-size: 1.2rem;
+        padding: 16px 18px;
+    }
+}
+
+.history-section {
+    margin-top: 25px;
+    text-align: left;
+}
+
+.history-section h2 {
+    text-align: center;
+    color: #4a3728;
+    font-size: 1.3rem;
+    border-bottom: 2px solid #8b5a2b;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+}
+
+/* 履歴が増えても画面に収まるようスクロール可能なラッパー */
+.table-scroll {
+    max-height: 420px;
+    overflow-y: auto;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* 履歴テーブル本体 */
+#history-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    font-size: 0.9rem;
+}
+
+#history-table thead th {
+    background-color: #8b5a2b;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px 8px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+#history-table tbody td {
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 1px solid #f0e6d8;
+    white-space: nowrap;
+}
+
+#history-table tbody tr:nth-child(even) {
+    background-color: #fbf8f3;
+}
+
+#history-table tbody tr:hover {
+    background-color: #fff2cc;
+    transition: background-color 0.2s ease;
+}
+
+#history-table tbody td:first-child,
+#history-table tbody th:first-child {
+    border-radius: 0;
+}
+
+/* データが空、または読み込み中のときの表示 */
+#history-table tbody tr td[colspan] {
+    padding: 20px;
+    color: #999;
+    font-style: italic;
+    white-space: normal;
+}
+
+/* 結果に応じた行の色分け（top.jsがtrにクラスを付与） */
+.hist-daikichi {
+    background: linear-gradient(90deg, #fff2cc, #ffe08a, #fff2cc) !important;
+    font-weight: bold;
+    color: #d8860b;
+}
+
+.hist-kichi,
+.hist-chuukichi,
+.hist-syoukichi,
+.hist-suekichi {
+    background-color: #f2fbee !important;
+}
+
+.hist-kyou {
+    background-color: #fff0f0 !important;
+}
+
+.hist-daikyou {
+    background-color: #f5e6ff !important;
+    color: #8b008b;
+    font-weight: bold;
+}
+
+/* 賞金のプラス／マイナスの色分け */
+.prize-plus {
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+.prize-minus {
+    color: #d9534f;
+    font-weight: bold;
+}
+
+.warning-notes {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: #999;
+    text-align: center;
+}
+
+/* 🏆 ランキングテーブル */
+.ranking-section {
+    margin-top: 25px;
+    text-align: left;
+}
+
+.ranking-section h2 {
+    text-align: center;
+    color: #4a3728;
+    font-size: 1.3rem;
+    border-bottom: 2px solid #8b5a2b;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+}
+
+#ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    font-size: 0.9rem;
+}
+
+#ranking-table thead th {
+    background-color: #8b5a2b;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px 8px;
+    text-align: center;
+}
+
+#ranking-table tbody td {
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 1px solid #f0e6d8;
+}
+
+#ranking-table tbody tr:nth-child(even) {
+    background-color: #fbf8f3;
+}
+
+.rank-me {
+    background: linear-gradient(90deg, #fff2cc, #ffe08a, #fff2cc) !important;
+    font-weight: bold;
+    color: #d8860b;
+}
+
+.rank-medal {
+    font-size: 1.1rem;
+}
+
+.my-rank-note {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #777;
+    margin-top: 8px;
+}
+
+/* スマホ表示の微調整 */
+@media (max-width: 600px) {
+    .main-title {
+        font-size: 1.5rem;
+    }
+    #history-table {
+        font-size: 0.78rem;
+    }
+    #history-table thead th,
+    #history-table tbody td {
+        padding: 6px 4px;
+        white-space: normal;
+    }
+    .table-scroll {
+        max-height: 320px;
+    }
+}
