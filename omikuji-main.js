@@ -58,7 +58,12 @@ window.addEventListener("DOMContentLoaded", async () => {
                 chitose_fukuro: 0, orizuru_negai: 0, kinchaku_omamori: 0,
                 christmas_ribbon: 0, seiya_candle: 0, snowman_charm: 0,
                 choco_kakera: 0, akai_ito: 0, love_letter: 0,
-                joya_kane_hibiki: 0, toshikoshi_soba: 0, susuharai_houki: 0
+                joya_kane_hibiki: 0, toshikoshi_soba: 0, susuharai_houki: 0,
+                hanami_dango: 0, sakura_hanabira: 0, hanami_bento: 0,
+                fuku_mame: 0, oni_no_tsuno: 0, hiiragi_iwashi: 0,
+                wakaba_shinme: 0, haru_no_tsubomi: 0, harukaze_no_ha: 0,
+                koinobori_uroko: 0, kabuto_kazari: 0, shobu_no_ha: 0,
+                chinowa_kaya: 0, minazuki_gashi: 0, oharai_no_gohei: 0
             }, data.ownedItems || {});
             equippedCollectible = data.equippedCollectible || "";
             shopItemKey = data.shopItemKey || "";
@@ -109,6 +114,12 @@ window.addEventListener("DOMContentLoaded", async () => {
             joyaBellDate = data.joyaBellDate || "";
             joyaBellCount = typeof data.joyaBellCount === "number" ? data.joyaBellCount : 0;
             joyaBellCompleteYear = typeof data.joyaBellCompleteYear === "number" ? data.joyaBellCompleteYear : 0;
+            hanamiDangoActive = data.hanamiDangoActive === true;
+            hanamiDangoTotalCollected = typeof data.hanamiDangoTotalCollected === "number" ? data.hanamiDangoTotalCollected : 0;
+            gotKodomonohiExtreme = data.gotKodomonohiExtreme === true;
+            mamemakiSuccessCount = typeof data.mamemakiSuccessCount === "number" ? data.mamemakiSuccessCount : 0;
+            nagoshiBadCount = typeof data.nagoshiBadCount === "number" ? data.nagoshiBadCount : 0;
+            nagoshiLastResetYear = typeof data.nagoshiLastResetYear === "number" ? data.nagoshiLastResetYear : 0;
         }
 
         refreshDailyMissions(); // 🎯 日付が変わっていればデイリーミッションをリセット（前日分の「お財布の達人」判定も含む）
@@ -143,6 +154,15 @@ window.addEventListener("DOMContentLoaded", async () => {
         updateJoyaBellUI(); // 🔔 除夜の鐘の進捗表示を初期化
         updateValentineUI();
         setInterval(updateValentineUI, 60000); // 💝 バレンタイン（チョコおみくじ欄）の開催状況を定期的に再チェック
+        updateSetsubunUI();
+        setInterval(updateSetsubunUI, 60000); // 🫘 節分（豆まきミニゲーム対象期間）の開催状況を定期的に再チェック
+        updateHaruUI();
+        setInterval(updateHaruUI, 60000); // 🌱 春の芽吹き（ショップの若葉のお守り）の開催状況を定期的に再チェック
+        updateHanamiUI();
+        setInterval(updateHanamiUI, 60000); // 🌸 桜満開・花見（桜吹雪演出）の開催状況を定期的に再チェック
+        updateKodomonohiUI();
+        setInterval(updateKodomonohiUI, 60000); // 🎏 こどもの日（鯉のぼり演出）の開催状況を定期的に再チェック
+        updateNagoshiUI(); // 🌾 夏越の大祓（茅の輪くぐり）の進捗表示を初期化
         checkKannazukiReturn(); // ⛩️ 11月になっていれば、神無月に貯めた賽銭箱の預け入れ額を「倍返し」する
         startCountdownTimers(); // ⏳ 次の季節イベント／次のボーナスタイムまでのカウントダウンを開始
         if (typeof schedulePhantomSpawn === "function") schedulePhantomSpawn(); // 🐱🐸 幻の参拝客の出現スケジュールを開始

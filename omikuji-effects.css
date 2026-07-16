@@ -224,6 +224,157 @@
     100% { transform: translateY(105vh) translateX(-15px) rotate(360deg); opacity: 0.8; }
 }
 
+/* 🌸 桜満開・花見（4月）の背景演出 */
+.container.hanami-active {
+    background-image: linear-gradient(rgba(255, 240, 245, 0.55), rgba(255, 225, 235, 0.55));
+    box-shadow: 0 0 30px rgba(255, 170, 200, 0.4);
+}
+
+.container.hanami-active h1,
+.container.hanami-active .main-title {
+    color: #c2467a;
+}
+
+#hanami-banner {
+    background: linear-gradient(90deg, #ffe1ec, #ffc7dd, #ffe1ec);
+    border: 1px solid #ff8fb8;
+    color: #8a2c53;
+}
+
+/* 🌸 花見中に舞い散る桜の花びら */
+.sakura-petal {
+    position: fixed;
+    top: -30px;
+    font-size: 20px;
+    pointer-events: none;
+    z-index: 5;
+    animation: sakura-fall linear forwards;
+}
+
+@keyframes sakura-fall {
+    0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0.95; }
+    50% { transform: translateY(50vh) translateX(-25px) rotate(150deg); }
+    100% { transform: translateY(105vh) translateX(20px) rotate(320deg); opacity: 0.8; }
+}
+
+/* 🎏 こどもの日（5/1〜5/5）の背景演出 */
+.container.kodomonohi-active {
+    background-image: linear-gradient(rgba(220, 245, 255, 0.6), rgba(200, 235, 255, 0.6));
+    box-shadow: 0 0 30px rgba(100, 180, 240, 0.4);
+}
+
+.container.kodomonohi-active h1,
+.container.kodomonohi-active .main-title {
+    color: #1f6fa8;
+}
+
+#kodomonohi-banner {
+    background: linear-gradient(90deg, #d9f3ff, #bfe9ff, #d9f3ff);
+    border: 1px solid #5fb8ec;
+    color: #14507a;
+}
+
+/* 🎏 こどもの日、鯉のぼり（稀に昇り龍）が画面を横切る演出 */
+.koinobori-piece {
+    position: fixed;
+    left: -80px;
+    font-size: 2.4rem;
+    pointer-events: none;
+    z-index: 5;
+    animation: koinobori-swim linear forwards;
+    filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.25));
+}
+
+.koinobori-dragon {
+    font-size: 2.8rem;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.85));
+}
+
+@keyframes koinobori-swim {
+    0% { left: -80px; transform: translateY(0) scaleX(1); }
+    48% { transform: translateY(-14px) scaleX(1); }
+    50% { transform: translateY(-14px) scaleX(-1); }
+    100% { left: calc(100vw + 80px); transform: translateY(0) scaleX(-1); }
+}
+
+/* 🫘 節分（2/1〜2/3）の背景演出（豆まき・鬼退治をイメージ） */
+.container.setsubun-active {
+    background-image: linear-gradient(rgba(60, 20, 15, 0.15), rgba(120, 40, 15, 0.15));
+    box-shadow: 0 0 30px rgba(220, 100, 30, 0.35);
+}
+
+.container.setsubun-active h1,
+.container.setsubun-active .main-title {
+    color: #8a3010;
+}
+
+#setsubun-banner {
+    background: linear-gradient(90deg, #4a1e10, #7a3213, #4a1e10);
+    border: 1px solid #ff9a4d;
+    color: #ffe3c2;
+}
+
+/* 🫘 節分中に降りまく豆 */
+.mamemaki-bean {
+    position: fixed;
+    top: -30px;
+    font-size: 20px;
+    pointer-events: none;
+    z-index: 5;
+    animation: mamemaki-fall linear forwards;
+}
+
+@keyframes mamemaki-fall {
+    0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0.95; }
+    50% { transform: translateY(50vh) translateX(-18px) rotate(220deg); }
+    100% { transform: translateY(105vh) translateX(15px) rotate(400deg); opacity: 0.85; }
+}
+
+/* 🫘 節分中に稀に現れる鬼 */
+.setsubun-oni-piece {
+    position: fixed;
+    top: -30px;
+    font-size: 32px;
+    pointer-events: none;
+    z-index: 5;
+    filter: drop-shadow(0 0 8px rgba(180, 40, 20, 0.7));
+    animation: mamemaki-fall linear forwards;
+}
+
+/* 🌱 春の芽吹き（3月）の背景演出（花が咲く前の若葉・新芽をイメージ） */
+.container.haru-active {
+    background-image: linear-gradient(rgba(235, 250, 230, 0.55), rgba(220, 245, 215, 0.55));
+    box-shadow: 0 0 30px rgba(140, 210, 120, 0.35);
+}
+
+.container.haru-active h1,
+.container.haru-active .main-title {
+    color: #3f7d2c;
+}
+
+#haru-banner {
+    background: linear-gradient(90deg, #eafce4, #d3f5c8, #eafce4);
+    border: 1px solid #8ed673;
+    color: #2c5c1c;
+}
+
+/* 🌱 春の芽吹き中、若葉や新芽がふわりと立ちのぼる演出 */
+.haru-sprout {
+    position: fixed;
+    bottom: -30px;
+    font-size: 20px;
+    pointer-events: none;
+    z-index: 5;
+    animation: haru-rise linear forwards;
+}
+
+@keyframes haru-rise {
+    0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+    15% { opacity: 0.9; }
+    50% { transform: translateY(-50vh) translateX(18px) rotate(-15deg); }
+    100% { transform: translateY(-105vh) translateX(-15px) rotate(15deg); opacity: 0; }
+}
+
 /* 🎍 お正月（1/1〜1/3）の背景演出 */
 .container.oshogatsu-active {
     background-image: linear-gradient(rgba(255, 246, 246, 0.92), rgba(255, 226, 222, 0.92));
