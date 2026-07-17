@@ -119,6 +119,45 @@
                 daySel.appendChild(opt);
             }
         })();
+
+        // 🎂 このブラウザで以前に入力した誕生日をlocalStorageから復元し、セレクトボックスに反映する
+        // （Firestoreへの本人確認前の問い合わせを避けるため、あくまで「このブラウザ内での再入力の手間を省く」ための仕組み）
+        function restoreBirthdaySelection() {
+            const userField = document.querySelector("#username");
+            const monthSel = document.querySelector("#birthMonth");
+            const daySel = document.querySelector("#birthDay");
+            if (!userField || !monthSel || !daySel) return;
+
+            const name = (userField.value || "").trim();
+            if (!name) {
+                monthSel.value = "";
+                daySel.value = "";
+                return;
+            }
+
+            try {
+                const saved = localStorage.getItem("omikuji_birthday_" + name);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    monthSel.value = String(parsed.month || "");
+                    daySel.value = String(parsed.day || "");
+                } else {
+                    monthSel.value = "";
+                    daySel.value = "";
+                }
+            } catch (e) {
+                // 読み込みに失敗しても致命的ではないので、静かに空欄のままにしておく
+            }
+        }
+
+        // ページを開いた直後（デフォルトの「ゲスト参拝者」名義分）に一度実行し、
+        // ユーザー名を変更した時にも再チェックする（DOMはこの時点ですでに利用可能なので、即時実行でよい）
+        restoreBirthdaySelection();
+        const usernameFieldForBirthday = document.querySelector("#username");
+        if (usernameFieldForBirthday) {
+            usernameFieldForBirthday.addEventListener("change", restoreBirthdaySelection);
+            usernameFieldForBirthday.addEventListener("blur", restoreBirthdaySelection);
+        }
     </script>
 
     <script type="module">
@@ -390,6 +429,18 @@
 
                 localStorage.setItem("logged_in_user", userField);
 
+                // 🎂 次回このブラウザで同じ名前でログインする時にセレクトボックスへ復元できるよう、誕生日を保存しておく
+                if (typeof userData.birthdayMonth === "number" && typeof userData.birthdayDay === "number") {
+                    try {
+                        localStorage.setItem("omikuji_birthday_" + userField, JSON.stringify({
+                            month: userData.birthdayMonth,
+                            day: userData.birthdayDay
+                        }));
+                    } catch (e) {
+                        // localStorageが使えない環境でも致命的ではないので、失敗は無視する
+                    }
+                }
+
                 const audio = document.querySelector("#se-coin");
                 if (audio) {
                     try {
@@ -403,10 +454,17 @@
                     ? ("\n\n" + luckyPicked.emoji + " 本日のラッキーアイテム：" + luckyPicked.name + "\n(" + luckyPicked.desc + ")")
                     : "";
 
+                // 🔰 新規登録時だけ、遊び方の簡単な案内を追加する（詳しくはミッションタブの「はじめてガイド」を参照）
+                const tutorialMsg = isNewUser
+                    ? "\n\n🔰【はじめての方へ】🔰\n" +
+                      "① おみくじを引く → ② 結果を送信する → ③ トップページで履歴を確認、が基本的な流れです。\n" +
+                      "「ミッション」タブに「🔰はじめてガイド」があるので、まずはそこから遊んでみてください！"
+                    : "";
+
                 alert(
                     (isNewUser ? "🎉 新規登録＆認証成功！\n" : "🎉 認証成功！\n") +
                     "ようこそ、" + userField + "様。おみくじ神社へご案内します！" +
-                    bonusMsg + luckyMsg + taianMsg + birthdayMsg + kimagureFeverMsg
+                    bonusMsg + luckyMsg + taianMsg + birthdayMsg + kimagureFeverMsg + tutorialMsg
                 );
 
                 window.location.href = "top.html"; // ログイン後はまずトップページへ移動

@@ -182,6 +182,7 @@ async function depositBank() {
     playSE("se-coin");
     trackMissionDeposit(amount); // 🎯「貯蓄家」ミッションの進捗を更新
     trackKannazukiDeposit(amount); // 🌫️ 神無月期間中なら「倍返し」対象として記録
+    trackTutorialMission("chokin_shite_miru"); // 🔰 はじめてガイド：賽銭箱に預けてみようの進捗を記録
     await saveUserState();
     alert("🏦 " + amount.toLocaleString() + "円を賽銭箱に預けました。\n（このお金はおみくじには使えませんが、大凶や神の試練で失うこともありません）" + (isSeasonalEventActive("kannazuki") ? "\n🌫️ 今は神無月…この預け入れは11月の「倍返し」の対象です！" : ""));
 }

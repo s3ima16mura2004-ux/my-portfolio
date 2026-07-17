@@ -151,6 +151,8 @@ window.addEventListener("DOMContentLoaded", async () => {
             seasonalActionCounts = (data.seasonalActionCounts && typeof data.seasonalActionCounts === "object") ? data.seasonalActionCounts : {};
             natsumatsuriRewardClaimedYear = typeof data.natsumatsuriRewardClaimedYear === "number" ? data.natsumatsuriRewardClaimedYear : 0;
             yearlyAlbum = Array.isArray(data.yearlyAlbum) ? data.yearlyAlbum : [];
+            tutorialMissionProgress = (data.tutorialMissionProgress && typeof data.tutorialMissionProgress === "object") ? data.tutorialMissionProgress : {};
+            tutorialMissionClaimed = (data.tutorialMissionClaimed && typeof data.tutorialMissionClaimed === "object") ? data.tutorialMissionClaimed : {};
             if (data.japanShrinesOwned && typeof data.japanShrinesOwned === "object") {
                 JAPAN_PREFECTURES.forEach(pref => {
                     pref.shrines.forEach(shrine => {
