@@ -169,6 +169,9 @@ function updateShrineMapPowerSpotUI() {
     lockedBox.classList.toggle("hidden", eligible || revealed);
     readyBox.classList.toggle("hidden", !(eligible && !revealed));
     unlockedBox.classList.toggle("hidden", !revealed);
+
+    updateJapanMapArchiveUI(revealed); // 🌄 第三弾解放時、第一弾・第二弾の日本地図をアーカイブ（折りたたみ）へ移動する
+
     if (!revealed) return;
 
     // 🌄 日本地図風のマス目に47都道府県を配置する（JAPAN_PREFECTURESと同じ位置関係を使う）
@@ -237,6 +240,24 @@ function updateShrineMapPowerSpotUI() {
 function selectPowerSpotPrefecture(prefKey) {
     selectedPowerSpotPrefKey = (selectedPowerSpotPrefKey === prefKey) ? "" : prefKey;
     updateShrineMapPowerSpotUI();
+}
+
+// 🌄 パワースポット編（第三弾）が解放されたら、全国神社巡り・奥宮（第一弾・第二弾）の日本地図セクションを
+// メインの位置から折りたたみ式のアーカイブへ移動する（DOM要素そのものを移動するのでidの重複は起きない）
+function updateJapanMapArchiveUI(revealed) {
+    const section = document.querySelector("#japan-map-section");
+    const inlineSlot = document.querySelector("#japan-map-inline-slot");
+    const archiveBox = document.querySelector("#japan-map-archive");
+    const archiveBody = document.querySelector("#japan-map-archive-body");
+    if (!section || !inlineSlot || !archiveBox || !archiveBody) return;
+
+    if (revealed) {
+        if (section.parentElement !== archiveBody) archiveBody.appendChild(section);
+        archiveBox.classList.remove("hidden");
+    } else {
+        if (section.parentElement !== inlineSlot) inlineSlot.appendChild(section);
+        archiveBox.classList.add("hidden");
+    }
 }
 
 // 🗾 地図上の都道府県をタップした時の処理（同じ県を再タップすると選択解除）

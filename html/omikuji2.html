@@ -431,21 +431,23 @@
                         <button id="map-buy-btn" class="btn-shop-buy" onclick="buyNextMapTile()" type="button">このマスを購入する</button>
                     </div>
 
-                    <div class="shop-section">
-                        <h3 class="shop-section-title">🗾 全国神社巡りマップ</h3>
+                    <div id="japan-map-inline-slot">
+                        <div id="japan-map-section" class="shop-section">
+                            <h3 class="shop-section-title">🗾 全国神社巡りマップ</h3>
 
-                        <div id="map-japan-locked" class="hidden">
-                            <p class="bank-desc">🔒 境内マップを完成させると解放されます。まずは「境内マップ」を20マスすべて埋めましょう！</p>
-                        </div>
-
-                        <div id="map-japan-unlocked" class="hidden">
-                            <p class="bank-desc">境内マップの完成、おめでとうございます！ここからは日本地図の好きな都道府県から自由な順番で、神社を1つずつ「鳥居→参道→手水舎→社殿」と少しずつ組み立てて完成させていきましょう。各都道府県に2〜3社ずつ、全国で106社あります。地図上の都道府県をタップすると、その土地の神社が下に表示されます。完成した神社の数の節目でお祝い金、全国制覇でさらに永続の大吉ボーナスがもらえます。</p>
-                            <p id="map-japan-progress" class="dex-progress">⛩️ コンプリートした神社：0 / 106社　｜　🗾 コンプリートした都道府県：0 / 47県</p>
-                            <div class="map-japan-grid-wrap">
-                                <div id="map-japan-grid" class="map-japan-grid"></div>
+                            <div id="map-japan-locked" class="hidden">
+                                <p class="bank-desc">🔒 境内マップを完成させると解放されます。まずは「境内マップ」を20マスすべて埋めましょう！</p>
                             </div>
-                            <div id="map-japan-detail" class="map-japan-detail">
-                                <p class="collect-item-desc">👆 上の地図から、好きな都道府県をタップして参拝先を選びましょう。</p>
+
+                            <div id="map-japan-unlocked" class="hidden">
+                                <p class="bank-desc">境内マップの完成、おめでとうございます！ここからは日本地図の好きな都道府県から自由な順番で、神社を1つずつ「鳥居→参道→手水舎→社殿」と少しずつ組み立てて完成させていきましょう。各都道府県に2〜3社ずつ、全国で106社あります。地図上の都道府県をタップすると、その土地の神社が下に表示されます。完成した神社の数の節目でお祝い金、全国制覇でさらに永続の大吉ボーナスがもらえます。</p>
+                                <p id="map-japan-progress" class="dex-progress">⛩️ コンプリートした神社：0 / 106社　｜　🗾 コンプリートした都道府県：0 / 47県</p>
+                                <div class="map-japan-grid-wrap">
+                                    <div id="map-japan-grid" class="map-japan-grid"></div>
+                                </div>
+                                <div id="map-japan-detail" class="map-japan-detail">
+                                    <p class="collect-item-desc">👆 上の地図から、好きな都道府県をタップして参拝先を選びましょう。</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -473,6 +475,11 @@
                             </div>
                         </div>
                     </div>
+
+                    <details id="japan-map-archive" class="daily-notices hidden" style="margin-top:15px;">
+                        <summary>📜 過去のマップ：全国神社巡り・奥宮（第一弾・第二弾）を見る</summary>
+                        <div id="japan-map-archive-body" class="daily-notices-body"></div>
+                    </details>
                 </div>
             </div>
 
@@ -555,7 +562,7 @@
     <script src="../js/omikuji-ui-seasonal1.js?v=2"></script>
     <script src="../js/omikuji-ui-seasonal2.js?v=2"></script>
     <script src="../js/omikuji-ui-seasonal3.js?v=2"></script>
-    <script src="../js/omikuji-ui-map.js?v=5"></script>
+    <script src="../js/omikuji-ui-map.js?v=6"></script>
     <script src="../js/omikuji-shop.js?v=6"></script>
     <script src="../js/omikuji-missions.js?v=1"></script>
     <script src="../js/omikuji-draw-helpers.js?v=2"></script>
