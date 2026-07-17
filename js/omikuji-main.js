@@ -195,6 +195,8 @@ window.addEventListener("DOMContentLoaded", async () => {
         setInterval(updateHalloweenUI, 60000); // 👻 ハロウィン（妖怪祭り・肝試し欄）の開催状況を定期的に再チェック
         updateSeasonalActionsUI();
         setInterval(updateSeasonalActionsUI, 60000); // 🎐 季節イベント共通ミニアクション（お月見・紅葉狩り等）の開催状況を定期的に再チェック
+        updateSeasonBadgeRow();
+        setInterval(updateSeasonBadgeRow, 60000); // 🎐 サイドバーの季節バッジ行を定期的に再チェック
         updateShichigosanUI();
         setInterval(updateShichigosanUI, 60000); // 👘 七五三（千歳飴バナー）の開催状況を定期的に再チェック
         updateChristmasUI();

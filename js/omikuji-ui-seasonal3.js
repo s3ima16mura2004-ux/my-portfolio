@@ -149,7 +149,10 @@ function updateNagoshiUI() {
 
     const active = isSeasonalEventActive("nagoshi");
     box.classList.toggle("hidden", !active);
-    if (!active) return;
+    if (!active) {
+        updateSeasonalMissionsBellUI();
+        return;
+    }
 
     if (btn) btn.disabled = nagoshiBadCount <= 0;
     if (statusText) {
@@ -157,6 +160,8 @@ function updateNagoshiUI() {
             ? "🌾 半年間で祓うべき凶事：" + nagoshiBadCount + "回（茅の輪をくぐると清められます）"
             : "🌾 現在、祓うべき凶事は記録されていません。清らかな半年でしたね！";
     }
+
+    updateSeasonalMissionsBellUI();
 }
 
 // 🗺️ 境内マップタブの表示を更新する（所持金を使って1マスずつ買い進めるマップの完成状況）
@@ -197,9 +202,15 @@ function updateHalloweenUI() {
         halloweenGhostInterval = null;
     }
 
-    if (!box) return;
+    if (!box) {
+        updateSeasonalMissionsBellUI();
+        return;
+    }
     box.classList.toggle("hidden", !active);
-    if (!active) return;
+    if (!active) {
+        updateSeasonalMissionsBellUI();
+        return;
+    }
 
     const usedToday = kimodameshiDate === todayStr();
     if (btn) btn.disabled = usedToday;
@@ -208,4 +219,6 @@ function updateHalloweenUI() {
             ? "👻 今日はもう肝試しに出かけました。また明日挑戦してください。（これまでに挑戦した回数：" + kimodameshiCount + "回）"
             : "👻 肝試しに出かけると、出会った妖怪に応じたご褒美がもらえます！（ハズレなし・1日1回）";
     }
+
+    updateSeasonalMissionsBellUI();
 }

@@ -109,7 +109,10 @@ function updateJoyaBellUI() {
 
     const active = isSeasonalEventActive("nenmatsu");
     box.classList.toggle("hidden", !active);
-    if (!active) return;
+    if (!active) {
+        updateSeasonalMissionsBellUI();
+        return;
+    }
 
     const today = todayStr();
     const count = joyaBellDate === today ? joyaBellCount : 0;
@@ -121,6 +124,8 @@ function updateJoyaBellUI() {
             ? "🔔 今年の除夜の鐘は108回つき終えました。良いお年を…！"
             : "🔔 除夜の鐘：" + count + " / " + JOYA_BELL_TARGET + "回（108回つくと煩悩祓いのご褒美があります）";
     }
+
+    updateSeasonalMissionsBellUI();
 }
 
 // 🎁 サンタの袋の演出テキストを組み立てる
@@ -141,7 +146,10 @@ function updateValentineUI() {
     if (!box) return;
 
     box.classList.toggle("hidden", !active);
-    if (!active) return;
+    if (!active) {
+        updateSeasonalMissionsBellUI();
+        return;
+    }
 
     const usedToday = chocoDrawDate === todayStr();
     if (btn) btn.disabled = usedToday;
@@ -150,6 +158,8 @@ function updateValentineUI() {
             ? "💝 今日はもうチョコおみくじを引きました。また明日挑戦してください。（これまでに引いた回数：" + chocoDrawCount + "回）"
             : "💝 チョコおみくじを引くと、運勢とあなたの「ペア運勢」がわかります！（ハズレなし・1日1回）";
     }
+
+    updateSeasonalMissionsBellUI();
 }
 
 // 🎆 夏祭り（8月限定・夜と週末は本格的な演出、それ以外は夏っぽい軽い演出）の表示を更新する

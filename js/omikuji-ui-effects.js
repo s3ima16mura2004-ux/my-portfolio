@@ -153,6 +153,68 @@ function updateSeasonalActionsUI() {
                 : config.emoji + " 「" + config.label + "」を行うと、ちょっとしたご利益がもらえます！（ハズレなし・1日1回）";
         }
     });
+
+    updateSeasonalMissionsBellUI();
+}
+
+// 🎐 季節限定ミッション（七夕・バレンタイン・ハロウィン肝試し・季節ミニアクション等）の
+// 「本日まだやっていないものが何件あるか」を数えて、サイドバーの通知ベルに表示する。
+// 各ボックス自身の表示/非表示・ボタンのdisabled状態は既存の各update関数がすでに正しく設定しているので、
+// ここではそれをそのまま数えるだけで、判定ロジックを二重に持たないようにしている。
+function updateSeasonalMissionsBellUI() {
+    const bell = document.querySelector("#seasonal-missions-bell");
+    const section = document.querySelector("#seasonal-missions-section");
+    const emptyText = document.querySelector("#seasonal-missions-empty");
+    if (!section) return;
+
+    const boxes = section.querySelectorAll(".lucky-item-box");
+    let activeCount = 0;
+    let pendingCount = 0;
+
+    boxes.forEach(box => {
+        if (box.classList.contains("hidden")) return; // 現在開催されていないイベント
+        activeCount++;
+        const btn = box.querySelector("button");
+        if (btn && !btn.disabled) pendingCount++;
+    });
+
+    if (emptyText) emptyText.classList.toggle("hidden", activeCount > 0);
+
+    if (bell) {
+        if (pendingCount > 0) {
+            bell.textContent = "🔔 季節限定ミッション：本日未実施 " + pendingCount + "件（タップでミッションタブへ）";
+            bell.classList.remove("hidden");
+        } else {
+            bell.classList.add("hidden");
+        }
+    }
+}
+
+// 🎐 現在アクティブな季節イベントを、絵文字バッジの一覧としてサイドバーに表示する
+// （長いバナー一覧を毎回開かなくても、今何が開催中かひと目で分かるようにするための軽量な表示）
+function updateSeasonBadgeRow() {
+    const row = document.querySelector("#season-badge-row");
+    if (!row) return;
+
+    const active = SEASONAL_EVENTS.filter(e => isSeasonalEventActive(e.key));
+    if (active.length === 0) {
+        row.classList.add("hidden");
+        row.innerHTML = "";
+        return;
+    }
+
+    row.classList.remove("hidden");
+    row.innerHTML = active.map(e =>
+        '<span class="season-badge" title="' + e.name.replace(/"/g, "&quot;") + '" onclick="openDailyNotices()">' + e.emoji + '</span>'
+    ).join("");
+}
+
+// 🎐 季節バッジをタップした時、「本日のお知らせ」の折りたたみを開いて詳細を見られるようにする
+function openDailyNotices() {
+    const details = document.querySelector(".daily-notices");
+    if (!details) return;
+    details.open = true;
+    details.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function unlockAllAudio() {

@@ -111,3 +111,11 @@ function selectMoreTab(tabName) {
     showTab(tabName);
     closeMoreMenu();
 }
+
+// 🔔 サイドバーの通知ベルをタップした時、ミッションタブの「季節限定ミッション」まで移動する
+function jumpToSeasonalMissions() {
+    showTab("missions");
+    closeMoreMenu();
+    const section = document.querySelector("#seasonal-missions-section");
+    if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+}
