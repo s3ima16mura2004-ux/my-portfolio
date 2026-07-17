@@ -57,7 +57,7 @@
                 <div id="season-badge-row" class="season-badge-row hidden"></div>
                 <p id="seasonal-missions-bell" class="seasonal-missions-bell hidden" onclick="jumpToSeasonalMissions()">-</p>
 
-                <details class="daily-notices" open>
+                <details id="sidebar-daily-notices" class="daily-notices" open>
                     <summary>📢 本日のお知らせ</summary>
                     <div class="daily-notices-body">
                 <p id="taian-status-box" class="taian-status-box hidden">-</p>
@@ -151,8 +151,9 @@
                         <div id="missions-always-list" class="missions-list"></div>
                     </div>
 
-                    <div id="seasonal-missions-section" class="shop-section">
-                        <h3 class="shop-section-title">🎐 季節限定ミッション</h3>
+                    <details id="seasonal-missions-section" class="daily-notices">
+                        <summary>🎐 季節限定ミッション <span id="seasonal-missions-badge">-</span></summary>
+                        <div class="daily-notices-body">
                         <p class="bank-desc">その季節・その日だけできる特別なミッションです。開催中のものだけここに表示されます。</p>
 
                         <div id="tanabata-box" class="lucky-item-box hidden">
@@ -229,7 +230,8 @@
                         </div>
 
                         <p id="seasonal-missions-empty" class="collect-item-note hidden">現在、開催中の季節限定ミッションはありません。</p>
-                    </div>
+                        </div>
+                    </details>
                 </div>
 
                 <div id="tab-prizes">

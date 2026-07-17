@@ -165,6 +165,7 @@ function updateSeasonalMissionsBellUI() {
     const bell = document.querySelector("#seasonal-missions-bell");
     const section = document.querySelector("#seasonal-missions-section");
     const emptyText = document.querySelector("#seasonal-missions-empty");
+    const sectionBadge = document.querySelector("#seasonal-missions-badge");
     if (!section) return;
 
     const boxes = section.querySelectorAll(".lucky-item-box");
@@ -179,6 +180,12 @@ function updateSeasonalMissionsBellUI() {
     });
 
     if (emptyText) emptyText.classList.toggle("hidden", activeCount > 0);
+
+    if (sectionBadge) {
+        sectionBadge.textContent = activeCount > 0
+            ? "（" + activeCount + "件開催中）"
+            : "（現在開催中のものはありません）";
+    }
 
     if (bell) {
         if (pendingCount > 0) {
@@ -211,7 +218,7 @@ function updateSeasonBadgeRow() {
 
 // 🎐 季節バッジをタップした時、「本日のお知らせ」の折りたたみを開いて詳細を見られるようにする
 function openDailyNotices() {
-    const details = document.querySelector(".daily-notices");
+    const details = document.querySelector("#sidebar-daily-notices");
     if (!details) return;
     details.open = true;
     details.scrollIntoView({ behavior: "smooth", block: "start" });
