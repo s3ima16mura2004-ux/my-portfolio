@@ -94,6 +94,7 @@ function omikuji() {
         if (isShrineMapJapanComplete()) daikichiBonus += SHRINE_MAP_JAPAN_COMPLETE_BONUS; // 🗾 全国神社巡り完成の永続ボーナス
         if (isShrineMapOkumiyaComplete()) daikichiBonus += SHRINE_MAP_OKUMIYA_COMPLETE_BONUS; // 🏯 奥宮制覇の永続ボーナス
         if (isShrineMapPowerSpotComplete()) daikichiBonus += SHRINE_MAP_POWERSPOT_COMPLETE_BONUS; // 🌄 パワースポット制覇の永続ボーナス
+        if (isShrineMapMiniThemeComplete()) daikichiBonus += SHRINE_MAP_MINITHEME_COMPLETE_BONUS; // 🎏 日本三大○○制覇の永続ボーナス
         const usedHanamiDango = hanamiDangoActive;
         if (usedHanamiDango) daikichiBonus += HANAMI_DANGO_BONUS; // 🍡 お花見団子（次の1回だけ有効）
         daikichiBonus = Math.min(MAX_DAIKICHI_BONUS, daikichiBonus); // 🛡️ 積み上がり過ぎ防止の上限

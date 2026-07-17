@@ -704,7 +704,7 @@ async function startPowerSpotMap() {
 // 神社の建立とは違い、1箇所ごとに一括購入するシンプルな仕組み（全国神社巡り完成後に解放）
 async function buyPowerSpot(prefKey, spotKey) {
     if (!isPowerSpotMapUnlocked()) {
-        alert("🙅 パワースポット編は、全国神社巡り（第一弾）を完成させると解放されます。");
+        alert("🙅 パワースポット編は、全国神社巡り（第一弾）と奥宮・摂社（第二弾）を両方完成させ、「進む」ボタンを押すと遊べるようになります。");
         return;
     }
 
@@ -833,4 +833,80 @@ async function ringJoyaBell() {
     } else {
         await saveUserState();
     }
+}
+// 🎏 パワースポット編（第三弾）を完成させたプレイヤーが、「日本三大○○」ミニマップ集（第四弾）へ進むボタンを押した時の処理
+async function startMiniThemeMap() {
+    if (!isMiniThemeMapEligible()) {
+        alert("🙅 「日本三大○○」ミニマップ集は、パワースポット編（第三弾）を完成させると進めるようになります。");
+        return;
+    }
+    if (miniThemeMapRevealed) return;
+
+    miniThemeMapRevealed = true;
+
+    playSE("se-win");
+    startConfetti();
+    updateShrineMapUI();
+    await saveUserState();
+
+    alert("🎏✨【日本三大○○、解放！】✨🎏\nパワースポット編の完成、おめでとうございます！\nここからは日本各地の「三大○○」を巡る、コンパクトな旅の始まりです。");
+}
+
+// 🎏 「日本三大○○」ミニマップ集（第四弾）のスポットを1つ訪れる（購入する）
+async function buyMiniThemeSpot(themeKey, spotKey) {
+    if (!isMiniThemeMapUnlocked()) {
+        alert("🙅 「日本三大○○」ミニマップ集は、パワースポット編（第三弾）を完成させると解放されます。");
+        return;
+    }
+
+    const theme = MINI_THEME_COLLECTIONS.find(t => t.key === themeKey);
+    if (!theme) return;
+    const spot = theme.spots.find(s => s.key === spotKey);
+    if (!spot) return;
+
+    if (isMiniThemeSpotOwned(spot)) {
+        alert("🎏 「" + spot.name + "」はすでに訪れています。");
+        return;
+    }
+
+    if (currentMoney < spot.cost) {
+        alert("🙅 所持金が足りません！\n「" + spot.name + "」を訪れるには" + spot.cost.toLocaleString() + "円必要です。");
+        return;
+    }
+
+    currentMoney -= spot.cost;
+    ownedMiniThemeSpots[spot.key] = true;
+
+    updateMoneyDisplay();
+    playSE("se-coin");
+
+    let milestoneMsg = "";
+    let themeCompleteMsg = "";
+    let completeMsg = "";
+
+    // 🎉 節目（訪れたスポットの数）に到達したらお祝い金を授与する
+    const newCount = getMiniThemeOwnedCount();
+    const milestone = MAP_MINITHEME_MILESTONES.find(m => m.count === newCount);
+    if (milestone) {
+        currentMoney += milestone.prize;
+        totalWinnings += milestone.prize;
+        updateMoneyDisplay();
+        recordHistory("🎏日本三大○○・節目ボーナス", milestone.prize, currentMoney);
+        milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n訪れたスポットが" + newCount + "箇所に達したお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
+    }
+
+    // 🎏 そのテーマのスポットをすべて訪れ終えたらお祝いメッセージ
+    if (isMiniThemeComplete(theme)) {
+        themeCompleteMsg = "\n\n🎏【" + theme.name + "コンプリート！】🎏\n" + theme.name + "をすべて訪れました！";
+    }
+
+    completeMsg = isShrineMapMiniThemeComplete()
+        ? "\n\n👑🎏【日本三大○○、完全制覇！】🎏👑\n全" + MINI_THEME_SPOT_COUNT + "箇所すべてを訪れました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_MINITHEME_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！"
+        : "";
+
+    updateShrineMapUI();
+    updateTitlesUI();
+    await saveUserState();
+
+    alert("🎏 「" + spot.name + "」を訪れました！\n（" + theme.name + "）" + milestoneMsg + themeCompleteMsg + completeMsg);
 }

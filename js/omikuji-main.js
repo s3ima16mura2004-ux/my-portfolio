@@ -130,6 +130,8 @@ window.addEventListener("DOMContentLoaded", async () => {
             japanOkumiyaPartsOwned = (data.japanOkumiyaPartsOwned && typeof data.japanOkumiyaPartsOwned === "object") ? data.japanOkumiyaPartsOwned : {};
             ownedPowerSpots = (data.ownedPowerSpots && typeof data.ownedPowerSpots === "object") ? data.ownedPowerSpots : {};
             powerSpotMapRevealed = data.powerSpotMapRevealed === true;
+            ownedMiniThemeSpots = (data.ownedMiniThemeSpots && typeof data.ownedMiniThemeSpots === "object") ? data.ownedMiniThemeSpots : {};
+            miniThemeMapRevealed = data.miniThemeMapRevealed === true;
             if (data.japanShrinesOwned && typeof data.japanShrinesOwned === "object") {
                 JAPAN_PREFECTURES.forEach(pref => {
                     pref.shrines.forEach(shrine => {

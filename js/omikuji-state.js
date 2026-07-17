@@ -161,7 +161,9 @@ async function saveUserState() {
             japanShrinePartsOwned: japanShrinePartsOwned,
             japanOkumiyaPartsOwned: japanOkumiyaPartsOwned,
             ownedPowerSpots: ownedPowerSpots,
-            powerSpotMapRevealed: powerSpotMapRevealed
+            powerSpotMapRevealed: powerSpotMapRevealed,
+            ownedMiniThemeSpots: ownedMiniThemeSpots,
+            miniThemeMapRevealed: miniThemeMapRevealed
         });
     } catch (e) {
         console.error("ユーザーデータの保存に失敗しました: ", e);
@@ -245,6 +247,8 @@ let japanShrinePartsOwned = {}; // 組み立て済みの神社パーツ（{ "神
 let japanOkumiyaPartsOwned = {}; // 🏯 第二弾「奥宮・摂社」の組み立て済みパーツ（構造はjapanShrinePartsOwnedと同じ）
 let ownedPowerSpots = {}; // 🌄 第三弾「パワースポット編」で訪れた（購入した）スポット（{ "スポットkey": true, ... }）
 let powerSpotMapRevealed = false; // 🌄 「パワースポット編へ進む」ボタンを押して第三弾を解放済みかどうか
+let ownedMiniThemeSpots = {}; // 🎏 第四弾「日本三大○○」ミニマップ集で訪れた（購入した）スポット
+let miniThemeMapRevealed = false; // 🎏 「日本三大○○へ進む」ボタンを押して第四弾を解放済みかどうか
 let selectedJapanPrefKey = ""; // 現在マップ上で選択中の都道府県（表示用。セッション内のみで保存はしない）
 let selectedPowerSpotPrefKey = ""; // 🌄 パワースポット編で選択中の都道府県（表示用。セッション内のみで保存はしない）
 
@@ -463,4 +467,39 @@ function getPowerSpotPrefectureCompleteCount() {
 // 🌄 全国すべてのパワースポットを訪れ終えたかどうか
 function isShrineMapPowerSpotComplete() {
     return getPowerSpotOwnedCount() >= POWER_SPOT_COUNT;
+}
+
+// 🎏 「日本三大○○」ミニマップ集（第四弾）に進むための条件を満たしているか（パワースポット編が完成）
+function isMiniThemeMapEligible() {
+    return isShrineMapPowerSpotComplete();
+}
+
+// 🎏 「日本三大○○」ミニマップ集がすでに解放（プレイヤーが「進む」ボタンを押して表示）されているかどうか
+function isMiniThemeMapUnlocked() {
+    return miniThemeMapRevealed;
+}
+
+// 🎏 指定したミニテーマのスポットを訪れた（購入した）かどうか
+function isMiniThemeSpotOwned(spot) {
+    return !!ownedMiniThemeSpots[spot.key];
+}
+
+// 🎏 訪れたミニテーマのスポットの総数（コンプリート状況の表示・称号判定に使用）
+function getMiniThemeOwnedCount() {
+    return Object.keys(ownedMiniThemeSpots).filter(k => ownedMiniThemeSpots[k]).length;
+}
+
+// 🎏 指定したミニテーマ（例：日本三大稲荷）のスポットをすべて訪れ済みかどうか
+function isMiniThemeComplete(theme) {
+    return theme.spots.every(isMiniThemeSpotOwned);
+}
+
+// 🎏 コンプリートしたミニテーマの数
+function getMiniThemeCompleteCount() {
+    return MINI_THEME_COLLECTIONS.filter(isMiniThemeComplete).length;
+}
+
+// 🎏 「日本三大○○」ミニマップ集を全制覇し終えたかどうか
+function isShrineMapMiniThemeComplete() {
+    return getMiniThemeOwnedCount() >= MINI_THEME_SPOT_COUNT;
 }

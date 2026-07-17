@@ -171,6 +171,7 @@ function updateShrineMapPowerSpotUI() {
     unlockedBox.classList.toggle("hidden", !revealed);
 
     updateJapanMapArchiveUI(revealed); // 🌄 第三弾解放時、第一弾・第二弾の日本地図をアーカイブ（折りたたみ）へ移動する
+    updateMiniThemeMapUI(); // 🎏 パワースポット編の状態が変わるたびに、第四弾の解放状況も一緒に見直す
 
     if (!revealed) return;
 
@@ -264,4 +265,49 @@ function updateJapanMapArchiveUI(revealed) {
 function selectJapanPrefecture(prefKey) {
     selectedJapanPrefKey = (selectedJapanPrefKey === prefKey) ? "" : prefKey;
     updateShrineMapJapanUI();
+}
+
+// 🎏 「日本三大○○」ミニマップ集（パワースポット編が完成すると進めるようになる第四弾）の表示を更新する
+function updateMiniThemeMapUI() {
+    const lockedBox = document.querySelector("#map-minitheme-locked");
+    const readyBox = document.querySelector("#map-minitheme-ready");
+    const unlockedBox = document.querySelector("#map-minitheme-unlocked");
+    if (!lockedBox || !readyBox || !unlockedBox) return;
+
+    const eligible = isMiniThemeMapEligible();
+    const revealed = isMiniThemeMapUnlocked();
+
+    lockedBox.classList.toggle("hidden", eligible || revealed);
+    readyBox.classList.toggle("hidden", !(eligible && !revealed));
+    unlockedBox.classList.toggle("hidden", !revealed);
+    if (!revealed) return;
+
+    const progressEl = document.querySelector("#map-minitheme-progress");
+    if (progressEl) {
+        progressEl.textContent =
+            "🎏 訪れたスポット：" + getMiniThemeOwnedCount() + " / " + MINI_THEME_SPOT_COUNT + "箇所　｜　" +
+            "🏆 コンプリートしたテーマ：" + getMiniThemeCompleteCount() + " / " + MINI_THEME_COLLECTIONS.length;
+    }
+
+    const listEl = document.querySelector("#minitheme-list");
+    if (listEl) {
+        listEl.innerHTML = MINI_THEME_COLLECTIONS.map(theme => {
+            const ownedCount = theme.spots.filter(isMiniThemeSpotOwned).length;
+            const complete = ownedCount === theme.spots.length;
+            const spotsHtml = theme.spots.map(spot => {
+                const owned = isMiniThemeSpotOwned(spot);
+                const actionHtml = owned
+                    ? '<span class="mission-status-tag mission-status-done">✅ 訪問済み</span>'
+                    : '<button class="btn-shop-buy" onclick="buyMiniThemeSpot(\'' + theme.key + '\',\'' + spot.key + '\')" type="button"' +
+                      (currentMoney < spot.cost ? " disabled" : "") + '>' + spot.cost.toLocaleString() + '円</button>';
+                return '<div class="map-japan-part-row"><span>' + spot.emoji + ' ' + spot.name + '</span>' + actionHtml + '</div>';
+            }).join("");
+            return (
+                '<div class="map-japan-shrine-block' + (complete ? " map-japan-shrine-complete" : "") + '">' +
+                '<p class="map-japan-shrine-title">' + theme.emoji + ' ' + theme.name +
+                (complete ? ' <span class="mission-status-tag mission-status-done">🎏 コンプリート</span>' : ' <span class="map-japan-shrine-progress">(' + ownedCount + '/' + theme.spots.length + ')</span>') +
+                '</p>' + spotsHtml + '</div>'
+            );
+        }).join("");
+    }
 }
