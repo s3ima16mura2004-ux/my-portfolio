@@ -96,6 +96,8 @@ function omikuji() {
         if (isShrineMapPowerSpotComplete()) daikichiBonus += SHRINE_MAP_POWERSPOT_COMPLETE_BONUS; // 🌄 パワースポット制覇の永続ボーナス
         if (isShrineMapMiniThemeComplete()) daikichiBonus += SHRINE_MAP_MINITHEME_COMPLETE_BONUS; // 🎏 日本三大○○制覇の永続ボーナス
         if (isShrineMapWorldSpotComplete()) daikichiBonus += SHRINE_MAP_WORLDSPOT_COMPLETE_BONUS; // 🌍 世界制覇の永続ボーナス
+        if (isHistoryMapComplete()) daikichiBonus += SHRINE_MAP_HISTORY_COMPLETE_BONUS; // 🏯 歴史編制覇の永続ボーナス
+        if (isBuilderModeComplete()) daikichiBonus += SHRINE_MAP_BUILDER_COMPLETE_BONUS; // 🏗️ 神社ビルダーモード完成の永続ボーナス
         const usedHanamiDango = hanamiDangoActive;
         if (usedHanamiDango) daikichiBonus += HANAMI_DANGO_BONUS; // 🍡 お花見団子（次の1回だけ有効）
         daikichiBonus = Math.min(MAX_DAIKICHI_BONUS, daikichiBonus); // 🛡️ 積み上がり過ぎ防止の上限
@@ -261,6 +263,9 @@ function omikuji() {
         // 🎅 クリスマス限定「サンタの袋」の抽選
         const santaBagWon = rollSantaBag();
 
+        // 🎐 季節イベントの代表アイテムを1年で集めきったかどうかの判定（年間コンボ）
+        const yearlyComboWon = checkYearlyComboComplete();
+
         recordHistory(resultName, prizeMoney, currentMoney);
         saveUserState();
 
@@ -295,26 +300,26 @@ function omikuji() {
 
         setTimeout(() => {
             if (resultName === "大大吉") {
-                alert((usedBirthdayTicket ? "🎂🎉【誕生日おめでとうございます！】🎉🎂\n大大吉確定チケットが発動しました！\n" : "☀️🎊【大大吉】🎊☀️\n") + "史上最高の奇跡です！神様が最大級の祝福をくださいました！\n【" + DAIDAIKICHI_PRIZE.toLocaleString() + "円】が当選しました！！！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon));
+                alert((usedBirthdayTicket ? "🎂🎉【誕生日おめでとうございます！】🎉🎂\n大大吉確定チケットが発動しました！\n" : "☀️🎊【大大吉】🎊☀️\n") + "史上最高の奇跡です！神様が最大級の祝福をくださいました！\n【" + DAIDAIKICHI_PRIZE.toLocaleString() + "円】が当選しました！！！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon) + yearlyComboToText(yearlyComboWon));
             } else if (resultName === "大吉") {
-                alert("🎉 おめでとうございます！【大吉】です！ 🎉\nなんと最高額の 100,000円 が当選しました！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon));
+                alert("🎉 おめでとうございます！【大吉】です！ 🎉\nなんと最高額の 100,000円 が当選しました！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon) + yearlyComboToText(yearlyComboWon));
             } else if (resultName === "神吉") {
-                alert("😊✨【神吉】✨😊\n全ての中で最も稀なる吉兆…神様との特別な縁が結ばれました！\n【" + KAMIKICHI_PRIZE.toLocaleString() + "円】を授かり、大吉運が永久に+" + (KAMIKICHI_BONUS_PER_DRAW * 100).toFixed(1) + "%上昇しました！(現在の神吉ボーナス合計：+" + (kamikichiBonus * 100).toFixed(1) + "%)" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon));
+                alert("😊✨【神吉】✨😊\n全ての中で最も稀なる吉兆…神様との特別な縁が結ばれました！\n【" + KAMIKICHI_PRIZE.toLocaleString() + "円】を授かり、大吉運が永久に+" + (KAMIKICHI_BONUS_PER_DRAW * 100).toFixed(1) + "%上昇しました！(現在の神吉ボーナス合計：+" + (kamikichiBonus * 100).toFixed(1) + "%)" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon) + yearlyComboToText(yearlyComboWon));
             } else if (resultName === "吉") {
-                alert("✨ やりました！【吉】です！ ✨\nみごと 10,000円 が当選しました！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon));
+                alert("✨ やりました！【吉】です！ ✨\nみごと 10,000円 が当選しました！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon) + yearlyComboToText(yearlyComboWon));
             } else if (resultName === "中吉") {
-                alert("♫ いいですね！【中吉】です！ ♫\n2,000円 が当選しました！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon));
+                alert("♫ いいですね！【中吉】です！ ♫\n2,000円 が当選しました！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon) + yearlyComboToText(yearlyComboWon));
             } else if (resultName === "小吉") {
-                alert("👍 堅実！【小吉】です！ 👍\n1,000円 が当選しました！(元取れた！)" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon));
+                alert("👍 堅実！【小吉】です！ 👍\n1,000円 が当選しました！(元取れた！)" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon) + yearlyComboToText(yearlyComboWon));
             } else if (resultName === "末吉") {
-                alert("😄 ちょっぴりお小遣い！【末吉】です！ 😄\n500円 が当選しました！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon));
+                alert("😄 ちょっぴりお小遣い！【末吉】です！ 😄\n500円 が当選しました！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon) + yearlyComboToText(yearlyComboWon));
             } else if (resultName === "凶") {
-                alert("😢残念！【凶】です！ 😢\n景品はありません。はずれです！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon));
+                alert("😢残念！【凶】です！ 😢\n景品はありません。はずれです！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon) + yearlyComboToText(yearlyComboWon));
             } else if (resultName === "大大凶") {
-                alert("💀⚡【大大凶】⚡💀\n史上最悪の凶事です…お財布の80%【" + Math.abs(prizeMoney).toLocaleString() + "円】が没収されました。\n\n🔥しかし！この上ない災いは、この上ない福に転じます！次の単発おみくじ" + feverCount + "回分は【大吉の確率が20倍(20%)】になります！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon));
+                alert("💀⚡【大大凶】⚡💀\n史上最悪の凶事です…お財布の80%【" + Math.abs(prizeMoney).toLocaleString() + "円】が没収されました。\n\n🔥しかし！この上ない災いは、この上ない福に転じます！次の単発おみくじ" + feverCount + "回分は【大吉の確率が20倍(20%)】になります！" + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon) + yearlyComboToText(yearlyComboWon));
                 stopDoomEffect();
             } else if (isTrial) {
-                alert(trialExtraMsg + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon));
+                alert(trialExtraMsg + dropsToText(dropped) + fukuDarumaToText(fukuDarumaWon) + santaBagToText(santaBagWon) + yearlyComboToText(yearlyComboWon));
                 stopDoomEffect();
             }
 

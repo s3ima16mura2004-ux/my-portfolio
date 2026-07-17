@@ -105,6 +105,8 @@ function omikuji10() {
         if (isShrineMapPowerSpotComplete()) daikichiBonus += SHRINE_MAP_POWERSPOT_COMPLETE_BONUS; // 🌄 パワースポット制覇の永続ボーナス
         if (isShrineMapMiniThemeComplete()) daikichiBonus += SHRINE_MAP_MINITHEME_COMPLETE_BONUS; // 🎏 日本三大○○制覇の永続ボーナス
         if (isShrineMapWorldSpotComplete()) daikichiBonus += SHRINE_MAP_WORLDSPOT_COMPLETE_BONUS; // 🌍 世界制覇の永続ボーナス
+        if (isHistoryMapComplete()) daikichiBonus += SHRINE_MAP_HISTORY_COMPLETE_BONUS; // 🏯 歴史編制覇の永続ボーナス
+        if (isBuilderModeComplete()) daikichiBonus += SHRINE_MAP_BUILDER_COMPLETE_BONUS; // 🏗️ 神社ビルダーモード完成の永続ボーナス
                 daikichiBonus = Math.min(MAX_DAIKICHI_BONUS, daikichiBonus); // 🛡️ 積み上がり過ぎ防止の上限
                 if (daikichiBonus > 0) okj = Math.min(1, okj + daikichiBonus);
 
@@ -279,6 +281,10 @@ function omikuji10() {
             totalPrize += totalFukuDaruma;
             if (totalFukuDaruma > 0) totalWinnings += totalFukuDaruma;
 
+            // 🎐 季節イベントの代表アイテムを1年で集めきったかどうかの判定（年間コンボ・10連は最後に1回だけ判定）
+            // ※ checkYearlyComboComplete() 自体が所持金・累計獲得賞金への反映まで行うため、ここでは表示用の金額のみ受け取る
+            const yearlyComboWon = checkYearlyComboComplete();
+
             currentMoney += totalPrize;
             updateMoneyDisplay();
             updateShopUI();
@@ -346,7 +352,15 @@ function omikuji10() {
                     alertMsg += "🎅 サンタの袋(合計)：+" + totalSantaBag.toLocaleString() + "円\n";
                 }
 
+                if (yearlyComboWon) {
+                    alertMsg += "🎐 年間コンボ達成ボーナス：+" + yearlyComboWon.toLocaleString() + "円\n";
+                }
+
                 alertMsg += "💰 合計損益：" + totalPrize.toLocaleString() + "円！";
+
+                if (yearlyComboWon) {
+                    alertMsg += "\n\n🎐👑【年間コンボ達成！】👑🎐\n季節イベントの代表アイテムを1年ですべて集めきりました！特別ボーナスを授かりました！";
+                }
 
                 if (gotDaidaikyouIn10) {
                     alertMsg += "\n\n💀🔥【大厄落としフィーバー発動！】🔥💀\n「大大凶」を乗り越えたため、次の単発おみくじ" + feverCount + "回は【大吉確率20倍(20%)】になります！";

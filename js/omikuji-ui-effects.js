@@ -109,6 +109,28 @@ function fukuDarumaToText(amount) {
     if (!amount) return "";
     return "\n\n🎊【福だるま登場！】🎊\n福だるまがコロコロ転がってきて【" + amount.toLocaleString() + "円】を授けてくれました！";
 }
+
+// 🎐 年間コンボ（季節イベントの代表アイテムを1年で集めきる）達成時のメッセージ
+function yearlyComboToText(amount) {
+    if (!amount) return "";
+    return "\n\n🎐👑【年間コンボ達成！】👑🎐\n1年を通して季節イベントの代表アイテムをすべて集めきりました！\n特別ボーナスとして【" + amount.toLocaleString() + "円】を授かりました！";
+}
+// 🎐 年間コンボ（季節イベントの代表アイテムを1年で集めきる）の進捗表示を更新する
+function updateYearlyComboUI() {
+    const box = document.querySelector("#yearly-combo-box");
+    if (!box) return;
+
+    checkYearlyComboReset();
+    box.classList.remove("hidden");
+
+    const gotCount = YEARLY_COMBO_ITEMS.filter(c => comboItemsGotThisYear[c.itemKey]).length;
+    if (comboLastClaimedYear === comboYear) {
+        box.textContent = "🎐 年間コンボ：今年はすでに達成済みです！（来年またチャレンジできます）";
+    } else {
+        box.textContent = "🎐 年間コンボ：季節の代表アイテムを " + gotCount + " / " + YEARLY_COMBO_ITEMS.length + " 種類、今年すでに入手済み（すべて揃うと特別ボーナス！）";
+    }
+}
+
 function unlockAllAudio() {
     const ids = ["se-coin", "se-shuffle", "se-win", "se-lose", "se-doom"];
     ids.forEach(id => {

@@ -268,6 +268,12 @@ function rollDrops() {
             ownedItems[item.key] = (ownedItems[item.key] || 0) + 1;
             dropped.push(item);
 
+            // 🎐 年間コンボ対象の代表アイテムなら、今年すでに入手済みとして記録する
+            if (YEARLY_COMBO_ITEMS.some(c => c.itemKey === item.key)) {
+                checkYearlyComboReset();
+                comboItemsGotThisYear[item.key] = true;
+            }
+
             if (item.key === "hanami_dango") hanamiDangoTotalCollected++; // 🍡 称号「花見団子の達人」判定用（使っても減らない累計）
 
             if (item.key === "ishikoro") {
@@ -296,6 +302,7 @@ function rollDrops() {
 
     checkOrihimeHikoboshiMeeting();
     checkOshogatsuHatsuyumeSet();
+    updateYearlyComboUI(); // 🎐 年間コンボの進捗表示を更新
 
     if (dropped.length > 0) trackMissionDropItem(); // 🎯「収集家見習い」ミッションの進捗を更新
 
@@ -481,6 +488,44 @@ async function chocoOmikuji() {
         "今日の運勢は【" + tier.name + "】！【" + tier.prize.toLocaleString() + "円】を授かりました。\n" +
         "そしてあなたの「ペア運勢」は…" + pair.emoji + "【" + pair.label + "】でした！\n" +
         "良いご縁がありますように…♡"
+    );
+}
+
+// 👻 ハロウィン（10/25〜10/31）限定：「肝試し」に1日1回挑戦する。ハズレなしで、出会った妖怪に応じたご褒美がもらえる
+async function kimodameshi() {
+    if (!isSeasonalEventActive("halloween")) return;
+
+    const today = todayStr();
+    if (kimodameshiDate === today) {
+        alert("👻 今日はもう肝試しに出かけました。また明日挑戦してください。");
+        return;
+    }
+
+    unlockAllAudio();
+    kimodameshiDate = today;
+    kimodameshiCount++;
+
+    const roll = Math.random();
+    const yokai = KIMODAMESHI_YOKAI_TYPES.find(t => roll >= t.min);
+
+    currentMoney += yokai.prize;
+    if (yokai.prize > 0) totalWinnings += yokai.prize;
+    if (yokai === KIMODAMESHI_YOKAI_TYPES[0]) gotHalloweenRareYokai = true;
+
+    updateMoneyDisplay();
+    playSE(yokai.prize > 0 ? "se-win" : "se-lose");
+    if (yokai.prize > 0) recordHistory("👻肝試し：" + yokai.name, yokai.prize, currentMoney);
+
+    updateHalloweenUI();
+    updateTitlesUI();
+    await saveUserState();
+
+    alert(
+        "👻🏮【肝試しの結果】🏮👻\n" +
+        yokai.emoji + " " + yokai.name + "\n" +
+        (yokai.prize > 0
+            ? "【" + yokai.prize.toLocaleString() + "円】を授かりました！"
+            : "今回は何ももらえませんでした…また明日挑戦しましょう。")
     );
 }
 
@@ -991,4 +1036,168 @@ async function buyWorldSpot(regionKey, spotKey) {
     await saveUserState();
 
     alert("🌍 「" + spot.name + "」を訪れました！\n（" + region.name + "）" + milestoneMsg + regionCompleteMsg + completeMsg);
+}
+
+// ============================================================
+// 🔀 第六弾：世界の絶景・名所編（第五弾）完成後に分岐する「歴史編」／「神社ビルダーモード」
+// ============================================================
+
+// 🔀 分岐画面で「歴史編」または「神社ビルダーモード」のどちらかを選んだ時の処理
+// （一度選ぶと以後この選択画面は表示されないが、選んだ方を完成させるともう一方も自動的に解放される）
+async function selectMapPath6(path) {
+    if (!isShrineMapWorldSpotComplete()) {
+        alert("🙅 この先は、世界の絶景・名所編（第五弾）を完成させると選べるようになります。");
+        return;
+    }
+    if (historyMapRevealed || builderModeRevealed) return; // すでにどちらか選択済み
+
+    mapPath6Choice = path;
+    if (path === "history") {
+        historyMapRevealed = true;
+    } else if (path === "builder") {
+        builderModeRevealed = true;
+    } else {
+        return;
+    }
+
+    playSE("se-win");
+    startConfetti();
+    updateShrineMapUI();
+    await saveUserState();
+
+    if (path === "history") {
+        alert("🏯✨【歴史編、解放！】✨🏯\n世界の絶景・名所編の完成、おめでとうございます！\nここから先は、日本の歴史を彩る史跡を巡る旅です。\n（歴史編を完成させると、神社ビルダーモードも自動的に解放されます）");
+    } else {
+        alert("🏗️✨【神社ビルダーモード、解放！】✨🏗️\n世界の絶景・名所編の完成、おめでとうございます！\nここから先は、自分だけの神社を少しずつ建て増していく旅です。\n（神社ビルダーモードを完成させると、歴史編も自動的に解放されます）");
+    }
+}
+
+// 🏯 歴史編（第六弾-A）の史跡を1つ訪れる（購入する）
+async function buyHistorySpot(eraKey, spotKey) {
+    if (!isHistoryMapUnlocked()) {
+        alert("🙅 歴史編は、世界の絶景・名所編（第五弾）を完成させた後の分岐で選ぶと解放されます。");
+        return;
+    }
+
+    const era = HISTORY_ERAS.find(e => e.key === eraKey);
+    if (!era) return;
+    const spot = era.spots.find(s => s.key === spotKey);
+    if (!spot) return;
+
+    if (isHistorySpotOwned(spot)) {
+        alert("🏯 「" + spot.name + "」はすでに訪れています。");
+        return;
+    }
+
+    if (currentMoney < spot.cost) {
+        alert("🙅 所持金が足りません！\n「" + spot.name + "」を訪れるには" + spot.cost.toLocaleString() + "円必要です。");
+        return;
+    }
+
+    currentMoney -= spot.cost;
+    ownedHistorySpots[spot.key] = true;
+
+    updateMoneyDisplay();
+    playSE("se-coin");
+
+    let milestoneMsg = "";
+    let eraCompleteMsg = "";
+    let completeMsg = "";
+    let autoUnlockMsg = "";
+
+    // 🎉 節目（訪れたスポットの数）に到達したらお祝い金を授与する
+    const newCount = getHistoryOwnedCount();
+    const milestone = MAP_HISTORY_MILESTONES.find(m => m.count === newCount);
+    if (milestone) {
+        currentMoney += milestone.prize;
+        totalWinnings += milestone.prize;
+        updateMoneyDisplay();
+        recordHistory("🏯歴史編・節目ボーナス", milestone.prize, currentMoney);
+        milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n訪れた史跡が" + newCount + "箇所に達したお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
+    }
+
+    // 🏯 その時代の史跡をすべて訪れ終えたらお祝いメッセージ
+    if (isHistoryEraComplete(era)) {
+        eraCompleteMsg = "\n\n🏯【" + era.name + "コンプリート！】🏯\n" + era.name + "の史跡をすべて訪れました！";
+    }
+
+    if (isHistoryMapComplete()) {
+        completeMsg = "\n\n👑🏯【歴史編、完全制覇！】🏯👑\n全" + HISTORY_SPOT_COUNT + "箇所の史跡をすべて訪れました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_HISTORY_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！";
+
+        // 🏗️ もう一方の「神社ビルダーモード」がまだ未解放なら、ここで自動的に解放する
+        if (!builderModeRevealed) {
+            builderModeRevealed = true;
+            autoUnlockMsg = "\n\n🏗️✨【神社ビルダーモード、自動解放！】✨🏗️\n歴史編の完成により、もう一方の道「神社ビルダーモード」も解放されました！";
+        }
+
+        // 🌏 両方の道を制覇していたら、最終称号のお祝いも追加する
+        if (isBuilderModeComplete()) {
+            completeMsg += "\n\n⛩️🌟👑【二道を極めし者】👑🌟⛩️\n歴史編と神社ビルダーモード、両方の道を制覇しました。本当にお疲れさまでした！";
+        }
+    }
+
+    updateShrineMapUI();
+    updateTitlesUI();
+    await saveUserState();
+
+    alert("🏯 「" + spot.name + "」を訪れました！\n（" + era.name + "）" + milestoneMsg + eraCompleteMsg + completeMsg + autoUnlockMsg);
+}
+
+// 🏗️ 神社ビルダーモード（第六弾-B）の次のパーツを1つ完成させる（境内マップと同じく、順番に1つずつ購入する形式）
+async function buyNextBuilderPart() {
+    if (!isBuilderModeUnlocked()) {
+        alert("🙅 神社ビルダーモードは、世界の絶景・名所編（第五弾）を完成させた後の分岐で選ぶと解放されます。");
+        return;
+    }
+
+    const part = BUILDER_PARTS[builderLevel];
+    if (!part) {
+        alert("🏗️ 神社ビルダーモードはすでに完成しています！");
+        return;
+    }
+    if (currentMoney < part.cost) {
+        alert("🙅 所持金が足りません！\n「" + part.name + "」の建立には" + part.cost.toLocaleString() + "円必要です。");
+        return;
+    }
+
+    currentMoney -= part.cost;
+    builderLevel++;
+
+    updateMoneyDisplay();
+    playSE("se-coin");
+
+    let milestoneMsg = "";
+    let completeMsg = "";
+    let autoUnlockMsg = "";
+
+    // 🎉 節目（完成させたパーツ数）に到達したらお祝い金を授与する
+    const milestone = MAP_BUILDER_MILESTONES.find(m => m.count === builderLevel);
+    if (milestone) {
+        currentMoney += milestone.prize;
+        totalWinnings += milestone.prize;
+        updateMoneyDisplay();
+        recordHistory("🏗️神社ビルダー・節目ボーナス", milestone.prize, currentMoney);
+        milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n境内の建て増しが" + builderLevel + "パーツ完成したお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
+    }
+
+    if (isBuilderModeComplete()) {
+        completeMsg = "\n\n👑🏗️【神社ビルダーモード、完成！】🏗️👑\nすべてのパーツが完成し、自分だけの神社が出来上がりました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_BUILDER_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！";
+
+        // 🏯 もう一方の「歴史編」がまだ未解放なら、ここで自動的に解放する
+        if (!historyMapRevealed) {
+            historyMapRevealed = true;
+            autoUnlockMsg = "\n\n🏯✨【歴史編、自動解放！】✨🏯\n神社ビルダーモードの完成により、もう一方の道「歴史編」も解放されました！";
+        }
+
+        // 🌏 両方の道を制覇していたら、最終称号のお祝いも追加する
+        if (isHistoryMapComplete()) {
+            completeMsg += "\n\n⛩️🌟👑【二道を極めし者】👑🌟⛩️\n歴史編と神社ビルダーモード、両方の道を制覇しました。本当にお疲れさまでした！";
+        }
+    }
+
+    updateShrineMapUI();
+    updateTitlesUI();
+    await saveUserState();
+
+    alert("🏗️ 「" + part.emoji + " " + part.name + "」が完成しました！\n" + part.desc + milestoneMsg + completeMsg + autoUnlockMsg);
 }

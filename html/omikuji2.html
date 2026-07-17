@@ -63,6 +63,7 @@
                 <p id="community-status-box" class="community-status-box hidden">-</p>
                 <p id="countdown-season-box" class="taian-status-box hidden">-</p>
                 <p id="countdown-bonus-box" class="taian-status-box hidden">-</p>
+                <p id="yearly-combo-box" class="taian-status-box hidden">-</p>
                 <p id="ushimitsu-banner" class="ushimitsu-banner hidden">🌙 ただいま「丑三つ時」…大大吉・大大凶の確率が跳ね上がっています…</p>
                 <p id="natsumatsuri-banner" class="ushimitsu-banner hidden">🎆 ただいま「夏祭り」開催中！（夜・週末限定）収集アイテムのドロップ率が1.5倍です！</p>
                 <p id="summer-theme-banner" class="ushimitsu-banner hidden">🌻 8月の昼下がり…夏の日差しがまぶしいですね（夏祭りは夜と週末に開催されます）</p>
@@ -71,6 +72,7 @@
                 <p id="koyo-banner" class="ushimitsu-banner hidden">🍁 ただいま「紅葉狩り」シーズン！山々が赤や橙色に色づいています</p>
                 <p id="oshogatsu-banner" class="ushimitsu-banner hidden">🎍 謹賀新年！初日の出とともに、新しい一年が始まりました</p>
                 <p id="kannazuki-banner" class="ushimitsu-banner hidden">🌫️ ただいま「神無月」…神様は出雲へお出かけ中です</p>
+                <p id="halloween-banner" class="ushimitsu-banner hidden">👻 ただいま「ハロウィン（妖怪祭り）」…境内に和風の妖怪たちが集っています…</p>
                 <p id="shichigosan-banner" class="ushimitsu-banner hidden">👘 ただいま「七五三」シーズン！ショップに「千歳飴」が並んでいます</p>
                 <p id="christmas-banner" class="ushimitsu-banner hidden">🎄 ただいま「クリスマス」の夜…イルミネーションが輝いています！低確率で「サンタの袋」が見つかるかも…？</p>
                 <p id="christmas-day-banner" class="ushimitsu-banner hidden">❄️ クリスマスシーズンの昼下がり…静かに雪がちらついています</p>
@@ -93,6 +95,12 @@
                     <p class="lucky-item-title">💝 バレンタイン・チョコおみくじ（2/1〜2/14限定） 💝</p>
                     <p id="choco-status-text" class="lucky-item-desc">-</p>
                     <button id="choco-omikuji-btn" class="btn-equip" onclick="chocoOmikuji()" type="button">🍫 チョコおみくじを引く</button>
+                </div>
+
+                <div id="halloween-box" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">👻 ハロウィン・肝試し（10/25〜10/31限定） 👻</p>
+                    <p id="kimodameshi-status-text" class="lucky-item-desc">-</p>
+                    <button id="kimodameshi-btn" class="btn-equip" onclick="kimodameshi()" type="button">🏮 肝試しに出かける</button>
                 </div>
 
                 <div id="nagoshi-box" class="lucky-item-box hidden">
@@ -501,21 +509,71 @@
                     </div>
 
                     <div class="shop-section">
-                        <h3 class="shop-section-title">🌍 世界の絶景・名所編（第五弾・最終章）</h3>
+                        <h3 class="shop-section-title">🌍 世界の絶景・名所編（第五弾）</h3>
 
                         <div id="map-worldspot-locked" class="hidden">
                             <p class="bank-desc">🔒 「日本三大○○」ミニマップ集（第四弾）を完成させると進めるようになります。</p>
                         </div>
 
                         <div id="map-worldspot-ready" class="hidden">
-                            <p class="bank-desc">🎉 「日本三大○○」の完成、おめでとうございます！世界の絶景・名所編（第五弾・最終章）へ進む準備が整いました。</p>
+                            <p class="bank-desc">🎉 「日本三大○○」の完成、おめでとうございます！世界の絶景・名所編（第五弾）へ進む準備が整いました。</p>
                             <button class="btn-shop-buy" onclick="startWorldSpotMap()" type="button">🌍 世界の絶景・名所へ進む</button>
                         </div>
 
                         <div id="map-worldspot-unlocked" class="hidden">
-                            <p class="bank-desc">舞台は日本を飛び出し、世界へ。東アジア・南アジア・中東・ヨーロッパ・北米・南米・オセアニアの7地域×2箇所、全14箇所を巡ります。これが神社巡りマップの最終章です。訪れたスポット数の節目でお祝い金、全制覇でさらに永続の大吉ボーナスがもらえます。</p>
+                            <p class="bank-desc">舞台は日本を飛び出し、世界へ。東アジア・南アジア・中東・ヨーロッパ・北米・南米・オセアニアの7地域×2箇所、全14箇所を巡ります。訪れたスポット数の節目でお祝い金、全制覇でさらに永続の大吉ボーナスがもらえます。</p>
                             <p id="map-worldspot-progress" class="dex-progress">🌍 訪れたスポット：0 / 14箇所　｜　🏆 コンプリートした地域：0 / 7</p>
                             <div id="worldspot-list"></div>
+                        </div>
+                    </div>
+
+                    <!-- 🔀 第六弾：世界の絶景・名所編（第五弾）完成後に分岐する「歴史編」／「神社ビルダーモード」 -->
+                    <div id="map-path6-choice" class="shop-section hidden">
+                        <h3 class="shop-section-title">🔀 神社巡りマップ・第六弾（最終章）</h3>
+                        <p class="bank-desc">🎉 世界の絶景・名所編（第五弾）の完成、おめでとうございます！ここからは、2つの道のどちらかを選んで進みます。<br>
+                        どちらを先に選んでも構いません。片方を完成させると、もう一方も自動的に解放されるので、最終的には両方とも制覇できます。</p>
+                        <div class="boost-cards-grid">
+                            <div>
+                                <p class="shop-item-name">🏯 歴史編</p>
+                                <p class="shop-item-desc" style="white-space:normal;">縄文時代から近代まで、日本の歴史を彩る史跡を時代ごとに巡るコレクション。</p>
+                                <button class="btn-shop-buy" onclick="selectMapPath6('history')" type="button" style="width:100%;margin-top:6px;">🏯 歴史編を選ぶ</button>
+                            </div>
+                            <div>
+                                <p class="shop-item-name">🏗️ 神社ビルダーモード</p>
+                                <p class="shop-item-desc" style="white-space:normal;">自分だけの神社を、鳥居や神楽殿など10のパーツで少しずつ建て増していくモード。</p>
+                                <button class="btn-shop-buy" onclick="selectMapPath6('builder')" type="button" style="width:100%;margin-top:6px;">🏗️ 神社ビルダーモードを選ぶ</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">🏯 歴史編（第六弾-A）</h3>
+
+                        <div id="map-history-locked" class="hidden">
+                            <p class="bank-desc">🔒 世界の絶景・名所編（第五弾）完成後の分岐選択で「歴史編」を選ぶと進めるようになります。</p>
+                        </div>
+
+                        <div id="map-history-unlocked" class="hidden">
+                            <p class="bank-desc">縄文・弥生から明治・近代まで、日本の8つの時代×3箇所、全24箇所の史跡を巡ります。訪れたスポット数の節目でお祝い金、全制覇でさらに永続の大吉ボーナスがもらえます。</p>
+                            <p id="map-history-progress" class="dex-progress">🏯 訪れた史跡：0 / 24箇所　｜　🏆 コンプリートした時代：0 / 8</p>
+                            <div id="map-history-era-grid" class="map-grid"></div>
+                            <div id="map-history-detail" class="map-japan-detail" style="margin-top:10px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">🏗️ 神社ビルダーモード（第六弾-B）</h3>
+
+                        <div id="map-builder-locked" class="hidden">
+                            <p class="bank-desc">🔒 世界の絶景・名所編（第五弾）完成後の分岐選択で「神社ビルダーモード」を選ぶと進めるようになります。</p>
+                        </div>
+
+                        <div id="map-builder-unlocked" class="hidden">
+                            <p class="bank-desc">自分だけの神社を、鳥居の新調から御本殿の大改築まで、全10パーツで少しずつ建て増していきます。境内マップと同じく、順番に1つずつ購入していく形式です。</p>
+                            <p id="map-builder-progress" class="dex-progress">🏗️ 完成状況：0 / 10パーツ</p>
+                            <div id="map-builder-list" style="margin-bottom:10px;"></div>
+                            <p id="map-builder-next-text" style="font-size:0.85rem;color:#666;margin:0 0 8px;">-</p>
+                            <button id="map-builder-buy-btn" class="btn-shop-buy hidden" onclick="buyNextBuilderPart()" type="button" style="width:100%;">🏗️ このパーツを建てる</button>
                         </div>
                     </div>
                 </div>

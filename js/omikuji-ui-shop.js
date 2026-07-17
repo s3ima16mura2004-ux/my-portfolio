@@ -269,7 +269,9 @@ function updateTitlesUI() {
         japanShrinePartsOwnedCount: getJapanShrinePartsTotalOwnedCount(), companionExp, ownedFriends,
         okumiyaCompleteCount: getOkumiyaCompleteCount(), okumiyaPartsOwnedCount: getOkumiyaPartsTotalOwnedCount(),
         powerSpotOwnedCount: getPowerSpotOwnedCount(), miniThemeOwnedCount: getMiniThemeOwnedCount(),
-        worldSpotOwnedCount: getWorldSpotOwnedCount()
+        worldSpotOwnedCount: getWorldSpotOwnedCount(),
+        historyOwnedCount: getHistoryOwnedCount(), builderLevel,
+        comboCompletedYears, gotHalloweenRareYokai
     };
     const earned = TITLES.filter(t => t.condition(stats));
 

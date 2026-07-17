@@ -134,6 +134,19 @@ window.addEventListener("DOMContentLoaded", async () => {
             miniThemeMapRevealed = data.miniThemeMapRevealed === true;
             ownedWorldSpots = (data.ownedWorldSpots && typeof data.ownedWorldSpots === "object") ? data.ownedWorldSpots : {};
             worldSpotMapRevealed = data.worldSpotMapRevealed === true;
+            mapPath6Choice = data.mapPath6Choice || "";
+            historyMapRevealed = data.historyMapRevealed === true;
+            ownedHistorySpots = (data.ownedHistorySpots && typeof data.ownedHistorySpots === "object") ? data.ownedHistorySpots : {};
+            builderModeRevealed = data.builderModeRevealed === true;
+            builderLevel = typeof data.builderLevel === "number" ? data.builderLevel : 0;
+            comboYear = typeof data.comboYear === "number" ? data.comboYear : 0;
+            comboItemsGotThisYear = (data.comboItemsGotThisYear && typeof data.comboItemsGotThisYear === "object") ? data.comboItemsGotThisYear : {};
+            comboLastClaimedYear = typeof data.comboLastClaimedYear === "number" ? data.comboLastClaimedYear : 0;
+            comboCompletedYears = typeof data.comboCompletedYears === "number" ? data.comboCompletedYears : 0;
+            checkYearlyComboReset(); // 🎐 年をまたいでいた場合はここで今年分にリセットしておく
+            kimodameshiDate = data.kimodameshiDate || "";
+            kimodameshiCount = typeof data.kimodameshiCount === "number" ? data.kimodameshiCount : 0;
+            gotHalloweenRareYokai = data.gotHalloweenRareYokai === true;
             if (data.japanShrinesOwned && typeof data.japanShrinesOwned === "object") {
                 JAPAN_PREFECTURES.forEach(pref => {
                     pref.shrines.forEach(shrine => {
@@ -171,6 +184,8 @@ window.addEventListener("DOMContentLoaded", async () => {
         setInterval(updateOshogatsuUI, 60000); // 🎍 お正月（初日の出演出）の開催状況を定期的に再チェック
         updateKannazukiUI();
         setInterval(updateKannazukiUI, 60000); // 🌫️ 神無月（寂しい演出）の開催状況を定期的に再チェック
+        updateHalloweenUI();
+        setInterval(updateHalloweenUI, 60000); // 👻 ハロウィン（妖怪祭り・肝試し欄）の開催状況を定期的に再チェック
         updateShichigosanUI();
         setInterval(updateShichigosanUI, 60000); // 👘 七五三（千歳飴バナー）の開催状況を定期的に再チェック
         updateChristmasUI();
@@ -189,6 +204,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         updateKodomonohiUI();
         setInterval(updateKodomonohiUI, 60000); // 🎏 こどもの日（鯉のぼり演出）の開催状況を定期的に再チェック
         updateNagoshiUI(); // 🌾 夏越の大祓（茅の輪くぐり）の進捗表示を初期化
+        updateYearlyComboUI(); // 🎐 年間コンボの進捗表示を初期化
         updateShrineMapUI(); // 🗺️ 境内マップの進捗表示を初期化
         checkKannazukiReturn(); // ⛩️ 11月になっていれば、神無月に貯めた賽銭箱の預け入れ額を「倍返し」する
         startCountdownTimers(); // ⏳ 次の季節イベント／次のボーナスタイムまでのカウントダウンを開始

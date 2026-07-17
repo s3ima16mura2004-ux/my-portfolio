@@ -459,6 +459,42 @@
     color: #4a4a44;
 }
 
+/* 👻 ハロウィン（妖怪祭り・10/25〜10/31）の背景演出。和風ホラーを意識した紫がかった夜の雰囲気 */
+.container.halloween-active {
+    background-image: linear-gradient(rgba(30, 15, 40, 0.88), rgba(50, 20, 45, 0.88));
+    box-shadow: 0 0 30px rgba(150, 60, 180, 0.5);
+}
+
+.container.halloween-active h1,
+.container.halloween-active .main-title {
+    color: #e6c9ff;
+}
+
+#halloween-banner {
+    background: linear-gradient(90deg, #2a1533, #4a1f52, #2a1533);
+    border: 1px solid #b35bd1;
+    color: #f0d9ff;
+}
+
+/* 👻🏮 ハロウィン中に提灯お化け・幽霊がふわりと漂う演出 */
+.ghost-piece {
+    position: fixed;
+    top: -30px;
+    font-size: 24px;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0.9;
+    animation: ghost-drift linear forwards;
+}
+
+@keyframes ghost-drift {
+    0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.9; }
+    50% { transform: translateY(50vh) translateX(-20px) rotate(-8deg); }
+    90% { opacity: 0.85; }
+    100% { transform: translateY(105vh) translateX(20px) rotate(8deg); opacity: 0; }
+}
+
 /* 👘 七五三（11月）のバナー（背景は同月の紅葉狩り演出をそのまま活かす） */
 #shichigosan-banner {
     background: linear-gradient(90deg, #fff0e0, #ffd9b3, #fff0e0);
@@ -609,5 +645,3 @@
 #choco-omikuji-btn {
     background: linear-gradient(90deg, #ff8fab, #ff6699);
 }
-
-
