@@ -55,6 +55,32 @@ async function buyShopItem(itemKey) {
     }
 }
 
+// 🐍🦊 賽銭箱（貯金）の資金で、新しい相棒を迎える
+async function buyCompanionFriend(key) {
+    const friend = COMPANION_FRIENDS.find(f => f.key === key);
+    if (!friend) return;
+
+    if (ownedFriends[key]) {
+        alert("🙅 「" + friend.name + "」はすでに迎えています。");
+        return;
+    }
+
+    if (bankMoney < friend.cost) {
+        alert("🙅 賽銭箱の残高が足りません！\n「" + friend.name + "」を迎えるには" + friend.cost.toLocaleString() + "円必要です。\n（現在の賽銭箱残高：" + bankMoney.toLocaleString() + "円）");
+        return;
+    }
+
+    bankMoney -= friend.cost;
+    ownedFriends[key] = true;
+
+    updateBankUI();
+    updateCompanionUI();
+    playSE("se-coin");
+    await saveUserState();
+
+    alert(friend.emoji + "✨【新しい相棒を迎えました！】✨" + friend.emoji + "\n「" + friend.name + "」が仲間になりました！\n" + friend.desc);
+}
+
 // 収集アイテムを装備／解除する
 // 装備中の収集アイテムを1個消費する。無くなったら自動的に装備を外す
 function consumeCollectible(key) {

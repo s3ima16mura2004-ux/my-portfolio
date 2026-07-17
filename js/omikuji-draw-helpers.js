@@ -190,6 +190,7 @@ function resolveTrial() {
                 if (hasShopEffect("suzu")) tax = Math.floor(tax / 2);
                 if (hasShopEffect("ikigami")) tax = Math.floor(tax / 2);
                 if (kiyomeShioActive) tax = Math.floor(tax / 2); // 🧂「清めの塩」ミッション報酬効果
+                if (ownedFriends.kitsune) tax = Math.floor(tax * 0.9); // 🦊 狐の相棒（賽銭箱で常時1割軽減）
                 outcome = {
                     resultName: "神の試練(失敗)",
                     imgSrc: "../images/omikuji_daikyou.png",
@@ -214,6 +215,7 @@ function resolveTrial() {
                 if (hasShopEffect("suzu")) tax = Math.floor(tax / 2);
                 if (hasShopEffect("ikigami")) tax = Math.floor(tax / 2);
                 if (kiyomeShioActive) tax = Math.floor(tax / 2); // 🧂「清めの塩」ミッション報酬効果
+                if (ownedFriends.kitsune) tax = Math.floor(tax * 0.9); // 🦊 狐の相棒（賽銭箱で常時1割軽減）
                 outcome = {
                     resultName: "神の試練(回避)",
                     imgSrc: "../images/omikuji_daikyou.png",

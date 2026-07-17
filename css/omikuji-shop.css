@@ -229,3 +229,21 @@
 .bank-btn-row button {
     flex: 1;
 }
+
+/* 🏺🐱 永続強化系カード（壺・相棒など）を並べて一覧しやすくするグリッド */
+.boost-cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-items: start;
+}
+
+.boost-cards-grid .shop-section {
+    margin-bottom: 0;
+}
+
+@media (max-width: 700px) {
+    .boost-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}

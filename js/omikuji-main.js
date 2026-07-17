@@ -74,6 +74,7 @@ window.addEventListener("DOMContentLoaded", async () => {
             totalWinnings = typeof data.totalWinnings === "number" ? data.totalWinnings : 0;
             urnLevel = typeof data.urnLevel === "number" ? data.urnLevel : 0;
             companionExp = typeof data.companionExp === "number" ? data.companionExp : 0;
+            ownedFriends = Object.assign({ shirohebi: false, kitsune: false }, data.ownedFriends || {});
 
             const today = todayStr();
             taianActive = (data.taianDate === today) && data.taianActive === true;

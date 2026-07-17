@@ -205,6 +205,7 @@ function omikuji() {
             if (hasShopEffect("gofu")) prizeMultiplier *= 1.1;
             if (hasShopEffect("oogi")) prizeMultiplier *= 1.15;
             if (hasShopEffect("amaterasu")) prizeMultiplier *= 1.2;
+            if (ownedFriends.shirohebi) prizeMultiplier *= 1.05; // 🐍 白蛇の相棒（賽銭箱で常時+5%）
             if (prizeMultiplier > 1) prizeMoney = Math.floor(prizeMoney * prizeMultiplier);
         }
 

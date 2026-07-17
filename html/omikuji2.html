@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>豪華おみくじ神社</title>
-    <link rel="stylesheet" href="../css/omikuji-core.css?v=2">
-    <link rel="stylesheet" href="../css/omikuji-shop.css?v=2">
+    <link rel="stylesheet" href="../css/omikuji-core.css?v=3">
+    <link rel="stylesheet" href="../css/omikuji-shop.css?v=3">
     <link rel="stylesheet" href="../css/omikuji-map.css?v=2">
     <link rel="stylesheet" href="../css/omikuji-missions.css?v=2">
     <link rel="stylesheet" href="../css/omikuji-seasonal-effects.css?v=2">
@@ -41,6 +41,8 @@
                     💰 あなたの所持金：<span id="money">10000</span>円
                 </div>
 
+                <p class="bank-balance">🏦 賽銭箱（貯金）：<span id="bank-money-display-side">0</span>円</p>
+
                 <div id="lucky-item-box" class="lucky-item-box hidden">
                     <p class="lucky-item-title">🎋 本日のラッキーアイテム 🎋</p>
                     <p id="lucky-item-name">-</p>
@@ -52,6 +54,9 @@
                     <p id="active-equip-text" class="hidden">-</p>
                 </div>
 
+                <details class="daily-notices" open>
+                    <summary>📢 本日のお知らせ</summary>
+                    <div class="daily-notices-body">
                 <p id="taian-status-box" class="taian-status-box hidden">-</p>
                 <p id="birthday-ticket-box" class="taian-status-box hidden">-</p>
                 <p id="shop-fever-box" class="taian-status-box hidden">-</p>
@@ -101,6 +106,8 @@
                     <p id="joya-bell-status-text" class="lucky-item-desc">-</p>
                     <button id="joya-bell-btn" class="btn-equip" onclick="ringJoyaBell()" type="button">🔔 鐘をつく</button>
                 </div>
+                    </div>
+                </details>
 
                 <div id="bonus-area" style="display: none; margin-bottom: 15px;">
                     <p style="font-size: 0.85rem; color: #d9534f; font-weight: bold; margin-bottom: 8px;">
@@ -313,24 +320,31 @@
                         <p id="shop-active-status" class="shop-active-status hidden">-</p>
                     </div>
 
-                    <div class="shop-section">
-                        <h3 class="shop-section-title">🏺 おみくじの壺（永続強化）</h3>
-                        <p id="urn-current-text" class="urn-current-text">現在の壺：普通の壺（大吉ボーナス +0.0%）</p>
-                        <div id="urn-next-box" class="urn-next-box">
-                            <p id="urn-next-text">-</p>
-                            <button id="urn-upgrade-btn" class="btn-shop-buy" onclick="upgradeUrn()" type="button">壺をランクアップする</button>
+                    <div class="boost-cards-grid">
+                        <div class="shop-section">
+                            <h3 class="shop-section-title">🏺 おみくじの壺（永続強化）</h3>
+                            <p id="urn-current-text" class="urn-current-text">現在の壺：普通の壺（大吉ボーナス +0.0%）</p>
+                            <div id="urn-next-box" class="urn-next-box">
+                                <p id="urn-next-text">-</p>
+                                <button id="urn-upgrade-btn" class="btn-shop-buy" onclick="upgradeUrn()" type="button">壺をランクアップする</button>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="shop-section">
-                        <h3 class="shop-section-title">🐱 相棒・招き猫の成長</h3>
-                        <p class="urn-current-text" style="margin-bottom:2px;">上の「購入アイテム」を買うたびに、相棒の招き猫が育っていきます。</p>
-                        <p id="companion-current-text" class="urn-current-text">🐱 現在の相棒：小さな招き猫</p>
-                        <p id="companion-desc-text" class="shop-item-desc" style="white-space:normal;">-</p>
-                        <div id="companion-progress-outer" class="mission-progress-outer">
-                            <div id="companion-progress-inner" class="mission-progress-inner"></div>
+                        <div class="shop-section">
+                            <h3 class="shop-section-title">🐱 相棒・招き猫の成長</h3>
+                            <p class="urn-current-text" style="margin-bottom:2px;">上の「購入アイテム」を買うたびに、相棒の招き猫が育っていきます。</p>
+                            <p id="companion-current-text" class="urn-current-text">🐱 現在の相棒：小さな招き猫</p>
+                            <p id="companion-desc-text" class="shop-item-desc" style="white-space:normal;">-</p>
+                            <div id="companion-progress-outer" class="mission-progress-outer">
+                                <div id="companion-progress-inner" class="mission-progress-inner"></div>
+                            </div>
+                            <p id="companion-next-text" class="mission-progress-text">-</p>
+
+                            <div id="companion-friends-box" class="urn-next-box" style="margin-top:10px;">
+                                <p style="margin:0 0 6px;font-size:0.85rem;color:#666;">🏦 賽銭箱の資金で、新しい相棒を迎えられます</p>
+                                <div id="companion-friends-list"></div>
+                            </div>
                         </div>
-                        <p id="companion-next-text" class="mission-progress-text">-</p>
                     </div>
 
                 </div>
@@ -509,21 +523,21 @@
 
     <script src="../js/omikuji-seasonal.js?v=1"></script>
     <script src="../js/omikuji-countdown.js?v=1"></script>
-    <script src="../js/omikuji-data.js?v=2"></script>
-    <script src="../js/omikuji-state.js?v=2"></script>
+    <script src="../js/omikuji-data.js?v=3"></script>
+    <script src="../js/omikuji-state.js?v=3"></script>
     <script src="../js/omikuji-ui-core.js?v=2"></script>
-    <script src="../js/omikuji-ui-shop.js?v=3"></script>
+    <script src="../js/omikuji-ui-shop.js?v=4"></script>
     <script src="../js/omikuji-ui-effects.js?v=2"></script>
     <script src="../js/omikuji-ui-seasonal1.js?v=2"></script>
     <script src="../js/omikuji-ui-seasonal2.js?v=2"></script>
     <script src="../js/omikuji-ui-seasonal3.js?v=2"></script>
     <script src="../js/omikuji-ui-map.js?v=2"></script>
-    <script src="../js/omikuji-shop.js?v=2"></script>
+    <script src="../js/omikuji-shop.js?v=3"></script>
     <script src="../js/omikuji-missions.js?v=1"></script>
-    <script src="../js/omikuji-draw-helpers.js?v=1"></script>
-    <script src="../js/omikuji-draw-single.js?v=2"></script>
-    <script src="../js/omikuji-draw-multi.js?v=2"></script>
-    <script src="../js/omikuji-main.js?v=2"></script>
+    <script src="../js/omikuji-draw-helpers.js?v=2"></script>
+    <script src="../js/omikuji-draw-single.js?v=3"></script>
+    <script src="../js/omikuji-draw-multi.js?v=3"></script>
+    <script src="../js/omikuji-main.js?v=3"></script>
     <script src="../js/omikuji-phantom.js?v=1"></script>
     <script>
         // 🚪 ログアウト処理：ログイン情報を消してログインページへ戻る

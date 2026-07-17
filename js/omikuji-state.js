@@ -45,6 +45,7 @@ let totalWinnings = 0;    // 累計獲得賞金額（プラスの当選金のみ
 let urnLevel = 0;         // おみくじの壺のランクアップ段階
 let kamikichiBonus = 0;   // 神吉を引くたびに永久に積み重なる大吉ボーナス（神様との契約）
 let companionExp = 0;     // 🐱 相棒「招き猫」の成長値。ショップの効果アイテムを購入するたびに+1される
+let ownedFriends = { shirohebi: false, kitsune: false }; // 🐍🦊 賽銭箱の資金で迎えた相棒たちの所持状況
 
 let taianActive = false;  // 本日が「大安吉日」かどうか（ログイン時に個人ごとに抽選済み）
 let bankMoney = 0;        // 賽銭箱（貯金）の残高。おみくじには使えないが大凶等のリスクからは守られる
@@ -115,6 +116,7 @@ async function saveUserState() {
             totalWinnings: totalWinnings,
             urnLevel: urnLevel,
             companionExp: companionExp,
+            ownedFriends: ownedFriends,
             bankMoney: bankMoney,
             dexAchieved: dexAchieved,
             dexRewardClaimed: dexRewardClaimed,

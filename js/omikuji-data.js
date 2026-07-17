@@ -115,6 +115,13 @@ const COMPANION_LEVELS = [
     { level: 4, name: "黄金招き猫", emoji: "🐈‍⬛", threshold: 100, bonus: 0.03, desc: "全身が黄金に輝く伝説級の招き猫。大吉運を大きく後押ししてくれる。" }
 ];
 
+// 🐍🦊 賽銭箱（貯金）の資金で新たに迎えられる相棒たち。招き猫と違い、一度迎えると永久にその効果が発動し続ける
+// 招き猫（大吉ボーナス）とは異なる種類の恒久ボーナスにして、効果が偏りすぎないようにしている
+const COMPANION_FRIENDS = [
+    { key: "shirohebi", emoji: "🐍", name: "白蛇の相棒", cost: 200000, prizeBonus: 0.05, desc: "賽銭箱の資金で迎える白蛇。迎えた後は獲得賞金が常時+5%される。" },
+    { key: "kitsune", emoji: "🦊", name: "狐の相棒", cost: 400000, taxCut: 0.10, desc: "賽銭箱の資金で迎える狐。迎えた後は「神の試練」等の没収額が常時1割軽減される。" }
+];
+
 // 🗺️ 境内マップ（所持金を使って1マスずつ買い進め、少しずつ神社の境内図を完成させていく大型の金策先）
 // 順番に購入するしかない（マップの端から埋まっていくイメージ）。金額は後半になるほど跳ね上がる
 const MAP_TILES = [
@@ -585,6 +592,7 @@ const TITLES = [
     { key: "first_visit", emoji: "🔰", name: "初参拝", desc: "はじめての参拝を達成", condition: s => s.totalDraws >= 1 },
     { key: "urn_master", emoji: "🏺", name: "壺のマイスター", desc: "おみくじの壺を最大までランクアップ", condition: s => s.urnLevel >= URN_LEVELS.length - 1 },
     { key: "companion_master", emoji: "🐈‍⬛", name: "黄金招き猫の主", desc: "相棒の招き猫を最大まで育てた", condition: s => (s.companionExp || 0) >= COMPANION_LEVELS[COMPANION_LEVELS.length - 1].threshold },
+    { key: "companion_friends_complete", emoji: "🐍🦊", name: "百獣の相棒", desc: "賽銭箱の資金で、白蛇と狐の両方の相棒を迎えた", condition: s => !!(s.ownedFriends && s.ownedFriends.shirohebi && s.ownedFriends.kitsune) },
     { key: "stone_collector", emoji: "🪨", name: "石ころコレクター", desc: "謎の石ころを100個集めた", condition: s => (s.ownedItems && s.ownedItems.ishikoro || 0) >= 100 },
     { key: "sages_stone", emoji: "🪨✨", name: "賢者の石の使い手", desc: "謎の石ころを500個集め「賢者の石」に変化させた", condition: s => s.ishikoro500Claimed === true },
     { key: "dex_complete", emoji: "📖", name: "図鑑コンプリート", desc: "大吉〜大凶(神の試練)まで全種類を達成", condition: s => s.dexRewardClaimed === true },

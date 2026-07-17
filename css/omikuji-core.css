@@ -160,6 +160,51 @@ h1 {
     .page-columns {
         grid-template-columns: 1fr;
     }
+    /* 📱 スマホ幅では、ステータス欄より先に「おみくじを引く」や本文コンテンツを表示する */
+    .page-columns .col-main {
+        order: -1;
+    }
+    .page-columns .col-side {
+        order: 1;
+    }
+}
+
+/* 📢 「本日だけのお知らせ」をまとめる折りたたみ欄（大安吉日・季節バナー・丑三つ時など）
+   常設のステータス（ランク・所持金など）とは見た目を分けて、情報の優先度を伝えやすくする */
+.daily-notices {
+    background: #fbf6ec;
+    border: 1px solid #e8dcc8;
+    border-radius: 8px;
+    padding: 8px 10px;
+}
+
+.daily-notices > summary {
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #8b5a2b;
+    list-style: none;
+}
+
+.daily-notices > summary::-webkit-details-marker {
+    display: none;
+}
+
+.daily-notices > summary::before {
+    content: "▶ ";
+    display: inline-block;
+    transition: transform 0.15s ease;
+}
+
+.daily-notices[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+.daily-notices-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
 }
 
 .omikuji-box {
