@@ -129,6 +129,7 @@ window.addEventListener("DOMContentLoaded", async () => {
             japanShrinePartsOwned = (data.japanShrinePartsOwned && typeof data.japanShrinePartsOwned === "object") ? data.japanShrinePartsOwned : {};
             japanOkumiyaPartsOwned = (data.japanOkumiyaPartsOwned && typeof data.japanOkumiyaPartsOwned === "object") ? data.japanOkumiyaPartsOwned : {};
             ownedPowerSpots = (data.ownedPowerSpots && typeof data.ownedPowerSpots === "object") ? data.ownedPowerSpots : {};
+            powerSpotMapRevealed = data.powerSpotMapRevealed === true;
             if (data.japanShrinesOwned && typeof data.japanShrinesOwned === "object") {
                 JAPAN_PREFECTURES.forEach(pref => {
                     pref.shrines.forEach(shrine => {

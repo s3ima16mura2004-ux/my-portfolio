@@ -160,7 +160,8 @@ async function saveUserState() {
             shrineMapLevel: shrineMapLevel,
             japanShrinePartsOwned: japanShrinePartsOwned,
             japanOkumiyaPartsOwned: japanOkumiyaPartsOwned,
-            ownedPowerSpots: ownedPowerSpots
+            ownedPowerSpots: ownedPowerSpots,
+            powerSpotMapRevealed: powerSpotMapRevealed
         });
     } catch (e) {
         console.error("ユーザーデータの保存に失敗しました: ", e);
@@ -243,6 +244,7 @@ let shrineMapLevel = 0; // 購入済みのマス数（0〜MAP_TILES.length）。
 let japanShrinePartsOwned = {}; // 組み立て済みの神社パーツ（{ "神社key:パーツkey": true, ... }）。全パーツ揃うとその神社が完成する
 let japanOkumiyaPartsOwned = {}; // 🏯 第二弾「奥宮・摂社」の組み立て済みパーツ（構造はjapanShrinePartsOwnedと同じ）
 let ownedPowerSpots = {}; // 🌄 第三弾「パワースポット編」で訪れた（購入した）スポット（{ "スポットkey": true, ... }）
+let powerSpotMapRevealed = false; // 🌄 「パワースポット編へ進む」ボタンを押して第三弾を解放済みかどうか
 let selectedJapanPrefKey = ""; // 現在マップ上で選択中の都道府県（表示用。セッション内のみで保存はしない）
 let selectedPowerSpotPrefKey = ""; // 🌄 パワースポット編で選択中の都道府県（表示用。セッション内のみで保存はしない）
 
@@ -428,8 +430,14 @@ function isShrineMapOkumiyaComplete() {
 }
 
 // 🌄 パワースポット編（全国神社巡り完成後に解放される第三弾）が解放されているかどうか
+// 🌄 パワースポット編（第三弾）に進むための条件を満たしているか（全国神社巡り＋奥宮の両方が完成）
+function isPowerSpotMapEligible() {
+    return isShrineMapJapanComplete() && isShrineMapOkumiyaComplete();
+}
+
+// 🌄 パワースポット編がすでに解放（プレイヤーが「進む」ボタンを押して表示）されているかどうか
 function isPowerSpotMapUnlocked() {
-    return isShrineMapJapanComplete();
+    return powerSpotMapRevealed;
 }
 
 // 🌄 指定したパワースポットを訪れた（購入した）かどうか

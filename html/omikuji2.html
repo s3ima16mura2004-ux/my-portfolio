@@ -454,11 +454,16 @@
                         <h3 class="shop-section-title">🌄 パワースポット編（第三弾）</h3>
 
                         <div id="map-powerspot-locked" class="hidden">
-                            <p class="bank-desc">🔒 全国神社巡りマップ（第一弾）を完成させると解放されます。</p>
+                            <p class="bank-desc">🔒 全国神社巡りマップ（第一弾）と、奥宮・摂社（第二弾）を両方完成させると進めるようになります。</p>
+                        </div>
+
+                        <div id="map-powerspot-ready" class="hidden">
+                            <p class="bank-desc">🎉 全国神社巡りと奥宮の完成、おめでとうございます！パワースポット編（第三弾）へ進む準備が整いました。</p>
+                            <button class="btn-shop-buy" onclick="startPowerSpotMap()" type="button">🌄 パワースポット編へ進む</button>
                         </div>
 
                         <div id="map-powerspot-unlocked" class="hidden">
-                            <p class="bank-desc">全国神社巡りの完成、おめでとうございます！ここからは神社に限らず、日本各地の自然のパワースポットを1箇所ずつ訪れていきましょう。各都道府県に2箇所ずつ、全国で94箇所あります。神社と違って1箇所ごとの一括購入です。訪れた箇所数の節目でお祝い金、全国制覇でさらに永続の大吉ボーナスがもらえます。</p>
+                            <p class="bank-desc">日本各地の自然のパワースポットを1箇所ずつ訪れていきましょう。各都道府県に2箇所ずつ、全国で94箇所あります。神社と違って1箇所ごとの一括購入です。訪れた箇所数の節目でお祝い金、全国制覇でさらに永続の大吉ボーナスがもらえます。</p>
                             <p id="map-powerspot-progress" class="dex-progress">🌄 訪れたスポット：0 / 94箇所　｜　🗾 コンプリートした都道府県：0 / 47県</p>
                             <div class="map-japan-grid-wrap">
                                 <div id="map-powerspot-grid" class="map-japan-grid"></div>
@@ -543,20 +548,20 @@
     <script src="../js/omikuji-seasonal.js?v=1"></script>
     <script src="../js/omikuji-countdown.js?v=1"></script>
     <script src="../js/omikuji-data.js?v=6"></script>
-    <script src="../js/omikuji-state.js?v=5"></script>
+    <script src="../js/omikuji-state.js?v=6"></script>
     <script src="../js/omikuji-ui-core.js?v=2"></script>
     <script src="../js/omikuji-ui-shop.js?v=6"></script>
     <script src="../js/omikuji-ui-effects.js?v=2"></script>
     <script src="../js/omikuji-ui-seasonal1.js?v=2"></script>
     <script src="../js/omikuji-ui-seasonal2.js?v=2"></script>
     <script src="../js/omikuji-ui-seasonal3.js?v=2"></script>
-    <script src="../js/omikuji-ui-map.js?v=4"></script>
-    <script src="../js/omikuji-shop.js?v=5"></script>
+    <script src="../js/omikuji-ui-map.js?v=5"></script>
+    <script src="../js/omikuji-shop.js?v=6"></script>
     <script src="../js/omikuji-missions.js?v=1"></script>
     <script src="../js/omikuji-draw-helpers.js?v=2"></script>
     <script src="../js/omikuji-draw-single.js?v=6"></script>
     <script src="../js/omikuji-draw-multi.js?v=6"></script>
-    <script src="../js/omikuji-main.js?v=5"></script>
+    <script src="../js/omikuji-main.js?v=6"></script>
     <script src="../js/omikuji-phantom.js?v=1"></script>
     <script>
         // 🚪 ログアウト処理：ログイン情報を消してログインページへ戻る

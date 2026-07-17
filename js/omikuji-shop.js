@@ -682,6 +682,24 @@ async function buyOkumiyaPart(prefKey, shrineKey, partKey) {
     alert("🏯 「" + shrine.name + "」奥宮の" + part.emoji + part.name + "が組み上がりました！\n（" + pref.name + "）" + okumiyaCompleteMsg + milestoneMsg + completeMsg);
 }
 
+// 🌄 全国神社巡り（第一弾）と奥宮（第二弾）を両方完成させたプレイヤーが、パワースポット編（第三弾）へ進むボタンを押した時の処理
+async function startPowerSpotMap() {
+    if (!isPowerSpotMapEligible()) {
+        alert("🙅 パワースポット編は、全国神社巡り（第一弾）と奥宮・摂社（第二弾）を両方完成させると進めるようになります。");
+        return;
+    }
+    if (powerSpotMapRevealed) return;
+
+    powerSpotMapRevealed = true;
+
+    playSE("se-win");
+    startConfetti();
+    updateShrineMapUI();
+    await saveUserState();
+
+    alert("🌄✨【パワースポット編、解放！】✨🌄\n全国神社巡りと奥宮の完成、おめでとうございます！\nここからは日本各地の自然のパワースポットを巡る、新たな旅の始まりです。");
+}
+
 // 🌄 全国神社巡りマップ・第三弾「パワースポット編」のスポットを1つ訪れる（購入する）。
 // 神社の建立とは違い、1箇所ごとに一括購入するシンプルな仕組み（全国神社巡り完成後に解放）
 async function buyPowerSpot(prefKey, spotKey) {

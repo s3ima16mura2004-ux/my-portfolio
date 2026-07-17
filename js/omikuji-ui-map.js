@@ -156,16 +156,20 @@ function updateShrineMapJapanUI() {
     updateShrineMapPowerSpotUI(); // 🌄 全国神社巡りの状態が変わるたびに、パワースポット編（第三弾）の解放状況も一緒に見直す
 }
 
-// 🌄 パワースポット編（全国神社巡り完成後に解放される第三弾）の表示を更新する
+// 🌄 パワースポット編（全国神社巡り＋奥宮の両方が完成すると進めるようになる第三弾）の表示を更新する
 function updateShrineMapPowerSpotUI() {
     const lockedBox = document.querySelector("#map-powerspot-locked");
+    const readyBox = document.querySelector("#map-powerspot-ready");
     const unlockedBox = document.querySelector("#map-powerspot-unlocked");
-    if (!lockedBox || !unlockedBox) return;
+    if (!lockedBox || !readyBox || !unlockedBox) return;
 
-    const unlocked = isPowerSpotMapUnlocked();
-    lockedBox.classList.toggle("hidden", unlocked);
-    unlockedBox.classList.toggle("hidden", !unlocked);
-    if (!unlocked) return;
+    const eligible = isPowerSpotMapEligible();
+    const revealed = isPowerSpotMapUnlocked();
+
+    lockedBox.classList.toggle("hidden", eligible || revealed);
+    readyBox.classList.toggle("hidden", !(eligible && !revealed));
+    unlockedBox.classList.toggle("hidden", !revealed);
+    if (!revealed) return;
 
     // 🌄 日本地図風のマス目に47都道府県を配置する（JAPAN_PREFECTURESと同じ位置関係を使う）
     const grid = document.querySelector("#map-powerspot-grid");
