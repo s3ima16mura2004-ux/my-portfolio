@@ -86,11 +86,13 @@ function updateShrineMapJapanUI() {
     // 🗾 コンプリート状況：神社の数、都道府県の数の両方を表示
     const shrineCount = getJapanShrineOwnedCount();
     const prefCount = getJapanPrefectureCompleteCount();
+    const okumiyaCount = getOkumiyaCompleteCount();
     const progressEl = document.querySelector("#map-japan-progress");
     if (progressEl) {
         progressEl.textContent =
             "⛩️ コンプリートした神社：" + shrineCount + " / " + JAPAN_SHRINE_COUNT + "社　｜　" +
-            "🗾 コンプリートした都道府県：" + prefCount + " / " + JAPAN_PREFECTURES.length + "県";
+            "🗾 コンプリートした都道府県：" + prefCount + " / " + JAPAN_PREFECTURES.length + "県　｜　" +
+            "🏯 完成した奥宮：" + okumiyaCount + " / " + JAPAN_SHRINE_COUNT + "社";
     }
 
     // 🗾 選択中の都道府県の詳細（神社ごとのパーツ組み立て状況）を表示する
@@ -112,11 +114,33 @@ function updateShrineMapJapanUI() {
                           (currentMoney < cost ? " disabled" : "") + '>' + cost.toLocaleString() + '円</button>';
                     return '<div class="map-japan-part-row"><span>' + part.emoji + ' ' + part.name + '</span>' + actionHtml + '</div>';
                 }).join("");
+
+                // 🏯 本殿が完成した神社だけ、第二弾「奥宮・摂社」の建立セクションを表示する
+                let okumiyaHtml = "";
+                if (complete) {
+                    const okumiyaCompleteFlag = isOkumiyaComplete(shrine);
+                    const okumiyaOwnedParts = getOkumiyaPartsOwnedCount(shrine);
+                    const okumiyaPartsHtml = OKUMIYA_BUILD_PARTS.map(part => {
+                        const owned = isOkumiyaPartOwned(shrine, part);
+                        const cost = getOkumiyaPartCost(shrine, part);
+                        const actionHtml = owned
+                            ? '<span class="mission-status-tag mission-status-done">✅</span>'
+                            : '<button class="btn-shop-buy" onclick="buyOkumiyaPart(\'' + pref.key + '\',\'' + shrine.key + '\',\'' + part.key + '\')" type="button"' +
+                              (currentMoney < cost ? " disabled" : "") + '>' + cost.toLocaleString() + '円</button>';
+                        return '<div class="map-japan-part-row"><span>' + part.emoji + ' ' + part.name + '</span>' + actionHtml + '</div>';
+                    }).join("");
+                    okumiyaHtml =
+                        '<div class="map-japan-shrine-block' + (okumiyaCompleteFlag ? " map-japan-shrine-complete" : "") + '" style="margin-top:6px;">' +
+                        '<p class="map-japan-shrine-title">🏯 奥宮・摂社（第二弾）' +
+                        (okumiyaCompleteFlag ? ' <span class="mission-status-tag mission-status-done">🏯 完成</span>' : ' <span class="map-japan-shrine-progress">(' + okumiyaOwnedParts + '/' + OKUMIYA_BUILD_PARTS.length + ')</span>') +
+                        '</p>' + okumiyaPartsHtml + '</div>';
+                }
+
                 return (
                     '<div class="map-japan-shrine-block' + (complete ? " map-japan-shrine-complete" : "") + '">' +
                     '<p class="map-japan-shrine-title">' + shrine.emoji + ' ' + shrine.name +
                     (complete ? ' <span class="mission-status-tag mission-status-done">⛩️ 完成</span>' : ' <span class="map-japan-shrine-progress">(' + ownedParts + '/' + SHRINE_BUILD_PARTS.length + ')</span>') +
-                    '</p>' + partsHtml + '</div>'
+                    '</p>' + partsHtml + okumiyaHtml + '</div>'
                 );
             }).join("");
             const completeTag = isJapanPrefectureComplete(pref) ? '<span class="mission-status-tag mission-status-done">🎏 コンプリート！</span>' : "";

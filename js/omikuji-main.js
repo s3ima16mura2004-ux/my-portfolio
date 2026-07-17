@@ -127,6 +127,7 @@ window.addEventListener("DOMContentLoaded", async () => {
             // 🔨 神社パーツ単位の所持データを読み込む。旧形式（神社ごとのtrue/false）が残っていた場合は、
             // その神社の全パーツを完成済みとして自動的に引き継ぐ（過去の参拝実績を失わないための移行措置）
             japanShrinePartsOwned = (data.japanShrinePartsOwned && typeof data.japanShrinePartsOwned === "object") ? data.japanShrinePartsOwned : {};
+            japanOkumiyaPartsOwned = (data.japanOkumiyaPartsOwned && typeof data.japanOkumiyaPartsOwned === "object") ? data.japanOkumiyaPartsOwned : {};
             if (data.japanShrinesOwned && typeof data.japanShrinesOwned === "object") {
                 JAPAN_PREFECTURES.forEach(pref => {
                     pref.shrines.forEach(shrine => {

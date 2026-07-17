@@ -81,6 +81,7 @@ function omikuji10() {
 
             for (let i = 0; i < 10; i++) {
                 let okj = Math.random();
+                const rawOkj10 = okj; // 🛡️ 神吉の判定専用に、ボーナス適用前の生の乱数を保存しておく
 
                 // 🍀🐱🏺🎊📖 大吉運アップ効果
                 let daikichiBonus = 0;
@@ -100,6 +101,8 @@ function omikuji10() {
         if (hasShopEffect("wakaba_omamori")) daikichiBonus += 0.04; // 🌱 春の芽吹き限定ショップアイテム
         if (isShrineMapComplete()) daikichiBonus += SHRINE_MAP_COMPLETE_BONUS; // 🗺️ 境内マップ完成の永続ボーナス
         if (isShrineMapJapanComplete()) daikichiBonus += SHRINE_MAP_JAPAN_COMPLETE_BONUS; // 🗾 全国神社巡り完成の永続ボーナス
+        if (isShrineMapOkumiyaComplete()) daikichiBonus += SHRINE_MAP_OKUMIYA_COMPLETE_BONUS; // 🏯 奥宮制覇の永続ボーナス
+                daikichiBonus = Math.min(MAX_DAIKICHI_BONUS, daikichiBonus); // 🛡️ 積み上がり過ぎ防止の上限
                 if (daikichiBonus > 0) okj = Math.min(1, okj + daikichiBonus);
 
                 if (i === 9) lastRandomNum = okj;
@@ -108,13 +111,14 @@ function omikuji10() {
                 let isExtremeTier10 = false;
                 let resultName10 = "";
 
-                if (okj >= kamikichiThreshold10) {
+                if (rawOkj10 >= kamikichiThreshold10) {
+                    // 🛡️ ここだけは大吉運ボーナス適用前の生の乱数(rawOkj10)で判定する
                     resultsCount["神吉"]++;
                     resultName10 = "神吉";
                     prize = KAMIKICHI_PRIZE;
                     isExtremeTier10 = true;
                     gotKamikichi = true;
-            kamikichiBonus += KAMIKICHI_BONUS_PER_DRAW;
+            kamikichiBonus = Math.min(KAMIKICHI_BONUS_CAP, kamikichiBonus + KAMIKICHI_BONUS_PER_DRAW);
             if (kodomonohiActive10) gotKodomonohiExtreme = true; // 🎏 こどもの日の称号判定
                 } else if (okj >= daidaikichiThreshold10) {
                     resultsCount["大大吉"]++;
@@ -210,7 +214,7 @@ function omikuji10() {
                 allDropped = allDropped.concat(rollDrops());
 
                 // 📖 図鑑に記録
-                if (okj >= kamikichiThreshold10) markDex("神吉");
+                if (rawOkj10 >= kamikichiThreshold10) markDex("神吉");
                 else if (okj >= daidaikichiThreshold10) markDex("大大吉");
                 else if (okj >= 0.99) markDex("大吉");
                 else if (okj >= 0.95) markDex("吉");

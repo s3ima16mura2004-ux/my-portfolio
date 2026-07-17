@@ -617,6 +617,71 @@ async function buyJapanShrinePart(prefKey, shrineKey, partKey) {
     alert("🔨 「" + shrine.name + "」の" + part.emoji + part.name + "が組み上がりました！\n（" + pref.name + "）" + shrineCompleteMsg + milestoneMsg + prefCompleteMsg + completeMsg);
 }
 
+// 🏯 全国神社巡りマップ・第二弾「奥宮・摂社」のパーツを1つ組み立てる。
+// 元の神社（鳥居〜社殿）が完成した後だけ挑戦できる、より高額な深掘りコンテンツ
+async function buyOkumiyaPart(prefKey, shrineKey, partKey) {
+    const pref = JAPAN_PREFECTURES.find(p => p.key === prefKey);
+    if (!pref) return;
+    const shrine = pref.shrines.find(s => s.key === shrineKey);
+    if (!shrine) return;
+
+    if (!isJapanShrineComplete(shrine)) {
+        alert("🙅 「" + shrine.name + "」の奥宮は、まず本殿（鳥居〜社殿）を完成させると建立できるようになります。");
+        return;
+    }
+
+    const part = OKUMIYA_BUILD_PARTS.find(p => p.key === partKey);
+    if (!part) return;
+
+    if (isOkumiyaPartOwned(shrine, part)) {
+        alert("🏯 「" + shrine.name + "」の奥宮の" + part.name + "はすでに組み立て済みです。");
+        return;
+    }
+
+    const cost = getOkumiyaPartCost(shrine, part);
+    if (currentMoney < cost) {
+        alert("🙅 所持金が足りません！\n「" + shrine.name + "」奥宮の" + part.name + "の建立には" + cost.toLocaleString() + "円必要です。");
+        return;
+    }
+
+    currentMoney -= cost;
+    japanOkumiyaPartsOwned[shrine.key + ":" + part.key] = true;
+
+    updateMoneyDisplay();
+    playSE("se-coin");
+
+    // 🏯 このパーツで奥宮がちょうど完成したかを確認する
+    const okumiyaJustCompleted = isOkumiyaComplete(shrine);
+    let okumiyaCompleteMsg = "";
+    let milestoneMsg = "";
+    let completeMsg = "";
+
+    if (okumiyaJustCompleted) {
+        okumiyaCompleteMsg = "\n\n🏯【" + shrine.name + "・奥宮、完成！】🏯\nさらに奥深い聖域が完成しました！";
+
+        // 🎉 節目（完成した奥宮の数）に到達したらお祝い金を授与する
+        const newCount = getOkumiyaCompleteCount();
+        const milestone = MAP_OKUMIYA_MILESTONES.find(m => m.count === newCount);
+        if (milestone) {
+            currentMoney += milestone.prize;
+            totalWinnings += milestone.prize;
+            updateMoneyDisplay();
+            recordHistory("🏯奥宮巡り・節目ボーナス", milestone.prize, currentMoney);
+            milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n完成した奥宮が" + newCount + "社に達したお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
+        }
+
+        completeMsg = isShrineMapOkumiyaComplete()
+            ? "\n\n👑🏯【奥宮制覇！】🏯👑\n全国" + JAPAN_SHRINE_COUNT + "社すべての奥宮を完成させました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_OKUMIYA_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！"
+            : "";
+    }
+
+    updateShrineMapUI();
+    updateTitlesUI();
+    await saveUserState();
+
+    alert("🏯 「" + shrine.name + "」奥宮の" + part.emoji + part.name + "が組み上がりました！\n（" + pref.name + "）" + okumiyaCompleteMsg + milestoneMsg + completeMsg);
+}
+
 // 🌾 夏越の大祓（6/25〜6/30）限定：「茅の輪くぐり」ボタン。半年分の「凶」「大凶」の累計を清算してご褒美を得る
 async function nagoshiChinowaKuguri() {
     if (!isSeasonalEventActive("nagoshi")) return;

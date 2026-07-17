@@ -158,7 +158,8 @@ async function saveUserState() {
             nagoshiBadCount: nagoshiBadCount,
             nagoshiLastResetYear: nagoshiLastResetYear,
             shrineMapLevel: shrineMapLevel,
-            japanShrinePartsOwned: japanShrinePartsOwned
+            japanShrinePartsOwned: japanShrinePartsOwned,
+            japanOkumiyaPartsOwned: japanOkumiyaPartsOwned
         });
     } catch (e) {
         console.error("ユーザーデータの保存に失敗しました: ", e);
@@ -239,6 +240,7 @@ let shrineMapLevel = 0; // 購入済みのマス数（0〜MAP_TILES.length）。
 
 // 🗾 全国神社巡りマップ関連の状態（境内マップ完成後に解放される第2段階。どの神社からでも自由な順番で参拝できる）
 let japanShrinePartsOwned = {}; // 組み立て済みの神社パーツ（{ "神社key:パーツkey": true, ... }）。全パーツ揃うとその神社が完成する
+let japanOkumiyaPartsOwned = {}; // 🏯 第二弾「奥宮・摂社」の組み立て済みパーツ（構造はjapanShrinePartsOwnedと同じ）
 let selectedJapanPrefKey = ""; // 現在マップ上で選択中の都道府県（表示用。セッション内のみで保存はしない）
 
 // 😲 神の気まぐれフィーバーが現在有効かどうか
@@ -376,4 +378,48 @@ function getJapanPrefectureCompleteCount() {
 // 🗾 全国神社巡りマップをすべて埋め終えたかどうか（全都道府県の全神社を完成済み）
 function isShrineMapJapanComplete() {
     return getJapanShrineOwnedCount() >= JAPAN_SHRINE_COUNT;
+}
+
+// 🏯 奥宮の1パーツ分の金額を計算する（神社の総額×1.5倍をOKUMIYA_BUILD_PARTSの重みで配分し、キリの良い数字に丸める）
+function getOkumiyaPartCost(shrine, part) {
+    const raw = shrine.cost * OKUMIYA_COST_MULTIPLIER * part.weight;
+    let rounded;
+    if (raw < 50000) rounded = Math.round(raw / 1000) * 1000;
+    else if (raw < 500000) rounded = Math.round(raw / 5000) * 5000;
+    else rounded = Math.round(raw / 10000) * 10000;
+    return Math.max(1000, rounded);
+}
+
+// 🏯 指定した神社の指定した奥宮パーツが組み立て済みかどうか
+function isOkumiyaPartOwned(shrine, part) {
+    return !!japanOkumiyaPartsOwned[shrine.key + ":" + part.key];
+}
+
+// 🏯 指定した神社で組み立て済みの奥宮パーツ数
+function getOkumiyaPartsOwnedCount(shrine) {
+    return OKUMIYA_BUILD_PARTS.filter(part => isOkumiyaPartOwned(shrine, part)).length;
+}
+
+// 🏯 指定した神社の奥宮が完成しているかどうか（元の神社自体が完成していることが前提条件）
+function isOkumiyaComplete(shrine) {
+    return isJapanShrineComplete(shrine) && OKUMIYA_BUILD_PARTS.every(part => isOkumiyaPartOwned(shrine, part));
+}
+
+// 🏯 これまでに組み立てた奥宮パーツの総数（全国すべての神社をまたいだ累計。称号判定に使用）
+function getOkumiyaPartsTotalOwnedCount() {
+    return Object.keys(japanOkumiyaPartsOwned).filter(k => japanOkumiyaPartsOwned[k]).length;
+}
+
+// 🏯 奥宮が完成済みの神社の総数（コンプリート状況の表示・称号判定に使用）
+function getOkumiyaCompleteCount() {
+    let count = 0;
+    JAPAN_PREFECTURES.forEach(pref => {
+        pref.shrines.forEach(shrine => { if (isOkumiyaComplete(shrine)) count++; });
+    });
+    return count;
+}
+
+// 🏯 全国すべての神社の奥宮を完成させ終えたかどうか
+function isShrineMapOkumiyaComplete() {
+    return getOkumiyaCompleteCount() >= JAPAN_SHRINE_COUNT;
 }

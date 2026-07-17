@@ -173,7 +173,27 @@ function updateUrnUI() {
     }
 }
 // 🐱 相棒「招き猫」の成長段階の表示を更新する
+// 🐍🦊 賽銭箱で迎えられる相棒たち（白蛇・狐）の一覧を描画する
+function renderCompanionFriendsUI() {
+    const list = document.querySelector("#companion-friends-list");
+    if (!list) return;
+
+    list.innerHTML = COMPANION_FRIENDS.map(f => {
+        const owned = !!ownedFriends[f.key];
+        const canAfford = bankMoney >= f.cost;
+        return '<div class="collect-item-row">' +
+            '<span>' + f.emoji + ' ' + f.name + (owned ? '' : '（' + f.cost.toLocaleString() + '円）') + '</span>' +
+            (owned
+                ? '<span class="equip-status" style="margin:0;">✅ 効果発動中</span>'
+                : '<button class="btn-equip" ' + (canAfford ? '' : 'disabled') + ' onclick="buyCompanionFriend(\'' + f.key + '\')" type="button">迎える</button>') +
+            '</div>' +
+            '<p class="collect-item-desc">' + f.desc + '</p>';
+    }).join("");
+}
+
 function updateCompanionUI() {
+    renderCompanionFriendsUI(); // 🐍🦊 賽銭箱で迎えられる相棒たちの一覧を先に描画（招き猫が最大成長でもここは常に表示する）
+
     const index = getCompanionLevelIndex();
     const current = COMPANION_LEVELS[index];
     const next = COMPANION_LEVELS[index + 1];
@@ -246,7 +266,8 @@ function updateTitlesUI() {
         communityDraws, orihimeHikoboshiMeetCount, hatsuyumeComplete, steadyVisitorEarned,
         hanamiDangoTotalCollected, gotKodomonohiExtreme, mamemakiSuccessCount, nagoshiLastResetYear,
         shrineMapLevel, japanShrineOwnedCount: getJapanShrineOwnedCount(), japanPrefCompleteCount: getJapanPrefectureCompleteCount(),
-        japanShrinePartsOwnedCount: getJapanShrinePartsTotalOwnedCount(), companionExp
+        japanShrinePartsOwnedCount: getJapanShrinePartsTotalOwnedCount(), companionExp, ownedFriends,
+        okumiyaCompleteCount: getOkumiyaCompleteCount(), okumiyaPartsOwnedCount: getOkumiyaPartsTotalOwnedCount()
     };
     const earned = TITLES.filter(t => t.condition(stats));
 
@@ -317,4 +338,6 @@ function updateBankUI() {
     if (bankDisplay) bankDisplay.textContent = bankMoney.toLocaleString();
     const bankDisplayTop = document.querySelector("#bank-money-display-top");
     if (bankDisplayTop) bankDisplayTop.textContent = bankMoney.toLocaleString();
+    const bankDisplaySide = document.querySelector("#bank-money-display-side");
+    if (bankDisplaySide) bankDisplaySide.textContent = bankMoney.toLocaleString();
 }

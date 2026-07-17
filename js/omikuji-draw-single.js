@@ -58,6 +58,7 @@ function omikuji() {
 
     function determineResult() {
         let okj = Math.random();
+        const rawOkj = okj; // 🛡️ 神吉の判定専用に、ボーナス適用前の生の乱数を保存しておく
         let isFeverActiveThisTurn = false;
 
         // 🕛 隠し要素：ゾロ目時刻の「神様の気まぐれ」チェック
@@ -91,8 +92,10 @@ function omikuji() {
         if (hasShopEffect("wakaba_omamori")) daikichiBonus += 0.04; // 🌱 春の芽吹き限定ショップアイテム
         if (isShrineMapComplete()) daikichiBonus += SHRINE_MAP_COMPLETE_BONUS; // 🗺️ 境内マップ完成の永続ボーナス
         if (isShrineMapJapanComplete()) daikichiBonus += SHRINE_MAP_JAPAN_COMPLETE_BONUS; // 🗾 全国神社巡り完成の永続ボーナス
+        if (isShrineMapOkumiyaComplete()) daikichiBonus += SHRINE_MAP_OKUMIYA_COMPLETE_BONUS; // 🏯 奥宮制覇の永続ボーナス
         const usedHanamiDango = hanamiDangoActive;
         if (usedHanamiDango) daikichiBonus += HANAMI_DANGO_BONUS; // 🍡 お花見団子（次の1回だけ有効）
+        daikichiBonus = Math.min(MAX_DAIKICHI_BONUS, daikichiBonus); // 🛡️ 積み上がり過ぎ防止の上限
         if (daikichiBonus > 0) okj = Math.min(1, okj + daikichiBonus);
         if (usedHanamiDango) hanamiDangoActive = false; // 使用済みとして予約状態を解除
 
@@ -130,14 +133,15 @@ function omikuji() {
             prizeMoney = DAIDAIKICHI_PRIZE;
             gotDaidaikichi = true;
             if (kodomonohiActive) gotKodomonohiExtreme = true; // 🎏 こどもの日の称号判定
-        } else if (okj >= kamikichiThreshold) {
+        } else if (rawOkj >= kamikichiThreshold) {
             // 😊 超激レア「神吉」（大大吉よりもさらに珍しい特別枠）
+            // 🛡️ ここだけは大吉運ボーナス適用前の生の乱数(rawOkj)で判定し、アイテムや壺の積み上げの影響を受けないようにしている
             isExtremeTier = true;
             imgSrc = "../images/omikuji_kamikichi.jpg";
             resultName = "神吉";
             prizeMoney = KAMIKICHI_PRIZE;
             gotKamikichi = true;
-            kamikichiBonus += KAMIKICHI_BONUS_PER_DRAW;
+            kamikichiBonus = Math.min(KAMIKICHI_BONUS_CAP, kamikichiBonus + KAMIKICHI_BONUS_PER_DRAW);
             if (kodomonohiActive) gotKodomonohiExtreme = true; // 🎏 こどもの日の称号判定
         } else if (okj >= daidaikichiThreshold) {
             // ☀️ 激レア「大大吉」
