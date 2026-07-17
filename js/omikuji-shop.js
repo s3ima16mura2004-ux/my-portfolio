@@ -232,6 +232,70 @@ async function incrementCommunityDraws() {
     }
 }
 
+// 🎆 夏祭り（8月）限定コミュニティ目標：花火玉が1個ドロップするたび、全ユーザー共有の合計にも加算する
+async function incrementNatsumatsuriCommunityCount() {
+    if (!window.omikujiDB || !window.omikujiCommunityRef || !window.omikujiSetDoc || !window.omikujiIncrement || !window.omikujiGetDoc) return;
+    const year = new Date().getFullYear();
+    try {
+        await window.omikujiSetDoc(
+            window.omikujiCommunityRef,
+            { ["natsumatsuriCount" + year]: window.omikujiIncrement(1) },
+            { merge: true }
+        );
+
+        // 加算後の最新値を読み直し、目標に到達していれば「達成年」を記録する（複数ユーザーが同時到達しても実害はない）
+        const snap = await window.omikujiGetDoc(window.omikujiCommunityRef);
+        if (snap.exists()) {
+            const data = snap.data();
+            const count = typeof data["natsumatsuriCount" + year] === "number" ? data["natsumatsuriCount" + year] : 0;
+            communityNatsumatsuriCount = count;
+            if (count >= NATSUMATSURI_COMMUNITY_GOAL && data["natsumatsuriGoalYear"] !== year) {
+                await window.omikujiSetDoc(window.omikujiCommunityRef, { natsumatsuriGoalYear: year }, { merge: true });
+                communityNatsumatsuriGoalYear = year;
+            }
+        }
+    } catch (e) {
+        console.error("夏祭りコミュニティ目標の更新に失敗しました: ", e);
+    }
+}
+
+// 🎆 夏祭りコミュニティ目標の最新状況を取得し、達成済みでまだ受け取っていなければボーナスを授与する
+async function checkNatsumatsuriCommunityReward() {
+    if (!window.omikujiDB || !window.omikujiCommunityRef || !window.omikujiGetDoc) return;
+    const year = new Date().getFullYear();
+
+    try {
+        const snap = await window.omikujiGetDoc(window.omikujiCommunityRef);
+        if (!snap.exists()) return;
+        const data = snap.data();
+        communityNatsumatsuriCount = typeof data["natsumatsuriCount" + year] === "number" ? data["natsumatsuriCount" + year] : 0;
+        communityNatsumatsuriGoalYear = typeof data["natsumatsuriGoalYear"] === "number" ? data["natsumatsuriGoalYear"] : 0;
+
+        updateNatsumatsuriCommunityUI();
+
+        if (communityNatsumatsuriGoalYear === year && natsumatsuriRewardClaimedYear !== year) {
+            natsumatsuriRewardClaimedYear = year;
+            currentMoney += NATSUMATSURI_COMMUNITY_PRIZE;
+            totalWinnings += NATSUMATSURI_COMMUNITY_PRIZE;
+            updateMoneyDisplay();
+            playSE("se-win");
+            startFireworks();
+            recordHistory("🎆夏祭り・みんなで花火玉ボーナス", NATSUMATSURI_COMMUNITY_PRIZE, currentMoney);
+            await saveUserState();
+
+            setTimeout(() => {
+                alert(
+                    "🎆🎉【みんなで花火玉、目標達成！】🎉🎆\n" +
+                    "今年の夏祭り、参拝者みんなで打ち上げ花火の玉を" + NATSUMATSURI_COMMUNITY_GOAL.toLocaleString() + "個集めました！\n" +
+                    "そのお祝いに【" + NATSUMATSURI_COMMUNITY_PRIZE.toLocaleString() + "円】を授かりました！"
+                );
+            }, 600);
+        }
+    } catch (e) {
+        console.error("夏祭りコミュニティ目標の取得に失敗しました: ", e);
+    }
+}
+
 // 🎊「福だるま」ボーナス抽選の純粋ロジック（金額のみ返す。副作用なし）
 function rollFukuDarumaAmount() {
     const tier = getCommunityTier(communityDraws);
@@ -272,6 +336,11 @@ function rollDrops() {
             if (YEARLY_COMBO_ITEMS.some(c => c.itemKey === item.key)) {
                 checkYearlyComboReset();
                 comboItemsGotThisYear[item.key] = true;
+            }
+
+            // 🎆 夏祭り限定「花火玉」がドロップしたら、みんなで集めるコミュニティ目標にも加算する
+            if (item.key === "hanabi_tama" && isNatsumatsuri) {
+                incrementNatsumatsuriCommunityCount();
             }
 
             if (item.key === "hanami_dango") hanamiDangoTotalCollected++; // 🍡 称号「花見団子の達人」判定用（使っても減らない累計）
@@ -526,6 +595,45 @@ async function kimodameshi() {
         (yokai.prize > 0
             ? "【" + yokai.prize.toLocaleString() + "円】を授かりました！"
             : "今回は何ももらえませんでした…また明日挑戦しましょう。")
+    );
+}
+
+// 🎐 季節イベント共通の「1日1回ミニアクション」を実行する（お月見・紅葉狩り・七五三・クリスマス・春の芽吹き・お花見・こどもの日で共通利用）
+async function performSeasonalDailyAction(eventKey) {
+    if (!isSeasonalEventActive(eventKey)) return;
+    const config = SEASONAL_DAILY_ACTIONS.find(a => a.key === eventKey);
+    if (!config) return;
+
+    const today = todayStr();
+    if (seasonalActionDates[eventKey] === today) {
+        alert(config.emoji + " 今日はもう「" + config.label + "」を行いました。また明日挑戦してください。");
+        return;
+    }
+
+    unlockAllAudio();
+    seasonalActionDates[eventKey] = today;
+    seasonalActionCounts[eventKey] = (seasonalActionCounts[eventKey] || 0) + 1;
+
+    const roll = Math.random();
+    const tier = config.tiers.find(t => roll >= t.min);
+
+    currentMoney += tier.prize;
+    if (tier.prize > 0) totalWinnings += tier.prize;
+
+    updateMoneyDisplay();
+    playSE(tier.prize > 0 ? "se-win" : "se-lose");
+    if (tier.prize > 0) recordHistory(config.emoji + config.label + "：" + tier.name, tier.prize, currentMoney);
+
+    updateSeasonalActionsUI();
+    updateTitlesUI();
+    await saveUserState();
+
+    alert(
+        config.emoji + "【" + config.label + "】" + config.emoji + "\n" +
+        tier.name + "\n" +
+        (tier.prize > 0
+            ? "【" + tier.prize.toLocaleString() + "円】を授かりました！"
+            : "特にご利益はありませんでした…また明日挑戦しましょう。")
     );
 }
 

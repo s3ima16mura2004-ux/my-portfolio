@@ -1352,6 +1352,10 @@ const TITLES = [
     { key: "halloween_collector", emoji: "👻✨", name: "妖怪祭りの常連", desc: "ハロウィンの限定アイテムを合計15個集めた", condition: s => {
         const oi = s.ownedItems || {};
         return ((oi.obake_kitsune_omen || 0) + (oi.chochin_hi || 0) + (oi.yokai_emaki || 0)) >= 15;
+    } },
+    { key: "seasonal_actions_all", emoji: "🎐🌸", name: "四季の営みを尽くす者", desc: "季節の行事（お月見・紅葉狩り・七五三・クリスマス・春の芽吹き・お花見・こどもの日）をすべて一度は行った", condition: s => {
+        const c = s.seasonalActionCounts || {};
+        return SEASONAL_DAILY_ACTIONS.every(a => (c[a.key] || 0) >= 1);
     } }
 ];
 
@@ -1441,3 +1445,79 @@ const KIMODAMESHI_YOKAI_TYPES = [
     { min: 0.3, emoji: "🦝", name: "化け狸にからかわれた", prize: 100 },
     { min: 0, emoji: "👻", name: "驚いて逃げ帰った", prize: 0 }
 ];
+
+// ============================================================
+// 🎐 季節イベント共通の「1日1回ミニアクション」（お供え・紅葉狩り・お花見など）
+// 七夕・バレンタイン・夏越の大祓・除夜の鐘のような個別ボタンが無かったイベントに、
+// 統一されたフォーマット（ハズレなし・5段階の結果・1日1回）で追加する
+// ============================================================
+const SEASONAL_DAILY_ACTIONS = [
+    {
+        key: "otsukimi", emoji: "🌕", label: "お供え物をする", boxTitle: "お月見・お供え物（9/15〜9/30限定）",
+        tiers: [
+            { min: 0.9, name: "満月の恵み", prize: 5000 },
+            { min: 0.6, name: "うさぎの祝福", prize: 1500 },
+            { min: 0.3, name: "ほのかなご利益", prize: 300 },
+            { min: 0, name: "静かな十五夜", prize: 0 }
+        ]
+    },
+    {
+        key: "koyo", emoji: "🍁", label: "紅葉狩りをする", boxTitle: "紅葉狩り（11月限定）",
+        tiers: [
+            { min: 0.9, name: "見事な紅葉のご褒美", prize: 5000 },
+            { min: 0.6, name: "山の恵み", prize: 1500 },
+            { min: 0.3, name: "色づく小さな恵み", prize: 300 },
+            { min: 0, name: "曇り空の一日", prize: 0 }
+        ]
+    },
+    {
+        key: "shichigosan", emoji: "👘", label: "千歳飴を結ぶ", boxTitle: "七五三・千歳飴（11月限定）",
+        tiers: [
+            { min: 0.9, name: "健やかな成長の祝福", prize: 5000 },
+            { min: 0.6, name: "晴れ着のご利益", prize: 1500 },
+            { min: 0.3, name: "ささやかなお祝い", prize: 300 },
+            { min: 0, name: "静かな参拝", prize: 0 }
+        ]
+    },
+    {
+        key: "christmas", emoji: "🎄", label: "ツリーを飾り付ける", boxTitle: "クリスマス・ツリー飾り（12/1〜12/25限定）",
+        tiers: [
+            { min: 0.9, name: "聖夜の奇跡", prize: 5000 },
+            { min: 0.6, name: "サンタの気配", prize: 1500 },
+            { min: 0.3, name: "小さなプレゼント", prize: 300 },
+            { min: 0, name: "静かなクリスマス", prize: 0 }
+        ]
+    },
+    {
+        key: "haru", emoji: "🌱", label: "若葉を摘む", boxTitle: "春の芽吹き（3月限定）",
+        tiers: [
+            { min: 0.9, name: "芽吹きの恵み", prize: 5000 },
+            { min: 0.6, name: "新緑のご利益", prize: 1500 },
+            { min: 0.3, name: "小さな新芽", prize: 300 },
+            { min: 0, name: "肌寒い一日", prize: 0 }
+        ]
+    },
+    {
+        key: "hanami", emoji: "🌸", label: "お花見をする", boxTitle: "お花見（4月限定）",
+        tiers: [
+            { min: 0.9, name: "満開のご褒美", prize: 5000 },
+            { min: 0.6, name: "花見酒の縁起", prize: 1500 },
+            { min: 0.3, name: "花びら一枚のご利益", prize: 300 },
+            { min: 0, name: "曇りの花見", prize: 0 }
+        ]
+    },
+    {
+        key: "kodomonohi", emoji: "🎏", label: "兜を飾る", boxTitle: "こどもの日（5/1〜5/5限定）",
+        tiers: [
+            { min: 0.9, name: "昇り龍の祝福", prize: 5000 },
+            { min: 0.6, name: "鯉のぼりのご利益", prize: 1500 },
+            { min: 0.3, name: "菖蒲湯の恵み", prize: 300 },
+            { min: 0, name: "静かな節句", prize: 0 }
+        ]
+    }
+];
+
+// 🎆 夏祭り（8月）限定：みんなで「打ち上げ花火の玉」を集める季節限定のコミュニティ目標
+// 神社改築コミュニティ目標（累計参拝回数）とは別に、その年の夏祭り期間だけ集計される
+const NATSUMATSURI_COMMUNITY_GOAL = 500;     // 全ユーザー合計でこの個数に達すると目標達成
+const NATSUMATSURI_COMMUNITY_PRIZE = 20000;  // 目標達成年に参拝した全員が受け取れる、その年1回きりのボーナス

@@ -61,6 +61,7 @@
                 <p id="birthday-ticket-box" class="taian-status-box hidden">-</p>
                 <p id="shop-fever-box" class="taian-status-box hidden">-</p>
                 <p id="community-status-box" class="community-status-box hidden">-</p>
+                <p id="natsumatsuri-community-box" class="community-status-box hidden">-</p>
                 <p id="countdown-season-box" class="taian-status-box hidden">-</p>
                 <p id="countdown-bonus-box" class="taian-status-box hidden">-</p>
                 <p id="yearly-combo-box" class="taian-status-box hidden">-</p>
@@ -101,6 +102,48 @@
                     <p class="lucky-item-title">👻 ハロウィン・肝試し（10/25〜10/31限定） 👻</p>
                     <p id="kimodameshi-status-text" class="lucky-item-desc">-</p>
                     <button id="kimodameshi-btn" class="btn-equip" onclick="kimodameshi()" type="button">🏮 肝試しに出かける</button>
+                </div>
+
+                <div id="seasonal-action-box-otsukimi" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">🌕 お月見・お供え物（9/15〜9/30限定） 🌕</p>
+                    <p id="seasonal-action-status-otsukimi" class="lucky-item-desc">-</p>
+                    <button id="seasonal-action-btn-otsukimi" class="btn-equip" onclick="performSeasonalDailyAction('otsukimi')" type="button">🌕 お供え物をする</button>
+                </div>
+
+                <div id="seasonal-action-box-koyo" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">🍁 紅葉狩り（11月限定） 🍁</p>
+                    <p id="seasonal-action-status-koyo" class="lucky-item-desc">-</p>
+                    <button id="seasonal-action-btn-koyo" class="btn-equip" onclick="performSeasonalDailyAction('koyo')" type="button">🍁 紅葉狩りをする</button>
+                </div>
+
+                <div id="seasonal-action-box-shichigosan" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">👘 七五三・千歳飴（11月限定） 👘</p>
+                    <p id="seasonal-action-status-shichigosan" class="lucky-item-desc">-</p>
+                    <button id="seasonal-action-btn-shichigosan" class="btn-equip" onclick="performSeasonalDailyAction('shichigosan')" type="button">👘 千歳飴を結ぶ</button>
+                </div>
+
+                <div id="seasonal-action-box-christmas" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">🎄 クリスマス・ツリー飾り（12/1〜12/25限定） 🎄</p>
+                    <p id="seasonal-action-status-christmas" class="lucky-item-desc">-</p>
+                    <button id="seasonal-action-btn-christmas" class="btn-equip" onclick="performSeasonalDailyAction('christmas')" type="button">🎄 ツリーを飾り付ける</button>
+                </div>
+
+                <div id="seasonal-action-box-haru" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">🌱 春の芽吹き（3月限定） 🌱</p>
+                    <p id="seasonal-action-status-haru" class="lucky-item-desc">-</p>
+                    <button id="seasonal-action-btn-haru" class="btn-equip" onclick="performSeasonalDailyAction('haru')" type="button">🌱 若葉を摘む</button>
+                </div>
+
+                <div id="seasonal-action-box-hanami" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">🌸 お花見（4月限定） 🌸</p>
+                    <p id="seasonal-action-status-hanami" class="lucky-item-desc">-</p>
+                    <button id="seasonal-action-btn-hanami" class="btn-equip" onclick="performSeasonalDailyAction('hanami')" type="button">🌸 お花見をする</button>
+                </div>
+
+                <div id="seasonal-action-box-kodomonohi" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">🎏 こどもの日（5/1〜5/5限定） 🎏</p>
+                    <p id="seasonal-action-status-kodomonohi" class="lucky-item-desc">-</p>
+                    <button id="seasonal-action-btn-kodomonohi" class="btn-equip" onclick="performSeasonalDailyAction('kodomonohi')" type="button">🎏 兜を飾る</button>
                 </div>
 
                 <div id="nagoshi-box" class="lucky-item-box hidden">
@@ -426,6 +469,12 @@
                         <p id="dex-progress" class="dex-progress">達成状況：0 / 10</p>
                         <div id="dex-grid" class="dex-grid"></div>
                         <p id="dex-reward-status" class="dex-reward-status hidden">-</p>
+                    </div>
+
+                    <div id="yearly-album-section" class="shop-section hidden">
+                        <h3 class="shop-section-title">📖 年間アルバム</h3>
+                        <p class="bank-desc">年が変わるたびに、その年の実績が自動的に記録されます。これまでの歩みを振り返ってみましょう。</p>
+                        <div id="yearly-album-list"></div>
                     </div>
                 </div>
 

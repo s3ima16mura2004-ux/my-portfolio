@@ -131,6 +131,30 @@ function updateYearlyComboUI() {
     }
 }
 
+// 🎐 季節イベント共通「1日1回ミニアクション」（お月見・紅葉狩り・七五三・クリスマス・春の芽吹き・お花見・こどもの日）の表示を更新する
+function updateSeasonalActionsUI() {
+    const today = todayStr();
+    SEASONAL_DAILY_ACTIONS.forEach(config => {
+        const box = document.querySelector("#seasonal-action-box-" + config.key);
+        const btn = document.querySelector("#seasonal-action-btn-" + config.key);
+        const statusText = document.querySelector("#seasonal-action-status-" + config.key);
+        if (!box) return;
+
+        const active = isSeasonalEventActive(config.key);
+        box.classList.toggle("hidden", !active);
+        if (!active) return;
+
+        const usedToday = seasonalActionDates[config.key] === today;
+        if (btn) btn.disabled = usedToday;
+        if (statusText) {
+            const count = seasonalActionCounts[config.key] || 0;
+            statusText.textContent = usedToday
+                ? config.emoji + " 今日はもう「" + config.label + "」を行いました。また明日挑戦してください。（これまでの回数：" + count + "回）"
+                : config.emoji + " 「" + config.label + "」を行うと、ちょっとしたご利益がもらえます！（ハズレなし・1日1回）";
+        }
+    });
+}
+
 function unlockAllAudio() {
     const ids = ["se-coin", "se-shuffle", "se-win", "se-lose", "se-doom"];
     ids.forEach(id => {
