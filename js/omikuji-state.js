@@ -159,7 +159,8 @@ async function saveUserState() {
             nagoshiLastResetYear: nagoshiLastResetYear,
             shrineMapLevel: shrineMapLevel,
             japanShrinePartsOwned: japanShrinePartsOwned,
-            japanOkumiyaPartsOwned: japanOkumiyaPartsOwned
+            japanOkumiyaPartsOwned: japanOkumiyaPartsOwned,
+            ownedPowerSpots: ownedPowerSpots
         });
     } catch (e) {
         console.error("ユーザーデータの保存に失敗しました: ", e);
@@ -241,7 +242,9 @@ let shrineMapLevel = 0; // 購入済みのマス数（0〜MAP_TILES.length）。
 // 🗾 全国神社巡りマップ関連の状態（境内マップ完成後に解放される第2段階。どの神社からでも自由な順番で参拝できる）
 let japanShrinePartsOwned = {}; // 組み立て済みの神社パーツ（{ "神社key:パーツkey": true, ... }）。全パーツ揃うとその神社が完成する
 let japanOkumiyaPartsOwned = {}; // 🏯 第二弾「奥宮・摂社」の組み立て済みパーツ（構造はjapanShrinePartsOwnedと同じ）
+let ownedPowerSpots = {}; // 🌄 第三弾「パワースポット編」で訪れた（購入した）スポット（{ "スポットkey": true, ... }）
 let selectedJapanPrefKey = ""; // 現在マップ上で選択中の都道府県（表示用。セッション内のみで保存はしない）
+let selectedPowerSpotPrefKey = ""; // 🌄 パワースポット編で選択中の都道府県（表示用。セッション内のみで保存はしない）
 
 // 😲 神の気まぐれフィーバーが現在有効かどうか
 function isShopFeverActive() {
@@ -422,4 +425,34 @@ function getOkumiyaCompleteCount() {
 // 🏯 全国すべての神社の奥宮を完成させ終えたかどうか
 function isShrineMapOkumiyaComplete() {
     return getOkumiyaCompleteCount() >= JAPAN_SHRINE_COUNT;
+}
+
+// 🌄 パワースポット編（全国神社巡り完成後に解放される第三弾）が解放されているかどうか
+function isPowerSpotMapUnlocked() {
+    return isShrineMapJapanComplete();
+}
+
+// 🌄 指定したパワースポットを訪れた（購入した）かどうか
+function isPowerSpotOwned(spot) {
+    return !!ownedPowerSpots[spot.key];
+}
+
+// 🌄 訪れたパワースポットの総数（コンプリート状況の表示・称号判定に使用）
+function getPowerSpotOwnedCount() {
+    return Object.keys(ownedPowerSpots).filter(k => ownedPowerSpots[k]).length;
+}
+
+// 🌄 指定した都道府県のパワースポットをすべて訪れ済みかどうか
+function isPowerSpotPrefectureComplete(pref) {
+    return pref.spots.every(isPowerSpotOwned);
+}
+
+// 🌄 コンプリート（パワースポットをすべて訪問）した都道府県の数
+function getPowerSpotPrefectureCompleteCount() {
+    return POWER_SPOT_PREFECTURES.filter(isPowerSpotPrefectureComplete).length;
+}
+
+// 🌄 全国すべてのパワースポットを訪れ終えたかどうか
+function isShrineMapPowerSpotComplete() {
+    return getPowerSpotOwnedCount() >= POWER_SPOT_COUNT;
 }

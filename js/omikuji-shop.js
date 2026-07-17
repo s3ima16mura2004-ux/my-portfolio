@@ -682,6 +682,66 @@ async function buyOkumiyaPart(prefKey, shrineKey, partKey) {
     alert("🏯 「" + shrine.name + "」奥宮の" + part.emoji + part.name + "が組み上がりました！\n（" + pref.name + "）" + okumiyaCompleteMsg + milestoneMsg + completeMsg);
 }
 
+// 🌄 全国神社巡りマップ・第三弾「パワースポット編」のスポットを1つ訪れる（購入する）。
+// 神社の建立とは違い、1箇所ごとに一括購入するシンプルな仕組み（全国神社巡り完成後に解放）
+async function buyPowerSpot(prefKey, spotKey) {
+    if (!isPowerSpotMapUnlocked()) {
+        alert("🙅 パワースポット編は、全国神社巡り（第一弾）を完成させると解放されます。");
+        return;
+    }
+
+    const pref = POWER_SPOT_PREFECTURES.find(p => p.key === prefKey);
+    if (!pref) return;
+    const spot = pref.spots.find(s => s.key === spotKey);
+    if (!spot) return;
+
+    if (isPowerSpotOwned(spot)) {
+        alert("🌄 「" + spot.name + "」はすでに訪れています。");
+        return;
+    }
+
+    if (currentMoney < spot.cost) {
+        alert("🙅 所持金が足りません！\n「" + spot.name + "」を訪れるには" + spot.cost.toLocaleString() + "円必要です。");
+        return;
+    }
+
+    currentMoney -= spot.cost;
+    ownedPowerSpots[spot.key] = true;
+
+    updateMoneyDisplay();
+    playSE("se-coin");
+
+    let milestoneMsg = "";
+    let prefCompleteMsg = "";
+    let completeMsg = "";
+
+    // 🎉 節目（訪れたスポットの数）に到達したらお祝い金を授与する
+    const newCount = getPowerSpotOwnedCount();
+    const milestone = MAP_POWERSPOT_MILESTONES.find(m => m.count === newCount);
+    if (milestone) {
+        currentMoney += milestone.prize;
+        totalWinnings += milestone.prize;
+        updateMoneyDisplay();
+        recordHistory("🌄パワースポット巡り・節目ボーナス", milestone.prize, currentMoney);
+        milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n訪れたパワースポットが" + newCount + "箇所に達したお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
+    }
+
+    // 🎏 その都道府県のパワースポットをすべて訪れ終えたらお祝いメッセージ
+    if (isPowerSpotPrefectureComplete(pref)) {
+        prefCompleteMsg = "\n\n🎏【" + pref.name + "パワースポット制覇！】🎏\n" + pref.name + "のパワースポットをすべて訪れました！";
+    }
+
+    completeMsg = isShrineMapPowerSpotComplete()
+        ? "\n\n👑🌄【パワースポット制覇！】🌄👑\n全国" + POWER_SPOT_COUNT + "箇所すべてのパワースポットを訪れました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_POWERSPOT_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！"
+        : "";
+
+    updateShrineMapUI();
+    updateTitlesUI();
+    await saveUserState();
+
+    alert("🌄 「" + spot.name + "」を訪れました！\n（" + pref.name + "）" + milestoneMsg + prefCompleteMsg + completeMsg);
+}
+
 // 🌾 夏越の大祓（6/25〜6/30）限定：「茅の輪くぐり」ボタン。半年分の「凶」「大凶」の累計を清算してご褒美を得る
 async function nagoshiChinowaKuguri() {
     if (!isSeasonalEventActive("nagoshi")) return;

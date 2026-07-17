@@ -152,6 +152,87 @@ function updateShrineMapJapanUI() {
 
     const container = document.querySelector(".container");
     if (container) container.classList.toggle("japan-map-complete", isShrineMapJapanComplete());
+
+    updateShrineMapPowerSpotUI(); // 🌄 全国神社巡りの状態が変わるたびに、パワースポット編（第三弾）の解放状況も一緒に見直す
+}
+
+// 🌄 パワースポット編（全国神社巡り完成後に解放される第三弾）の表示を更新する
+function updateShrineMapPowerSpotUI() {
+    const lockedBox = document.querySelector("#map-powerspot-locked");
+    const unlockedBox = document.querySelector("#map-powerspot-unlocked");
+    if (!lockedBox || !unlockedBox) return;
+
+    const unlocked = isPowerSpotMapUnlocked();
+    lockedBox.classList.toggle("hidden", unlocked);
+    unlockedBox.classList.toggle("hidden", !unlocked);
+    if (!unlocked) return;
+
+    // 🌄 日本地図風のマス目に47都道府県を配置する（JAPAN_PREFECTURESと同じ位置関係を使う）
+    const grid = document.querySelector("#map-powerspot-grid");
+    if (grid) {
+        grid.innerHTML = POWER_SPOT_PREFECTURES.map(pref => {
+            const ownedCount = pref.spots.filter(isPowerSpotOwned).length;
+            const total = pref.spots.length;
+            const complete = ownedCount === total;
+            const partial = ownedCount > 0 && !complete;
+            const selected = selectedPowerSpotPrefKey === pref.key;
+            const shortName = pref.name.replace(/(都|府|県)$/, "");
+            const cls = "map-japan-tile" +
+                (complete ? " map-japan-tile-complete" : "") +
+                (partial ? " map-japan-tile-partial" : "") +
+                (selected ? " map-japan-tile-selected" : "");
+            return (
+                '<button type="button" class="' + cls + '" style="grid-row:' + pref.row + ';grid-column:' + pref.col + ';" ' +
+                'onclick="selectPowerSpotPrefecture(\'' + pref.key + '\')" title="' + pref.name + '：' + ownedCount + '/' + total + '訪問済み">' +
+                '<span class="map-japan-tile-label">' + shortName + '</span>' +
+                '<span class="map-japan-tile-count">' + ownedCount + '/' + total + '</span>' +
+                '</button>'
+            );
+        }).join("");
+    }
+
+    // 🌄 コンプリート状況：スポットの数、都道府県の数の両方を表示
+    const spotCount = getPowerSpotOwnedCount();
+    const prefCount = getPowerSpotPrefectureCompleteCount();
+    const progressEl = document.querySelector("#map-powerspot-progress");
+    if (progressEl) {
+        progressEl.textContent =
+            "🌄 訪れたスポット：" + spotCount + " / " + POWER_SPOT_COUNT + "箇所　｜　" +
+            "🗾 コンプリートした都道府県：" + prefCount + " / " + POWER_SPOT_PREFECTURES.length + "県";
+    }
+
+    // 🌄 選択中の都道府県の詳細（スポットごとの訪問状況）を表示する
+    const detailBox = document.querySelector("#map-powerspot-detail");
+    if (detailBox) {
+        const pref = POWER_SPOT_PREFECTURES.find(p => p.key === selectedPowerSpotPrefKey);
+        if (!pref) {
+            detailBox.innerHTML = '<p class="collect-item-desc">👆 上の地図から、好きな都道府県をタップして訪問先を選びましょう。</p>';
+        } else {
+            const spotsHtml = pref.spots.map(spot => {
+                const owned = isPowerSpotOwned(spot);
+                const actionHtml = owned
+                    ? '<span class="mission-status-tag mission-status-done">✅ 訪問済み</span>'
+                    : '<button class="btn-shop-buy" onclick="buyPowerSpot(\'' + pref.key + '\',\'' + spot.key + '\')" type="button"' +
+                      (currentMoney < spot.cost ? " disabled" : "") + '>' + spot.cost.toLocaleString() + '円</button>';
+                return (
+                    '<div class="map-japan-shrine-block' + (owned ? " map-japan-shrine-complete" : "") + '">' +
+                    '<p class="map-japan-shrine-title">' + spot.emoji + ' ' + spot.name + '</p>' +
+                    '<div class="map-japan-part-row"><span>' + spot.emoji + ' ' + spot.name + '</span>' + actionHtml + '</div>' +
+                    '</div>'
+                );
+            }).join("");
+            const completeTag = isPowerSpotPrefectureComplete(pref) ? '<span class="mission-status-tag mission-status-done">🎏 コンプリート！</span>' : "";
+            detailBox.innerHTML =
+                '<p class="shop-section-title" style="margin-top:0;">' + pref.name + " " + completeTag + '</p>' +
+                spotsHtml;
+        }
+    }
+}
+
+// 🌄 パワースポット編の地図上で都道府県をタップした時の処理（同じ県を再タップすると選択解除）
+function selectPowerSpotPrefecture(prefKey) {
+    selectedPowerSpotPrefKey = (selectedPowerSpotPrefKey === prefKey) ? "" : prefKey;
+    updateShrineMapPowerSpotUI();
 }
 
 // 🗾 地図上の都道府県をタップした時の処理（同じ県を再タップすると選択解除）

@@ -267,7 +267,8 @@ function updateTitlesUI() {
         hanamiDangoTotalCollected, gotKodomonohiExtreme, mamemakiSuccessCount, nagoshiLastResetYear,
         shrineMapLevel, japanShrineOwnedCount: getJapanShrineOwnedCount(), japanPrefCompleteCount: getJapanPrefectureCompleteCount(),
         japanShrinePartsOwnedCount: getJapanShrinePartsTotalOwnedCount(), companionExp, ownedFriends,
-        okumiyaCompleteCount: getOkumiyaCompleteCount(), okumiyaPartsOwnedCount: getOkumiyaPartsTotalOwnedCount()
+        okumiyaCompleteCount: getOkumiyaCompleteCount(), okumiyaPartsOwnedCount: getOkumiyaPartsTotalOwnedCount(),
+        powerSpotOwnedCount: getPowerSpotOwnedCount()
     };
     const earned = TITLES.filter(t => t.condition(stats));
 
