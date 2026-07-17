@@ -128,7 +128,8 @@
             doc,
             getDoc,
             setDoc,
-            updateDoc
+            updateDoc,
+            deleteField
         } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -155,6 +156,15 @@
 
         function todayStr() {
             return new Date().toLocaleDateString("ja-JP");
+        }
+
+        // 🔐 合言葉（パスワード）をSHA-256でハッシュ化する（ユーザー名をソルトとして混ぜ、単純な照合表攻撃を避ける）
+        // ※ クライアントサイドのみで完結する簡易的な対策であり、本格的な認証基盤（Firebase Authenticationなど）の
+        //   代わりにはならない点には留意。ただしFirestoreの中身を誰かに見られても素の合言葉が漏れることは防げる
+        async function hashPassword(username, password) {
+            const data = new TextEncoder().encode("omikuji-salt:" + username + ":" + password);
+            const digest = await crypto.subtle.digest("SHA-256", data);
+            return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, "0")).join("");
         }
 
         function unlockAudio() {
@@ -195,13 +205,38 @@
 
                 let userData;
                 let isNewUser = false;
+                let needsPasswordMigration = false;
+                const passHash = await hashPassword(userField, passField);
 
                 if (snap.exists()) {
                     userData = snap.data();
-                    if (userData.password !== passField) {
-                        errorTxt.textContent = "❌ 合言葉（パスワード）が違います！";
+
+                    if (typeof userData.passwordHash === "string") {
+                        // 🔐 すでにハッシュ化済みのアカウント
+                        if (userData.passwordHash !== passHash) {
+                            errorTxt.textContent = "❌ 合言葉（パスワード）が違います！";
+                            errorTxt.style.display = "block";
+                            document.querySelector("#password").value = "";
+                            loginBtn.disabled = false;
+                            loginBtn.textContent = "🙏 いざ、参拝する";
+                            return;
+                        }
+                    } else if (typeof userData.password === "string") {
+                        // 🛠️ 移行措置：まだ平文パスワードのままの古いアカウント。今回だけ平文で照合し、
+                        // 成功したらこの後の保存時にハッシュへ自動移行する（以後は平文を保持しない）
+                        if (userData.password !== passField) {
+                            errorTxt.textContent = "❌ 合言葉（パスワード）が違います！";
+                            errorTxt.style.display = "block";
+                            document.querySelector("#password").value = "";
+                            loginBtn.disabled = false;
+                            loginBtn.textContent = "🙏 いざ、参拝する";
+                            return;
+                        }
+                        needsPasswordMigration = true;
+                    } else {
+                        // 想定外（合言葉の情報が全くない）：安全側に倒してログインを拒否する
+                        errorTxt.textContent = "⚠️ アカウント情報の読み込みに失敗しました。お手数ですが運営にご連絡ください。";
                         errorTxt.style.display = "block";
-                        document.querySelector("#password").value = "";
                         loginBtn.disabled = false;
                         loginBtn.textContent = "🙏 いざ、参拝する";
                         return;
@@ -221,10 +256,10 @@
                     userData.birthdayTicket = userData.birthdayTicket === true;
                     userData.kimagureFeverUntil = typeof userData.kimagureFeverUntil === "number" ? userData.kimagureFeverUntil : 0;
                 } else {
-                    // 新規登録：入力された合言葉でこの名前のアカウントを新規作成
+                    // 新規登録：入力された合言葉をハッシュ化して保存する（平文は保存しない）
                     isNewUser = true;
                     userData = {
-                        password: passField,
+                        passwordHash: passHash,
                         money: 10000,
                         feverCount: 0,
                         prayDate: "",
@@ -343,6 +378,15 @@
                     birthdayTicket: userData.birthdayTicket,
                     kimagureFeverUntil: userData.kimagureFeverUntil
                 });
+
+                // 🔐 まだ平文パスワードのままだったアカウントは、今回のログイン成功を機にハッシュ化した値へ移行し、
+                // 平文の合言葉フィールドはFirestoreから完全に削除する
+                if (needsPasswordMigration) {
+                    await updateDoc(userRef, {
+                        passwordHash: passHash,
+                        password: deleteField()
+                    });
+                }
 
                 localStorage.setItem("logged_in_user", userField);
 

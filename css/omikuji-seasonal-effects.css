@@ -459,6 +459,12 @@
     color: #4a4a44;
 }
 
+/* 🌫️👻 神無月（10月全体）とハロウィン（10/25〜10/31）が重なる期間は、
+   神無月の彩度フィルターを打ち消し、ハロウィンの紫の夜演出だけがはっきり出るようにする */
+.container.kannazuki-active.halloween-active {
+    filter: none;
+}
+
 /* 👻 ハロウィン（妖怪祭り・10/25〜10/31）の背景演出。和風ホラーを意識した紫がかった夜の雰囲気 */
 .container.halloween-active {
     background-image: linear-gradient(rgba(30, 15, 40, 0.88), rgba(50, 20, 45, 0.88));

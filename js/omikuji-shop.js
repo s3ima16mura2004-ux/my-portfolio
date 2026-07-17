@@ -261,6 +261,11 @@ async function incrementNatsumatsuriCommunityCount() {
 
 // 🎆 夏祭りコミュニティ目標の最新状況を取得し、達成済みでまだ受け取っていなければボーナスを授与する
 async function checkNatsumatsuriCommunityReward() {
+    // 🛡️ 8月以外は判定自体を行わない（無駄なFirestore読み込みを防ぐ）。
+    // 「期間中に参拝した人がボーナス対象」という設計なので、8月に絞ることは仕様上も自然
+    const isAugust = (new Date().getMonth() + 1) === NATSUMATSURI_MONTH;
+    if (!isAugust) return;
+
     if (!window.omikujiDB || !window.omikujiCommunityRef || !window.omikujiGetDoc) return;
     const year = new Date().getFullYear();
 

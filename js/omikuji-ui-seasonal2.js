@@ -167,6 +167,8 @@ function updateNatsumatsuriUI() {
 
     if (matsuriBanner) matsuriBanner.classList.toggle("hidden", !(isAugust && festivalActive));
     if (summerBanner) summerBanner.classList.toggle("hidden", !(isAugust && !festivalActive));
+
+    updateNatsumatsuriCommunityUI(); // 🎆 8月以外に切り替わった際も、コミュニティ目標欄を確実に非表示にする
 }
 
 // 🎆 夏祭り限定コミュニティ目標「みんなで花火玉を集めよう」の進捗表示を更新する
