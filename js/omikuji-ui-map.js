@@ -172,6 +172,7 @@ function updateShrineMapPowerSpotUI() {
 
     updateJapanMapArchiveUI(revealed); // 🌄 第三弾解放時、第一弾・第二弾の日本地図をアーカイブ（折りたたみ）へ移動する
     updateMiniThemeMapUI(); // 🎏 パワースポット編の状態が変わるたびに、第四弾の解放状況も一緒に見直す
+    updateWorldSpotMapUI(); // 🌍 第四弾の状態が変わるたびに、第五弾（最終章）の解放状況も一緒に見直す
 
     if (!revealed) return;
 
@@ -306,6 +307,51 @@ function updateMiniThemeMapUI() {
                 '<div class="map-japan-shrine-block' + (complete ? " map-japan-shrine-complete" : "") + '">' +
                 '<p class="map-japan-shrine-title">' + theme.emoji + ' ' + theme.name +
                 (complete ? ' <span class="mission-status-tag mission-status-done">🎏 コンプリート</span>' : ' <span class="map-japan-shrine-progress">(' + ownedCount + '/' + theme.spots.length + ')</span>') +
+                '</p>' + spotsHtml + '</div>'
+            );
+        }).join("");
+    }
+}
+
+// 🌍 世界の絶景・名所編（日本三大○○が完成すると進めるようになる第五弾・最終章）の表示を更新する
+function updateWorldSpotMapUI() {
+    const lockedBox = document.querySelector("#map-worldspot-locked");
+    const readyBox = document.querySelector("#map-worldspot-ready");
+    const unlockedBox = document.querySelector("#map-worldspot-unlocked");
+    if (!lockedBox || !readyBox || !unlockedBox) return;
+
+    const eligible = isWorldSpotMapEligible();
+    const revealed = isWorldSpotMapUnlocked();
+
+    lockedBox.classList.toggle("hidden", eligible || revealed);
+    readyBox.classList.toggle("hidden", !(eligible && !revealed));
+    unlockedBox.classList.toggle("hidden", !revealed);
+    if (!revealed) return;
+
+    const progressEl = document.querySelector("#map-worldspot-progress");
+    if (progressEl) {
+        progressEl.textContent =
+            "🌍 訪れたスポット：" + getWorldSpotOwnedCount() + " / " + WORLD_SPOT_COUNT + "箇所　｜　" +
+            "🏆 コンプリートした地域：" + getWorldSpotRegionCompleteCount() + " / " + WORLD_SPOT_REGIONS.length;
+    }
+
+    const listEl = document.querySelector("#worldspot-list");
+    if (listEl) {
+        listEl.innerHTML = WORLD_SPOT_REGIONS.map(region => {
+            const ownedCount = region.spots.filter(isWorldSpotOwned).length;
+            const complete = ownedCount === region.spots.length;
+            const spotsHtml = region.spots.map(spot => {
+                const owned = isWorldSpotOwned(spot);
+                const actionHtml = owned
+                    ? '<span class="mission-status-tag mission-status-done">✅ 訪問済み</span>'
+                    : '<button class="btn-shop-buy" onclick="buyWorldSpot(\'' + region.key + '\',\'' + spot.key + '\')" type="button"' +
+                      (currentMoney < spot.cost ? " disabled" : "") + '>' + spot.cost.toLocaleString() + '円</button>';
+                return '<div class="map-japan-part-row"><span>' + spot.emoji + ' ' + spot.name + '</span>' + actionHtml + '</div>';
+            }).join("");
+            return (
+                '<div class="map-japan-shrine-block' + (complete ? " map-japan-shrine-complete" : "") + '">' +
+                '<p class="map-japan-shrine-title">' + region.emoji + ' ' + region.name +
+                (complete ? ' <span class="mission-status-tag mission-status-done">🌍 コンプリート</span>' : ' <span class="map-japan-shrine-progress">(' + ownedCount + '/' + region.spots.length + ')</span>') +
                 '</p>' + spotsHtml + '</div>'
             );
         }).join("");

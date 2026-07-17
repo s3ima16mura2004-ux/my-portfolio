@@ -268,7 +268,8 @@ function updateTitlesUI() {
         shrineMapLevel, japanShrineOwnedCount: getJapanShrineOwnedCount(), japanPrefCompleteCount: getJapanPrefectureCompleteCount(),
         japanShrinePartsOwnedCount: getJapanShrinePartsTotalOwnedCount(), companionExp, ownedFriends,
         okumiyaCompleteCount: getOkumiyaCompleteCount(), okumiyaPartsOwnedCount: getOkumiyaPartsTotalOwnedCount(),
-        powerSpotOwnedCount: getPowerSpotOwnedCount(), miniThemeOwnedCount: getMiniThemeOwnedCount()
+        powerSpotOwnedCount: getPowerSpotOwnedCount(), miniThemeOwnedCount: getMiniThemeOwnedCount(),
+        worldSpotOwnedCount: getWorldSpotOwnedCount()
     };
     const earned = TITLES.filter(t => t.condition(stats));
 

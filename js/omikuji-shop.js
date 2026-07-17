@@ -910,3 +910,85 @@ async function buyMiniThemeSpot(themeKey, spotKey) {
 
     alert("🎏 「" + spot.name + "」を訪れました！\n（" + theme.name + "）" + milestoneMsg + themeCompleteMsg + completeMsg);
 }
+
+// 🌍 「日本三大○○」ミニマップ集（第四弾）を完成させたプレイヤーが、世界の絶景・名所編（第五弾・最終章）へ進むボタンを押した時の処理
+async function startWorldSpotMap() {
+    if (!isWorldSpotMapEligible()) {
+        alert("🙅 世界の絶景・名所編は、「日本三大○○」ミニマップ集（第四弾）を完成させると進めるようになります。");
+        return;
+    }
+    if (worldSpotMapRevealed) return;
+
+    worldSpotMapRevealed = true;
+
+    playSE("se-win");
+    startConfetti();
+    updateShrineMapUI();
+    await saveUserState();
+
+    alert("🌍✨【世界の絶景・名所編、解放！】✨🌍\n「日本三大○○」の完成、おめでとうございます！\n舞台は日本を飛び出し、世界へ。ここが神社巡りマップの最終章です。");
+}
+
+// 🌍 世界の絶景・名所編（第五弾）のスポットを1つ訪れる（購入する）
+async function buyWorldSpot(regionKey, spotKey) {
+    if (!isWorldSpotMapUnlocked()) {
+        alert("🙅 世界の絶景・名所編は、「日本三大○○」ミニマップ集（第四弾）を完成させると解放されます。");
+        return;
+    }
+
+    const region = WORLD_SPOT_REGIONS.find(r => r.key === regionKey);
+    if (!region) return;
+    const spot = region.spots.find(s => s.key === spotKey);
+    if (!spot) return;
+
+    if (isWorldSpotOwned(spot)) {
+        alert("🌍 「" + spot.name + "」はすでに訪れています。");
+        return;
+    }
+
+    if (currentMoney < spot.cost) {
+        alert("🙅 所持金が足りません！\n「" + spot.name + "」を訪れるには" + spot.cost.toLocaleString() + "円必要です。");
+        return;
+    }
+
+    currentMoney -= spot.cost;
+    ownedWorldSpots[spot.key] = true;
+
+    updateMoneyDisplay();
+    playSE("se-coin");
+
+    let milestoneMsg = "";
+    let regionCompleteMsg = "";
+    let completeMsg = "";
+
+    // 🎉 節目（訪れたスポットの数）に到達したらお祝い金を授与する
+    const newCount = getWorldSpotOwnedCount();
+    const milestone = MAP_WORLDSPOT_MILESTONES.find(m => m.count === newCount);
+    if (milestone) {
+        currentMoney += milestone.prize;
+        totalWinnings += milestone.prize;
+        updateMoneyDisplay();
+        recordHistory("🌍世界の絶景・名所巡り・節目ボーナス", milestone.prize, currentMoney);
+        milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n訪れたスポットが" + newCount + "箇所に達したお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
+    }
+
+    // 🌍 その地域のスポットをすべて訪れ終えたらお祝いメッセージ
+    if (isWorldSpotRegionComplete(region)) {
+        regionCompleteMsg = "\n\n🌍【" + region.name + "コンプリート！】🌍\n" + region.name + "のスポットをすべて訪れました！";
+    }
+
+    if (isShrineMapWorldSpotComplete()) {
+        completeMsg = "\n\n👑🌍【世界制覇！】🌍👑\n世界の絶景・名所" + WORLD_SPOT_COUNT + "箇所すべてを訪れました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_WORLDSPOT_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！";
+
+        // 🌏 五段階すべてを制覇していたら、最終称号のお祝いも追加する
+        if (getJapanShrineOwnedCount() >= JAPAN_SHRINE_COUNT && isShrineMapOkumiyaComplete() && isShrineMapPowerSpotComplete() && isShrineMapMiniThemeComplete()) {
+            completeMsg += "\n\n🌏👑👑【全世界巡礼王】👑👑🌏\n神社巡りマップ第一弾〜第五弾のすべてを制覇しました。長い旅、本当にお疲れさまでした！";
+        }
+    }
+
+    updateShrineMapUI();
+    updateTitlesUI();
+    await saveUserState();
+
+    alert("🌍 「" + spot.name + "」を訪れました！\n（" + region.name + "）" + milestoneMsg + regionCompleteMsg + completeMsg);
+}
