@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>金大黒 豪華おみくじ神社 - ログイン</title>
-    <link rel="stylesheet" href="css/omikuji-core.css?v=10">
-    <link rel="stylesheet" href="css/omikuji-shop.css?v=10">
-    <link rel="stylesheet" href="css/omikuji-map.css?v=10">
-    <link rel="stylesheet" href="css/omikuji-missions.css?v=10">
-    <link rel="stylesheet" href="css/omikuji-seasonal-effects.css?v=10">
-    <link rel="stylesheet" href="css/omikuji-status-effects.css?v=10">
-    <link rel="stylesheet" href="css/omikuji-widgets.css?v=10">
-    <link rel="stylesheet" href="css/omikuji-top.css?v=10">
+    <link rel="stylesheet" href="css/omikuji-core.css?v=4">
+    <link rel="stylesheet" href="css/omikuji-shop.css?v=4">
+    <link rel="stylesheet" href="css/omikuji-map.css?v=4">
+    <link rel="stylesheet" href="css/omikuji-missions.css?v=4">
+    <link rel="stylesheet" href="css/omikuji-seasonal-effects.css?v=4">
+    <link rel="stylesheet" href="css/omikuji-status-effects.css?v=4">
+    <link rel="stylesheet" href="css/omikuji-widgets.css?v=4">
+    <link rel="stylesheet" href="css/omikuji-top.css?v=4">
     <style>
         .login-box {
             max-width: 400px;
@@ -119,6 +119,45 @@
                 daySel.appendChild(opt);
             }
         })();
+
+        // 🎂 このブラウザで以前に入力した誕生日をlocalStorageから復元し、セレクトボックスに反映する
+        // （Firestoreへの本人確認前の問い合わせを避けるため、あくまで「このブラウザ内での再入力の手間を省く」ための仕組み）
+        function restoreBirthdaySelection() {
+            const userField = document.querySelector("#username");
+            const monthSel = document.querySelector("#birthMonth");
+            const daySel = document.querySelector("#birthDay");
+            if (!userField || !monthSel || !daySel) return;
+
+            const name = (userField.value || "").trim();
+            if (!name) {
+                monthSel.value = "";
+                daySel.value = "";
+                return;
+            }
+
+            try {
+                const saved = localStorage.getItem("omikuji_birthday_" + name);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    monthSel.value = String(parsed.month || "");
+                    daySel.value = String(parsed.day || "");
+                } else {
+                    monthSel.value = "";
+                    daySel.value = "";
+                }
+            } catch (e) {
+                // 読み込みに失敗しても致命的ではないので、静かに空欄のままにしておく
+            }
+        }
+
+        // ページを開いた直後（デフォルトの「ゲスト参拝者」名義分）に一度実行し、
+        // ユーザー名を変更した時にも再チェックする（DOMはこの時点ですでに利用可能なので、即時実行でよい）
+        restoreBirthdaySelection();
+        const usernameFieldForBirthday = document.querySelector("#username");
+        if (usernameFieldForBirthday) {
+            usernameFieldForBirthday.addEventListener("change", restoreBirthdaySelection);
+            usernameFieldForBirthday.addEventListener("blur", restoreBirthdaySelection);
+        }
     </script>
 
     <script type="module">
@@ -128,7 +167,8 @@
             doc,
             getDoc,
             setDoc,
-            updateDoc
+            updateDoc,
+            deleteField
         } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -155,6 +195,15 @@
 
         function todayStr() {
             return new Date().toLocaleDateString("ja-JP");
+        }
+
+        // 🔐 合言葉（パスワード）をSHA-256でハッシュ化する（ユーザー名をソルトとして混ぜ、単純な照合表攻撃を避ける）
+        // ※ クライアントサイドのみで完結する簡易的な対策であり、本格的な認証基盤（Firebase Authenticationなど）の
+        //   代わりにはならない点には留意。ただしFirestoreの中身を誰かに見られても素の合言葉が漏れることは防げる
+        async function hashPassword(username, password) {
+            const data = new TextEncoder().encode("omikuji-salt:" + username + ":" + password);
+            const digest = await crypto.subtle.digest("SHA-256", data);
+            return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, "0")).join("");
         }
 
         function unlockAudio() {
@@ -195,13 +244,38 @@
 
                 let userData;
                 let isNewUser = false;
+                let needsPasswordMigration = false;
+                const passHash = await hashPassword(userField, passField);
 
                 if (snap.exists()) {
                     userData = snap.data();
-                    if (userData.password !== passField) {
-                        errorTxt.textContent = "❌ 合言葉（パスワード）が違います！";
+
+                    if (typeof userData.passwordHash === "string") {
+                        // 🔐 すでにハッシュ化済みのアカウント
+                        if (userData.passwordHash !== passHash) {
+                            errorTxt.textContent = "❌ 合言葉（パスワード）が違います！";
+                            errorTxt.style.display = "block";
+                            document.querySelector("#password").value = "";
+                            loginBtn.disabled = false;
+                            loginBtn.textContent = "🙏 いざ、参拝する";
+                            return;
+                        }
+                    } else if (typeof userData.password === "string") {
+                        // 🛠️ 移行措置：まだ平文パスワードのままの古いアカウント。今回だけ平文で照合し、
+                        // 成功したらこの後の保存時にハッシュへ自動移行する（以後は平文を保持しない）
+                        if (userData.password !== passField) {
+                            errorTxt.textContent = "❌ 合言葉（パスワード）が違います！";
+                            errorTxt.style.display = "block";
+                            document.querySelector("#password").value = "";
+                            loginBtn.disabled = false;
+                            loginBtn.textContent = "🙏 いざ、参拝する";
+                            return;
+                        }
+                        needsPasswordMigration = true;
+                    } else {
+                        // 想定外（合言葉の情報が全くない）：安全側に倒してログインを拒否する
+                        errorTxt.textContent = "⚠️ アカウント情報の読み込みに失敗しました。お手数ですが運営にご連絡ください。";
                         errorTxt.style.display = "block";
-                        document.querySelector("#password").value = "";
                         loginBtn.disabled = false;
                         loginBtn.textContent = "🙏 いざ、参拝する";
                         return;
@@ -221,10 +295,10 @@
                     userData.birthdayTicket = userData.birthdayTicket === true;
                     userData.kimagureFeverUntil = typeof userData.kimagureFeverUntil === "number" ? userData.kimagureFeverUntil : 0;
                 } else {
-                    // 新規登録：入力された合言葉でこの名前のアカウントを新規作成
+                    // 新規登録：入力された合言葉をハッシュ化して保存する（平文は保存しない）
                     isNewUser = true;
                     userData = {
-                        password: passField,
+                        passwordHash: passHash,
                         money: 10000,
                         feverCount: 0,
                         prayDate: "",
@@ -344,7 +418,28 @@
                     kimagureFeverUntil: userData.kimagureFeverUntil
                 });
 
+                // 🔐 まだ平文パスワードのままだったアカウントは、今回のログイン成功を機にハッシュ化した値へ移行し、
+                // 平文の合言葉フィールドはFirestoreから完全に削除する
+                if (needsPasswordMigration) {
+                    await updateDoc(userRef, {
+                        passwordHash: passHash,
+                        password: deleteField()
+                    });
+                }
+
                 localStorage.setItem("logged_in_user", userField);
+
+                // 🎂 次回このブラウザで同じ名前でログインする時にセレクトボックスへ復元できるよう、誕生日を保存しておく
+                if (typeof userData.birthdayMonth === "number" && typeof userData.birthdayDay === "number") {
+                    try {
+                        localStorage.setItem("omikuji_birthday_" + userField, JSON.stringify({
+                            month: userData.birthdayMonth,
+                            day: userData.birthdayDay
+                        }));
+                    } catch (e) {
+                        // localStorageが使えない環境でも致命的ではないので、失敗は無視する
+                    }
+                }
 
                 const audio = document.querySelector("#se-coin");
                 if (audio) {
@@ -359,13 +454,20 @@
                     ? ("\n\n" + luckyPicked.emoji + " 本日のラッキーアイテム：" + luckyPicked.name + "\n(" + luckyPicked.desc + ")")
                     : "";
 
+                // 🔰 新規登録時だけ、遊び方の簡単な案内を追加する（詳しくはミッションタブの「はじめてガイド」を参照）
+                const tutorialMsg = isNewUser
+                    ? "\n\n🔰【はじめての方へ】🔰\n" +
+                      "① おみくじを引く → ② 結果を送信する → ③ トップページで履歴を確認、が基本的な流れです。\n" +
+                      "「ミッション」タブに「🔰はじめてガイド」があるので、まずはそこから遊んでみてください！"
+                    : "";
+
                 alert(
                     (isNewUser ? "🎉 新規登録＆認証成功！\n" : "🎉 認証成功！\n") +
                     "ようこそ、" + userField + "様。おみくじ神社へご案内します！" +
-                    bonusMsg + luckyMsg + taianMsg + birthdayMsg + kimagureFeverMsg
+                    bonusMsg + luckyMsg + taianMsg + birthdayMsg + kimagureFeverMsg + tutorialMsg
                 );
 
-                window.location.href = "html/top.html"; // ログイン後はまずトップページへ移動
+                window.location.href = "html/top.html"; // ログイン後はまずトップページへ移動（index.htmlはルート、top.htmlはhtml/フォルダ内）
             } catch (e) {
                 console.error("ログイン処理に失敗しました: ", e);
                 errorTxt.textContent = "⚠️ 通信エラーが発生しました。もう一度お試しください。";
