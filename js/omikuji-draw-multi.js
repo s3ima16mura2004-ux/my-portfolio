@@ -24,7 +24,7 @@ function omikuji10() {
     currentMoney -= drawCost10;
     updateMoneyDisplay();
 
-    playSE("se-coin");
+    playSE("se-purchase");
 
     if (drawBtn) drawBtn.disabled = true;
     if (draw10Btn) draw10Btn.disabled = true;
@@ -105,6 +105,8 @@ function omikuji10() {
         if (isShrineMapPowerSpotComplete()) daikichiBonus += SHRINE_MAP_POWERSPOT_COMPLETE_BONUS; // 🌄 パワースポット制覇の永続ボーナス
         if (isShrineMapMiniThemeComplete()) daikichiBonus += SHRINE_MAP_MINITHEME_COMPLETE_BONUS; // 🎏 日本三大○○制覇の永続ボーナス
         if (isShrineMapWorldSpotComplete()) daikichiBonus += SHRINE_MAP_WORLDSPOT_COMPLETE_BONUS; // 🌍 世界制覇の永続ボーナス
+        if (isHistoryMapComplete()) daikichiBonus += SHRINE_MAP_HISTORY_COMPLETE_BONUS; // 🏯 歴史編制覇の永続ボーナス
+        if (isBuilderModeComplete()) daikichiBonus += SHRINE_MAP_BUILDER_COMPLETE_BONUS; // 🏗️ 神社ビルダーモード完成の永続ボーナス
                 daikichiBonus = Math.min(MAX_DAIKICHI_BONUS, daikichiBonus); // 🛡️ 積み上がり過ぎ防止の上限
                 if (daikichiBonus > 0) okj = Math.min(1, okj + daikichiBonus);
 
@@ -124,7 +126,7 @@ function omikuji10() {
             kamikichiBonus = Math.min(KAMIKICHI_BONUS_CAP, kamikichiBonus + KAMIKICHI_BONUS_PER_DRAW);
             if (kodomonohiActive10) gotKodomonohiExtreme = true; // 🎏 こどもの日の称号判定
                 } else if (rawOkj10 >= daidaikichiThreshold10) {
-                    // 🛡️ ここも神吉と同様、大吉運ボーナス適用前の生の乱数(rawOkj10)で判定する
+                    // 🛡️ 神吉と同じ考え方で、ここも大吉運ボーナス適用前の生の乱数(rawOkj10)で判定する
                     resultsCount["大大吉"]++;
                     resultName10 = "大大吉";
                     prize = DAIDAIKICHI_PRIZE;
@@ -246,7 +248,7 @@ function omikuji10() {
 
                 // 🎖️ 称号判定用の累計データを更新（10連の1回1回もカウント）
                 totalDraws++;
-                if (okj >= 0.99 && rawOkj10 < daidaikichiThreshold10) totalDaikichi++;
+                if (resultName10 === "大吉") totalDaikichi++;
                 totalProfit += (prize - (drawCost10 / 10));
                 if (prize > 0) totalWinnings += prize;
 
@@ -280,6 +282,10 @@ function omikuji10() {
             totalPrize += totalFukuDaruma;
             if (totalFukuDaruma > 0) totalWinnings += totalFukuDaruma;
 
+            // 🎐 季節イベントの代表アイテムを1年で集めきったかどうかの判定（年間コンボ・10連は最後に1回だけ判定）
+            // ※ checkYearlyComboComplete() 自体が所持金・累計獲得賞金への反映まで行うため、ここでは表示用の金額のみ受け取る
+            const yearlyComboWon = checkYearlyComboComplete();
+
             currentMoney += totalPrize;
             updateMoneyDisplay();
             updateShopUI();
@@ -300,12 +306,14 @@ function omikuji10() {
             if (draw10Btn) draw10Btn.disabled = false;
             if (submitBtn) submitBtn.disabled = false;
 
-            if (resultsCount["神吉"] > 0) {
-                playSE("se-kamikichi");
-            } else if (resultsCount["大大吉"] > 0) {
-                playSE("se-daidaikichi");
-            } else if (totalPrize > 0) {
-                playSE("se-win");
+            if (totalPrize > 0) {
+                if (resultsCount["神吉"] > 0) {
+                    playSE("se-kamikichi");
+                } else if (resultsCount["大大吉"] > 0) {
+                    playSE("se-daidaikichi");
+                } else {
+                    playSE("se-win");
+                }
             } else if (totalPrize < 0) {
                 if (resultsCount["大凶"] > 0 || resultsCount["大大凶"] > 0) {
                     playSE("se-doom");
@@ -351,7 +359,15 @@ function omikuji10() {
                     alertMsg += "🎅 サンタの袋(合計)：+" + totalSantaBag.toLocaleString() + "円\n";
                 }
 
+                if (yearlyComboWon) {
+                    alertMsg += "🎐 年間コンボ達成ボーナス：+" + yearlyComboWon.toLocaleString() + "円\n";
+                }
+
                 alertMsg += "💰 合計損益：" + totalPrize.toLocaleString() + "円！";
+
+                if (yearlyComboWon) {
+                    alertMsg += "\n\n🎐👑【年間コンボ達成！】👑🎐\n季節イベントの代表アイテムを1年ですべて集めきりました！特別ボーナスを授かりました！";
+                }
 
                 if (gotDaidaikyouIn10) {
                     alertMsg += "\n\n💀🔥【大厄落としフィーバー発動！】🔥💀\n「大大凶」を乗り越えたため、次の単発おみくじ" + feverCount + "回は【大吉確率20倍(20%)】になります！";

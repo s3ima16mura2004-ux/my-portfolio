@@ -109,9 +109,123 @@ function fukuDarumaToText(amount) {
     if (!amount) return "";
     return "\n\n🎊【福だるま登場！】🎊\n福だるまがコロコロ転がってきて【" + amount.toLocaleString() + "円】を授けてくれました！";
 }
+
+// 🎐 年間コンボ（季節イベントの代表アイテムを1年で集めきる）達成時のメッセージ
+function yearlyComboToText(amount) {
+    if (!amount) return "";
+    return "\n\n🎐👑【年間コンボ達成！】👑🎐\n1年を通して季節イベントの代表アイテムをすべて集めきりました！\n特別ボーナスとして【" + amount.toLocaleString() + "円】を授かりました！";
+}
+// 🎐 年間コンボ（季節イベントの代表アイテムを1年で集めきる）の進捗表示を更新する
+function updateYearlyComboUI() {
+    const box = document.querySelector("#yearly-combo-box");
+    if (!box) return;
+
+    checkYearlyComboReset();
+    box.classList.remove("hidden");
+
+    const gotCount = YEARLY_COMBO_ITEMS.filter(c => comboItemsGotThisYear[c.itemKey]).length;
+    if (comboLastClaimedYear === comboYear) {
+        box.textContent = "🎐 年間コンボ：今年はすでに達成済みです！（来年またチャレンジできます）";
+    } else {
+        box.textContent = "🎐 年間コンボ：季節の代表アイテムを " + gotCount + " / " + YEARLY_COMBO_ITEMS.length + " 種類、今年すでに入手済み（すべて揃うと特別ボーナス！）";
+    }
+}
+
+// 🎐 季節イベント共通「1日1回ミニアクション」（お月見・紅葉狩り・七五三・クリスマス・春の芽吹き・お花見・こどもの日）の表示を更新する
+function updateSeasonalActionsUI() {
+    const today = todayStr();
+    SEASONAL_DAILY_ACTIONS.forEach(config => {
+        const box = document.querySelector("#seasonal-action-box-" + config.key);
+        const btn = document.querySelector("#seasonal-action-btn-" + config.key);
+        const statusText = document.querySelector("#seasonal-action-status-" + config.key);
+        if (!box) return;
+
+        const active = isSeasonalEventActive(config.key);
+        box.classList.toggle("hidden", !active);
+        if (!active) return;
+
+        const usedToday = seasonalActionDates[config.key] === today;
+        if (btn) btn.disabled = usedToday;
+        if (statusText) {
+            const count = seasonalActionCounts[config.key] || 0;
+            statusText.textContent = usedToday
+                ? config.emoji + " 今日はもう「" + config.label + "」を行いました。また明日挑戦してください。（これまでの回数：" + count + "回）"
+                : config.emoji + " 「" + config.label + "」を行うと、ちょっとしたご利益がもらえます！（ハズレなし・1日1回）";
+        }
+    });
+
+    updateSeasonalMissionsBellUI();
+}
+
+// 🎐 季節限定ミッション（七夕・バレンタイン・ハロウィン肝試し・季節ミニアクション等）の
+// 「本日まだやっていないものが何件あるか」を数えて、サイドバーの通知ベルに表示する。
+// 各ボックス自身の表示/非表示・ボタンのdisabled状態は既存の各update関数がすでに正しく設定しているので、
+// ここではそれをそのまま数えるだけで、判定ロジックを二重に持たないようにしている。
+function updateSeasonalMissionsBellUI() {
+    const bell = document.querySelector("#seasonal-missions-bell");
+    const section = document.querySelector("#seasonal-missions-section");
+    const emptyText = document.querySelector("#seasonal-missions-empty");
+    const sectionBadge = document.querySelector("#seasonal-missions-badge");
+    if (!section) return;
+
+    const boxes = section.querySelectorAll(".lucky-item-box");
+    let activeCount = 0;
+    let pendingCount = 0;
+
+    boxes.forEach(box => {
+        if (box.classList.contains("hidden")) return; // 現在開催されていないイベント
+        activeCount++;
+        const btn = box.querySelector("button");
+        if (btn && !btn.disabled) pendingCount++;
+    });
+
+    if (emptyText) emptyText.classList.toggle("hidden", activeCount > 0);
+
+    if (sectionBadge) {
+        sectionBadge.textContent = activeCount > 0
+            ? "（" + activeCount + "件開催中）"
+            : "（現在開催中のものはありません）";
+    }
+
+    if (bell) {
+        if (pendingCount > 0) {
+            bell.textContent = "🔔 季節限定ミッション：本日未実施 " + pendingCount + "件（タップでミッションタブへ）";
+            bell.classList.remove("hidden");
+        } else {
+            bell.classList.add("hidden");
+        }
+    }
+}
+
+// 🎐 現在アクティブな季節イベントを、絵文字バッジの一覧としてサイドバーに表示する
+// （長いバナー一覧を毎回開かなくても、今何が開催中かひと目で分かるようにするための軽量な表示）
+function updateSeasonBadgeRow() {
+    const row = document.querySelector("#season-badge-row");
+    if (!row) return;
+
+    const active = SEASONAL_EVENTS.filter(e => isSeasonalEventActive(e.key));
+    if (active.length === 0) {
+        row.classList.add("hidden");
+        row.innerHTML = "";
+        return;
+    }
+
+    row.classList.remove("hidden");
+    row.innerHTML = active.map(e =>
+        '<span class="season-badge" title="' + e.name.replace(/"/g, "&quot;") + '" onclick="openDailyNotices()">' + e.emoji + '</span>'
+    ).join("");
+}
+
+// 🎐 季節バッジをタップした時、「本日のお知らせ」の折りたたみを開いて詳細を見られるようにする
+function openDailyNotices() {
+    const details = document.querySelector("#sidebar-daily-notices");
+    if (!details) return;
+    details.open = true;
+    details.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 function unlockAllAudio() {
-    const ids = ["se-coin", "se-shuffle", "se-win", "se-lose", "se-doom",
-        "se-daidaikichi", "se-kamikichi", "se-purchase", "se-milestone", "se-complete", "se-levelup"];
+    const ids = ["se-coin", "se-found", "se-purchase", "se-shuffle", "se-win", "se-kamikichi", "se-daidaikichi", "se-levelup", "se-milestone", "se-complete", "se-lose", "se-doom"];
     ids.forEach(id => {
         const audio = document.querySelector("#" + id);
         if (audio) {

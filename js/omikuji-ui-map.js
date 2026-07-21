@@ -170,12 +170,7 @@ function updateShrineMapPowerSpotUI() {
     readyBox.classList.toggle("hidden", !(eligible && !revealed));
     unlockedBox.classList.toggle("hidden", !revealed);
 
-    // 📜 各弾は「次の弾へ進むボタンを押したら」ではなく「自分自身が完成したら」アーカイブ（折りたたみ）される
-    relocateToArchive("japan-map-section", "japan-map-inline-slot", "japan-map-archive", "japan-map-archive-body", isPowerSpotMapEligible());
-    relocateToArchive("powerspot-section", "powerspot-inline-slot", "powerspot-archive", "powerspot-archive-body", isShrineMapPowerSpotComplete());
-    relocateToArchive("minitheme-section", "minitheme-inline-slot", "minitheme-archive", "minitheme-archive-body", isShrineMapMiniThemeComplete());
-    relocateToArchive("worldspot-section", "worldspot-inline-slot", "worldspot-archive", "worldspot-archive-body", isShrineMapWorldSpotComplete());
-
+    updateJapanMapArchiveUI(revealed); // 🌄 第三弾解放時、第一弾・第二弾の日本地図をアーカイブ（折りたたみ）へ移動する
     updateMiniThemeMapUI(); // 🎏 パワースポット編の状態が変わるたびに、第四弾の解放状況も一緒に見直す
     updateWorldSpotMapUI(); // 🌍 第四弾の状態が変わるたびに、第五弾（最終章）の解放状況も一緒に見直す
 
@@ -251,20 +246,18 @@ function selectPowerSpotPrefecture(prefKey) {
 
 // 🌄 パワースポット編（第三弾）が解放されたら、全国神社巡り・奥宮（第一弾・第二弾）の日本地図セクションを
 // メインの位置から折りたたみ式のアーカイブへ移動する（DOM要素そのものを移動するのでidの重複は起きない）
-// 📜 完成した弾のセクションを、メインの表示位置から折りたたみ式のアーカイブへ移動する共通処理
-// （DOM要素そのものを移動するのでidの重複は起きない）
-function relocateToArchive(sectionId, slotId, archiveId, archiveBodyId, shouldArchive) {
-    const section = document.querySelector("#" + sectionId);
-    const slot = document.querySelector("#" + slotId);
-    const archiveBox = document.querySelector("#" + archiveId);
-    const archiveBody = document.querySelector("#" + archiveBodyId);
-    if (!section || !slot || !archiveBox || !archiveBody) return;
+function updateJapanMapArchiveUI(revealed) {
+    const section = document.querySelector("#japan-map-section");
+    const inlineSlot = document.querySelector("#japan-map-inline-slot");
+    const archiveBox = document.querySelector("#japan-map-archive");
+    const archiveBody = document.querySelector("#japan-map-archive-body");
+    if (!section || !inlineSlot || !archiveBox || !archiveBody) return;
 
-    if (shouldArchive) {
+    if (revealed) {
         if (section.parentElement !== archiveBody) archiveBody.appendChild(section);
         archiveBox.classList.remove("hidden");
     } else {
-        if (section.parentElement !== slot) slot.appendChild(section);
+        if (section.parentElement !== inlineSlot) inlineSlot.appendChild(section);
         archiveBox.classList.add("hidden");
     }
 }
@@ -276,6 +269,24 @@ function selectJapanPrefecture(prefKey) {
 }
 
 // 🎏 「日本三大○○」ミニマップ集（パワースポット編が完成すると進めるようになる第四弾）の表示を更新する
+// 🎏 「日本三大○○」（第四弾）が解放されたら、パワースポット編（第三弾）のセクションを
+// メインの位置から折りたたみ式のアーカイブへ移動する（第一弾・第二弾と同じ考え方）
+function updatePowerSpotMapArchiveUI(revealed) {
+    const section = document.querySelector("#map-powerspot-section");
+    const inlineSlot = document.querySelector("#powerspot-inline-slot");
+    const archiveBox = document.querySelector("#powerspot-map-archive");
+    const archiveBody = document.querySelector("#powerspot-map-archive-body");
+    if (!section || !inlineSlot || !archiveBox || !archiveBody) return;
+
+    if (revealed) {
+        if (section.parentElement !== archiveBody) archiveBody.appendChild(section);
+        archiveBox.classList.remove("hidden");
+    } else {
+        if (section.parentElement !== inlineSlot) inlineSlot.appendChild(section);
+        archiveBox.classList.add("hidden");
+    }
+}
+
 function updateMiniThemeMapUI() {
     const lockedBox = document.querySelector("#map-minitheme-locked");
     const readyBox = document.querySelector("#map-minitheme-ready");
@@ -288,6 +299,7 @@ function updateMiniThemeMapUI() {
     lockedBox.classList.toggle("hidden", eligible || revealed);
     readyBox.classList.toggle("hidden", !(eligible && !revealed));
     unlockedBox.classList.toggle("hidden", !revealed);
+    updatePowerSpotMapArchiveUI(revealed); // 🌄 第四弾解放時、第三弾（パワースポット編）をアーカイブ（折りたたみ）へ移動する
     if (!revealed) return;
 
     const progressEl = document.querySelector("#map-minitheme-progress");
@@ -362,5 +374,134 @@ function updateWorldSpotMapUI() {
                 '</p>' + spotsHtml + '</div>'
             );
         }).join("");
+    }
+
+    updateMapPath6UI(); // 🔀 世界の絶景・名所編の状態が変わるたびに、第六弾（歴史編／神社ビルダーモード）の解放状況も一緒に見直す
+}
+// ============================================================
+// 🔀 第六弾：世界の絶景・名所編（第五弾）完成後に分岐する「歴史編」／「神社ビルダーモード」の表示更新
+// ============================================================
+
+// 🔀 分岐選択画面（歴史編／神社ビルダーモードのどちらを選ぶか）の表示を更新する
+function updateMapPath6UI() {
+    const choiceBox = document.querySelector("#map-path6-choice");
+    if (choiceBox) {
+        choiceBox.classList.toggle("hidden", !isMapPath6ChoicePending());
+    }
+    updateHistoryMapUI();
+    updateBuilderModeUI();
+}
+
+// 🏯 歴史編（第六弾-A）の表示を更新する
+function updateHistoryMapUI() {
+    const lockedBox = document.querySelector("#map-history-locked");
+    const unlockedBox = document.querySelector("#map-history-unlocked");
+    if (!lockedBox || !unlockedBox) return;
+
+    const revealed = isHistoryMapUnlocked();
+    lockedBox.classList.toggle("hidden", revealed || isMapPath6ChoicePending());
+    unlockedBox.classList.toggle("hidden", !revealed);
+    if (!revealed) return;
+
+    const progressEl = document.querySelector("#map-history-progress");
+    if (progressEl) {
+        progressEl.textContent =
+            "🏯 訪れた史跡：" + getHistoryOwnedCount() + " / " + HISTORY_SPOT_COUNT + "箇所　｜　" +
+            "🏆 コンプリートした時代：" + getHistoryEraCompleteCount() + " / " + HISTORY_ERAS.length;
+    }
+
+    const grid = document.querySelector("#map-history-era-grid");
+    if (grid) {
+        grid.innerHTML = HISTORY_ERAS.map(era => {
+            const ownedCount = era.spots.filter(isHistorySpotOwned).length;
+            const total = era.spots.length;
+            const complete = ownedCount === total;
+            const selected = selectedHistoryEraKey === era.key;
+            const cls = "map-tile" + (complete ? " map-tile-owned" : "") + (selected ? " map-japan-tile-selected" : "");
+            return (
+                '<button type="button" class="' + cls + '" onclick="selectHistoryEra(\'' + era.key + '\')" ' +
+                'title="' + era.name + '：' + ownedCount + '/' + total + '訪問済み">' +
+                '<div class="map-tile-emoji">' + era.emoji + '</div>' +
+                '<div class="dex-name">' + era.name + '</div>' +
+                '</button>'
+            );
+        }).join("");
+    }
+
+    const detailBox = document.querySelector("#map-history-detail");
+    if (detailBox) {
+        const era = HISTORY_ERAS.find(e => e.key === selectedHistoryEraKey);
+        if (!era) {
+            detailBox.innerHTML = '<p class="collect-item-desc">👆 上の一覧から、好きな時代をタップして史跡を選びましょう。</p>';
+        } else {
+            const spotsHtml = era.spots.map(spot => {
+                const owned = isHistorySpotOwned(spot);
+                const actionHtml = owned
+                    ? '<span class="mission-status-tag mission-status-done">✅ 訪問済み</span>'
+                    : '<button class="btn-shop-buy" onclick="buyHistorySpot(\'' + era.key + '\',\'' + spot.key + '\')" type="button"' +
+                      (currentMoney < spot.cost ? " disabled" : "") + '>' + spot.cost.toLocaleString() + '円</button>';
+                return '<div class="map-japan-part-row"><span>' + spot.emoji + ' ' + spot.name + '</span>' + actionHtml + '</div>';
+            }).join("");
+            const completeTag = isHistoryEraComplete(era) ? '<span class="mission-status-tag mission-status-done">🏯 コンプリート！</span>' : "";
+            detailBox.innerHTML =
+                '<p class="shop-section-title" style="margin-top:0;">' + era.name + " " + completeTag + '</p>' +
+                spotsHtml;
+        }
+    }
+}
+
+// 🏯 歴史編の時代一覧から1つタップした時の処理（同じ時代を再タップすると選択解除）
+function selectHistoryEra(eraKey) {
+    selectedHistoryEraKey = (selectedHistoryEraKey === eraKey) ? "" : eraKey;
+    updateHistoryMapUI();
+}
+
+// 🏗️ 神社ビルダーモード（第六弾-B）の表示を更新する
+function updateBuilderModeUI() {
+    const lockedBox = document.querySelector("#map-builder-locked");
+    const unlockedBox = document.querySelector("#map-builder-unlocked");
+    if (!lockedBox || !unlockedBox) return;
+
+    const revealed = isBuilderModeUnlocked();
+    lockedBox.classList.toggle("hidden", revealed || isMapPath6ChoicePending());
+    unlockedBox.classList.toggle("hidden", !revealed);
+    if (!revealed) return;
+
+    const progressEl = document.querySelector("#map-builder-progress");
+    if (progressEl) {
+        progressEl.textContent = "🏗️ 完成状況：" + builderLevel + " / " + BUILDER_PARTS.length + "パーツ";
+    }
+
+    const listEl = document.querySelector("#map-builder-list");
+    if (listEl) {
+        listEl.innerHTML = BUILDER_PARTS.map((part, i) => {
+            const owned = i < builderLevel;
+            const isNext = i === builderLevel;
+            return (
+                '<div class="map-japan-part-row"><span>' + (owned ? part.emoji : "❔") + ' ' + (owned ? part.name : "？？？") + '</span>' +
+                (owned
+                    ? '<span class="mission-status-tag mission-status-done">✅ 完成</span>'
+                    : (isNext ? '<span class="mission-status-tag">' + part.cost.toLocaleString() + '円</span>' : '<span class="mission-status-tag">未解放</span>')
+                ) + '</div>'
+            );
+        }).join("");
+    }
+
+    const nextText = document.querySelector("#map-builder-next-text");
+    const buyBtn = document.querySelector("#map-builder-buy-btn");
+    const next = BUILDER_PARTS[builderLevel];
+
+    if (!next) {
+        if (nextText) nextText.textContent = "🏆 神社ビルダーモードが完成しました！永続的に大吉ボーナス+" + (SHRINE_MAP_BUILDER_COMPLETE_BONUS * 100).toFixed(1) + "%を授かっています。";
+        if (buyBtn) buyBtn.classList.add("hidden");
+        return;
+    }
+
+    if (nextText) {
+        nextText.textContent = "次のパーツ：" + next.emoji + " " + next.name + "（" + next.cost.toLocaleString() + "円）　" + next.desc;
+    }
+    if (buyBtn) {
+        buyBtn.classList.remove("hidden");
+        buyBtn.disabled = currentMoney < next.cost;
     }
 }

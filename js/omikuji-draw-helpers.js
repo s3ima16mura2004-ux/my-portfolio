@@ -74,7 +74,7 @@ function checkZoromeBonus(num) {
         totalWinnings += bonusAmount;
         updateMoneyDisplay();
 
-        playSE("se-win");
+        playSE("se-found");
         recordHistory("🌟ゾロ目ボーナス", bonusAmount, currentMoney);
         saveUserState();
 
@@ -98,7 +98,7 @@ function checkStraightBonus(num, lastFour) {
         totalWinnings += STRAIGHT_BONUS_PRIZE;
         updateMoneyDisplay();
 
-        playSE("se-win");
+        playSE("se-found");
         recordHistory("🌈階段の奇跡", STRAIGHT_BONUS_PRIZE, currentMoney);
         saveUserState();
 
@@ -123,7 +123,7 @@ function checkKimagureTime() {
         totalWinnings += KIMAGURE_BONUS_PRIZE;
         updateMoneyDisplay();
 
-        playSE("se-win");
+        playSE("se-found");
         recordHistory("🕛神様の気まぐれ", KIMAGURE_BONUS_PRIZE, currentMoney);
         saveUserState();
 
