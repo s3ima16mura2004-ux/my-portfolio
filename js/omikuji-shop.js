@@ -42,7 +42,7 @@ async function buyShopItem(itemKey) {
     updateCompanionUI();
 
     updateMoneyDisplay();
-    playSE("se-coin");
+    playSE("se-purchase");
     trackMissionShopBuy(); // 🎯「ショップの常連」ミッションの進捗を更新
     await saveUserState();
 
@@ -50,6 +50,7 @@ async function buyShopItem(itemKey) {
 
     if (grownCompanion) {
         setTimeout(() => {
+            playSE("se-levelup");
             alert("🐱✨【招き猫が成長しました！】✨🐱\n" + grownCompanion.emoji + " 「" + grownCompanion.name + "」になりました！\n" + grownCompanion.desc);
         }, 400);
     }
@@ -75,7 +76,7 @@ async function buyCompanionFriend(key) {
 
     updateBankUI();
     updateCompanionUI();
-    playSE("se-coin");
+    playSE("se-purchase");
     await saveUserState();
 
     alert(friend.emoji + "✨【新しい相棒を迎えました！】✨" + friend.emoji + "\n「" + friend.name + "」が仲間になりました！\n" + friend.desc);
@@ -154,7 +155,7 @@ async function upgradeUrn() {
     urnLevel++;
 
     updateMoneyDisplay();
-    playSE("se-coin");
+    playSE("se-levelup");
     await saveUserState();
     updateTitlesUI();
 
@@ -179,10 +180,9 @@ async function depositBank() {
     updateMoneyDisplay();
     updateBankUI();
     if (input) input.value = "";
-    playSE("se-coin");
+    playSE("se-purchase");
     trackMissionDeposit(amount); // 🎯「貯蓄家」ミッションの進捗を更新
     trackKannazukiDeposit(amount); // 🌫️ 神無月期間中なら「倍返し」対象として記録
-    trackTutorialMission("chokin_shite_miru"); // 🔰 はじめてガイド：賽銭箱に預けてみようの進捗を記録
     await saveUserState();
     alert("🏦 " + amount.toLocaleString() + "円を賽銭箱に預けました。\n（このお金はおみくじには使えませんが、大凶や神の試練で失うこともありません）" + (isSeasonalEventActive("kannazuki") ? "\n🌫️ 今は神無月…この預け入れは11月の「倍返し」の対象です！" : ""));
 }
@@ -206,7 +206,7 @@ async function withdrawBank() {
     updateMoneyDisplay();
     updateBankUI();
     if (input) input.value = "";
-    playSE("se-coin");
+    playSE("se-purchase");
     await saveUserState();
     alert("🏦 賽銭箱から" + amount.toLocaleString() + "円を引き出しました。");
 }
@@ -230,75 +230,6 @@ async function incrementCommunityDraws() {
         applyShrineTierVisual();
     } catch (e) {
         console.error("コミュニティカウンターの更新に失敗しました: ", e);
-    }
-}
-
-// 🎆 夏祭り（8月）限定コミュニティ目標：花火玉が1個ドロップするたび、全ユーザー共有の合計にも加算する
-async function incrementNatsumatsuriCommunityCount() {
-    if (!window.omikujiDB || !window.omikujiCommunityRef || !window.omikujiSetDoc || !window.omikujiIncrement || !window.omikujiGetDoc) return;
-    const year = new Date().getFullYear();
-    try {
-        await window.omikujiSetDoc(
-            window.omikujiCommunityRef,
-            { ["natsumatsuriCount" + year]: window.omikujiIncrement(1) },
-            { merge: true }
-        );
-
-        // 加算後の最新値を読み直し、目標に到達していれば「達成年」を記録する（複数ユーザーが同時到達しても実害はない）
-        const snap = await window.omikujiGetDoc(window.omikujiCommunityRef);
-        if (snap.exists()) {
-            const data = snap.data();
-            const count = typeof data["natsumatsuriCount" + year] === "number" ? data["natsumatsuriCount" + year] : 0;
-            communityNatsumatsuriCount = count;
-            if (count >= NATSUMATSURI_COMMUNITY_GOAL && data["natsumatsuriGoalYear"] !== year) {
-                await window.omikujiSetDoc(window.omikujiCommunityRef, { natsumatsuriGoalYear: year }, { merge: true });
-                communityNatsumatsuriGoalYear = year;
-            }
-        }
-    } catch (e) {
-        console.error("夏祭りコミュニティ目標の更新に失敗しました: ", e);
-    }
-}
-
-// 🎆 夏祭りコミュニティ目標の最新状況を取得し、達成済みでまだ受け取っていなければボーナスを授与する
-async function checkNatsumatsuriCommunityReward() {
-    // 🛡️ 8月以外は判定自体を行わない（無駄なFirestore読み込みを防ぐ）。
-    // 「期間中に参拝した人がボーナス対象」という設計なので、8月に絞ることは仕様上も自然
-    const isAugust = (new Date().getMonth() + 1) === NATSUMATSURI_MONTH;
-    if (!isAugust) return;
-
-    if (!window.omikujiDB || !window.omikujiCommunityRef || !window.omikujiGetDoc) return;
-    const year = new Date().getFullYear();
-
-    try {
-        const snap = await window.omikujiGetDoc(window.omikujiCommunityRef);
-        if (!snap.exists()) return;
-        const data = snap.data();
-        communityNatsumatsuriCount = typeof data["natsumatsuriCount" + year] === "number" ? data["natsumatsuriCount" + year] : 0;
-        communityNatsumatsuriGoalYear = typeof data["natsumatsuriGoalYear"] === "number" ? data["natsumatsuriGoalYear"] : 0;
-
-        updateNatsumatsuriCommunityUI();
-
-        if (communityNatsumatsuriGoalYear === year && natsumatsuriRewardClaimedYear !== year) {
-            natsumatsuriRewardClaimedYear = year;
-            currentMoney += NATSUMATSURI_COMMUNITY_PRIZE;
-            totalWinnings += NATSUMATSURI_COMMUNITY_PRIZE;
-            updateMoneyDisplay();
-            playSE("se-win");
-            startFireworks();
-            recordHistory("🎆夏祭り・みんなで花火玉ボーナス", NATSUMATSURI_COMMUNITY_PRIZE, currentMoney);
-            await saveUserState();
-
-            setTimeout(() => {
-                alert(
-                    "🎆🎉【みんなで花火玉、目標達成！】🎉🎆\n" +
-                    "今年の夏祭り、参拝者みんなで打ち上げ花火の玉を" + NATSUMATSURI_COMMUNITY_GOAL.toLocaleString() + "個集めました！\n" +
-                    "そのお祝いに【" + NATSUMATSURI_COMMUNITY_PRIZE.toLocaleString() + "円】を授かりました！"
-                );
-            }, 600);
-        }
-    } catch (e) {
-        console.error("夏祭りコミュニティ目標の取得に失敗しました: ", e);
     }
 }
 
@@ -338,17 +269,6 @@ function rollDrops() {
             ownedItems[item.key] = (ownedItems[item.key] || 0) + 1;
             dropped.push(item);
 
-            // 🎐 年間コンボ対象の代表アイテムなら、今年すでに入手済みとして記録する
-            if (YEARLY_COMBO_ITEMS.some(c => c.itemKey === item.key)) {
-                checkYearlyComboReset();
-                comboItemsGotThisYear[item.key] = true;
-            }
-
-            // 🎆 夏祭り限定「花火玉」がドロップしたら、みんなで集めるコミュニティ目標にも加算する
-            if (item.key === "hanabi_tama" && isNatsumatsuri) {
-                incrementNatsumatsuriCommunityCount();
-            }
-
             if (item.key === "hanami_dango") hanamiDangoTotalCollected++; // 🍡 称号「花見団子の達人」判定用（使っても減らない累計）
 
             if (item.key === "ishikoro") {
@@ -377,7 +297,6 @@ function rollDrops() {
 
     checkOrihimeHikoboshiMeeting();
     checkOshogatsuHatsuyumeSet();
-    updateYearlyComboUI(); // 🎐 年間コンボの進捗表示を更新
 
     if (dropped.length > 0) trackMissionDropItem(); // 🎯「収集家見習い」ミッションの進捗を更新
 
@@ -566,83 +485,6 @@ async function chocoOmikuji() {
     );
 }
 
-// 👻 ハロウィン（10/25〜10/31）限定：「肝試し」に1日1回挑戦する。ハズレなしで、出会った妖怪に応じたご褒美がもらえる
-async function kimodameshi() {
-    if (!isSeasonalEventActive("halloween")) return;
-
-    const today = todayStr();
-    if (kimodameshiDate === today) {
-        alert("👻 今日はもう肝試しに出かけました。また明日挑戦してください。");
-        return;
-    }
-
-    unlockAllAudio();
-    kimodameshiDate = today;
-    kimodameshiCount++;
-
-    const roll = Math.random();
-    const yokai = KIMODAMESHI_YOKAI_TYPES.find(t => roll >= t.min);
-
-    currentMoney += yokai.prize;
-    if (yokai.prize > 0) totalWinnings += yokai.prize;
-    if (yokai === KIMODAMESHI_YOKAI_TYPES[0]) gotHalloweenRareYokai = true;
-
-    updateMoneyDisplay();
-    playSE(yokai.prize > 0 ? "se-win" : "se-lose");
-    if (yokai.prize > 0) recordHistory("👻肝試し：" + yokai.name, yokai.prize, currentMoney);
-
-    updateHalloweenUI();
-    updateTitlesUI();
-    await saveUserState();
-
-    alert(
-        "👻🏮【肝試しの結果】🏮👻\n" +
-        yokai.emoji + " " + yokai.name + "\n" +
-        (yokai.prize > 0
-            ? "【" + yokai.prize.toLocaleString() + "円】を授かりました！"
-            : "今回は何ももらえませんでした…また明日挑戦しましょう。")
-    );
-}
-
-// 🎐 季節イベント共通の「1日1回ミニアクション」を実行する（お月見・紅葉狩り・七五三・クリスマス・春の芽吹き・お花見・こどもの日で共通利用）
-async function performSeasonalDailyAction(eventKey) {
-    if (!isSeasonalEventActive(eventKey)) return;
-    const config = SEASONAL_DAILY_ACTIONS.find(a => a.key === eventKey);
-    if (!config) return;
-
-    const today = todayStr();
-    if (seasonalActionDates[eventKey] === today) {
-        alert(config.emoji + " 今日はもう「" + config.label + "」を行いました。また明日挑戦してください。");
-        return;
-    }
-
-    unlockAllAudio();
-    seasonalActionDates[eventKey] = today;
-    seasonalActionCounts[eventKey] = (seasonalActionCounts[eventKey] || 0) + 1;
-
-    const roll = Math.random();
-    const tier = config.tiers.find(t => roll >= t.min);
-
-    currentMoney += tier.prize;
-    if (tier.prize > 0) totalWinnings += tier.prize;
-
-    updateMoneyDisplay();
-    playSE(tier.prize > 0 ? "se-win" : "se-lose");
-    if (tier.prize > 0) recordHistory(config.emoji + config.label + "：" + tier.name, tier.prize, currentMoney);
-
-    updateSeasonalActionsUI();
-    updateTitlesUI();
-    await saveUserState();
-
-    alert(
-        config.emoji + "【" + config.label + "】" + config.emoji + "\n" +
-        tier.name + "\n" +
-        (tier.prize > 0
-            ? "【" + tier.prize.toLocaleString() + "円】を授かりました！"
-            : "特にご利益はありませんでした…また明日挑戦しましょう。")
-    );
-}
-
 // 🍡 お花見団子を1個使って、次の1回の単発おみくじだけ大吉運を少しアップさせる（花見シーズン以外でも所持していれば使用可）
 async function useHanamiDango() {
     if (!(ownedItems.hanami_dango > 0)) {
@@ -658,7 +500,7 @@ async function useHanamiDango() {
     hanamiDangoActive = true;
 
     updateShopUI();
-    playSE("se-coin");
+    playSE("se-purchase");
     await saveUserState();
 
     alert("🍡【お花見団子、実食！】🍡\n次の単発おみくじで、大吉運が少しだけアップします！");
@@ -680,7 +522,7 @@ async function buyNextMapTile() {
     shrineMapLevel++;
 
     updateMoneyDisplay();
-    playSE("se-coin");
+    playSE("se-purchase");
 
     // 🎉 節目（5・10・15・20マス）に到達したらお祝い金を授与する
     let milestoneMsg = "";
@@ -689,6 +531,7 @@ async function buyNextMapTile() {
         currentMoney += milestone.prize;
         totalWinnings += milestone.prize;
         updateMoneyDisplay();
+        playSE("se-milestone");
         recordHistory("🗺️境内マップ・節目ボーナス", milestone.prize, currentMoney);
         milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n境内マップが" + shrineMapLevel + "マス埋まったお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
     }
@@ -736,7 +579,7 @@ async function buyJapanShrinePart(prefKey, shrineKey, partKey) {
     japanShrinePartsOwned[shrine.key + ":" + part.key] = true;
 
     updateMoneyDisplay();
-    playSE("se-coin");
+    playSE("se-purchase");
 
     // ⛩️ このパーツで神社がちょうど完成したかを確認する
     const shrineJustCompleted = isJapanShrineComplete(shrine);
@@ -755,6 +598,7 @@ async function buyJapanShrinePart(prefKey, shrineKey, partKey) {
             currentMoney += milestone.prize;
             totalWinnings += milestone.prize;
             updateMoneyDisplay();
+            playSE("se-milestone");
             recordHistory("🗾全国神社巡り・節目ボーナス", milestone.prize, currentMoney);
             milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n完成した神社が" + newCount + "社に達したお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
         }
@@ -764,9 +608,11 @@ async function buyJapanShrinePart(prefKey, shrineKey, partKey) {
             prefCompleteMsg = "\n\n🎏【" + pref.name + "コンプリート！】🎏\n" + pref.name + "の神社をすべて完成させました！";
         }
 
-        completeMsg = isShrineMapJapanComplete()
-            ? "\n\n👑🗾【日本全国制覇！】🗾👑\n全国" + JAPAN_SHRINE_COUNT + "社すべての神社を完成させました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_JAPAN_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！"
-            : "";
+        completeMsg = "";
+        if (isShrineMapJapanComplete()) {
+            playSE("se-complete");
+            completeMsg = "\n\n👑🗾【日本全国制覇！】🗾👑\n全国" + JAPAN_SHRINE_COUNT + "社すべての神社を完成させました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_JAPAN_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！";
+        }
     }
 
     updateShrineMapUI();
@@ -807,7 +653,7 @@ async function buyOkumiyaPart(prefKey, shrineKey, partKey) {
     japanOkumiyaPartsOwned[shrine.key + ":" + part.key] = true;
 
     updateMoneyDisplay();
-    playSE("se-coin");
+    playSE("se-purchase");
 
     // 🏯 このパーツで奥宮がちょうど完成したかを確認する
     const okumiyaJustCompleted = isOkumiyaComplete(shrine);
@@ -825,13 +671,16 @@ async function buyOkumiyaPart(prefKey, shrineKey, partKey) {
             currentMoney += milestone.prize;
             totalWinnings += milestone.prize;
             updateMoneyDisplay();
+            playSE("se-milestone");
             recordHistory("🏯奥宮巡り・節目ボーナス", milestone.prize, currentMoney);
             milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n完成した奥宮が" + newCount + "社に達したお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
         }
 
-        completeMsg = isShrineMapOkumiyaComplete()
-            ? "\n\n👑🏯【奥宮制覇！】🏯👑\n全国" + JAPAN_SHRINE_COUNT + "社すべての奥宮を完成させました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_OKUMIYA_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！"
-            : "";
+        completeMsg = "";
+        if (isShrineMapOkumiyaComplete()) {
+            playSE("se-complete");
+            completeMsg = "\n\n👑🏯【奥宮制覇！】🏯👑\n全国" + JAPAN_SHRINE_COUNT + "社すべての奥宮を完成させました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_OKUMIYA_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！";
+        }
     }
 
     updateShrineMapUI();
@@ -851,7 +700,7 @@ async function startPowerSpotMap() {
 
     powerSpotMapRevealed = true;
 
-    playSE("se-win");
+    playSE("se-complete");
     startConfetti();
     updateShrineMapUI();
     await saveUserState();
@@ -886,7 +735,7 @@ async function buyPowerSpot(prefKey, spotKey) {
     ownedPowerSpots[spot.key] = true;
 
     updateMoneyDisplay();
-    playSE("se-coin");
+    playSE("se-purchase");
 
     let milestoneMsg = "";
     let prefCompleteMsg = "";
@@ -899,6 +748,7 @@ async function buyPowerSpot(prefKey, spotKey) {
         currentMoney += milestone.prize;
         totalWinnings += milestone.prize;
         updateMoneyDisplay();
+        playSE("se-milestone");
         recordHistory("🌄パワースポット巡り・節目ボーナス", milestone.prize, currentMoney);
         milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n訪れたパワースポットが" + newCount + "箇所に達したお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
     }
@@ -908,9 +758,11 @@ async function buyPowerSpot(prefKey, spotKey) {
         prefCompleteMsg = "\n\n🎏【" + pref.name + "パワースポット制覇！】🎏\n" + pref.name + "のパワースポットをすべて訪れました！";
     }
 
-    completeMsg = isShrineMapPowerSpotComplete()
-        ? "\n\n👑🌄【パワースポット制覇！】🌄👑\n全国" + POWER_SPOT_COUNT + "箇所すべてのパワースポットを訪れました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_POWERSPOT_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！"
-        : "";
+    completeMsg = "";
+    if (isShrineMapPowerSpotComplete()) {
+        playSE("se-complete");
+        completeMsg = "\n\n👑🌄【パワースポット制覇！】🌄👑\n全国" + POWER_SPOT_COUNT + "箇所すべてのパワースポットを訪れました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_POWERSPOT_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！";
+    }
 
     updateShrineMapUI();
     updateTitlesUI();
@@ -966,7 +818,7 @@ async function ringJoyaBell() {
     if (joyaBellCount >= JOYA_BELL_TARGET) return;
 
     joyaBellCount++;
-    playSE("se-coin");
+    playSE("se-purchase");
     updateJoyaBellUI();
 
     if (joyaBellCount >= JOYA_BELL_TARGET) {
@@ -1003,7 +855,7 @@ async function startMiniThemeMap() {
 
     miniThemeMapRevealed = true;
 
-    playSE("se-win");
+    playSE("se-complete");
     startConfetti();
     updateShrineMapUI();
     await saveUserState();
@@ -1037,7 +889,7 @@ async function buyMiniThemeSpot(themeKey, spotKey) {
     ownedMiniThemeSpots[spot.key] = true;
 
     updateMoneyDisplay();
-    playSE("se-coin");
+    playSE("se-purchase");
 
     let milestoneMsg = "";
     let themeCompleteMsg = "";
@@ -1050,6 +902,7 @@ async function buyMiniThemeSpot(themeKey, spotKey) {
         currentMoney += milestone.prize;
         totalWinnings += milestone.prize;
         updateMoneyDisplay();
+        playSE("se-milestone");
         recordHistory("🎏日本三大○○・節目ボーナス", milestone.prize, currentMoney);
         milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n訪れたスポットが" + newCount + "箇所に達したお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
     }
@@ -1059,9 +912,11 @@ async function buyMiniThemeSpot(themeKey, spotKey) {
         themeCompleteMsg = "\n\n🎏【" + theme.name + "コンプリート！】🎏\n" + theme.name + "をすべて訪れました！";
     }
 
-    completeMsg = isShrineMapMiniThemeComplete()
-        ? "\n\n👑🎏【日本三大○○、完全制覇！】🎏👑\n全" + MINI_THEME_SPOT_COUNT + "箇所すべてを訪れました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_MINITHEME_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！"
-        : "";
+    completeMsg = "";
+    if (isShrineMapMiniThemeComplete()) {
+        playSE("se-complete");
+        completeMsg = "\n\n👑🎏【日本三大○○、完全制覇！】🎏👑\n全" + MINI_THEME_SPOT_COUNT + "箇所すべてを訪れました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_MINITHEME_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！";
+    }
 
     updateShrineMapUI();
     updateTitlesUI();
@@ -1080,7 +935,7 @@ async function startWorldSpotMap() {
 
     worldSpotMapRevealed = true;
 
-    playSE("se-win");
+    playSE("se-complete");
     startConfetti();
     updateShrineMapUI();
     await saveUserState();
@@ -1114,7 +969,7 @@ async function buyWorldSpot(regionKey, spotKey) {
     ownedWorldSpots[spot.key] = true;
 
     updateMoneyDisplay();
-    playSE("se-coin");
+    playSE("se-purchase");
 
     let milestoneMsg = "";
     let regionCompleteMsg = "";
@@ -1127,6 +982,7 @@ async function buyWorldSpot(regionKey, spotKey) {
         currentMoney += milestone.prize;
         totalWinnings += milestone.prize;
         updateMoneyDisplay();
+        playSE("se-milestone");
         recordHistory("🌍世界の絶景・名所巡り・節目ボーナス", milestone.prize, currentMoney);
         milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n訪れたスポットが" + newCount + "箇所に達したお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
     }
@@ -1137,6 +993,7 @@ async function buyWorldSpot(regionKey, spotKey) {
     }
 
     if (isShrineMapWorldSpotComplete()) {
+        playSE("se-complete");
         completeMsg = "\n\n👑🌍【世界制覇！】🌍👑\n世界の絶景・名所" + WORLD_SPOT_COUNT + "箇所すべてを訪れました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_WORLDSPOT_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！";
 
         // 🌏 五段階すべてを制覇していたら、最終称号のお祝いも追加する
@@ -1150,168 +1007,4 @@ async function buyWorldSpot(regionKey, spotKey) {
     await saveUserState();
 
     alert("🌍 「" + spot.name + "」を訪れました！\n（" + region.name + "）" + milestoneMsg + regionCompleteMsg + completeMsg);
-}
-
-// ============================================================
-// 🔀 第六弾：世界の絶景・名所編（第五弾）完成後に分岐する「歴史編」／「神社ビルダーモード」
-// ============================================================
-
-// 🔀 分岐画面で「歴史編」または「神社ビルダーモード」のどちらかを選んだ時の処理
-// （一度選ぶと以後この選択画面は表示されないが、選んだ方を完成させるともう一方も自動的に解放される）
-async function selectMapPath6(path) {
-    if (!isShrineMapWorldSpotComplete()) {
-        alert("🙅 この先は、世界の絶景・名所編（第五弾）を完成させると選べるようになります。");
-        return;
-    }
-    if (historyMapRevealed || builderModeRevealed) return; // すでにどちらか選択済み
-
-    mapPath6Choice = path;
-    if (path === "history") {
-        historyMapRevealed = true;
-    } else if (path === "builder") {
-        builderModeRevealed = true;
-    } else {
-        return;
-    }
-
-    playSE("se-win");
-    startConfetti();
-    updateShrineMapUI();
-    await saveUserState();
-
-    if (path === "history") {
-        alert("🏯✨【歴史編、解放！】✨🏯\n世界の絶景・名所編の完成、おめでとうございます！\nここから先は、日本の歴史を彩る史跡を巡る旅です。\n（歴史編を完成させると、神社ビルダーモードも自動的に解放されます）");
-    } else {
-        alert("🏗️✨【神社ビルダーモード、解放！】✨🏗️\n世界の絶景・名所編の完成、おめでとうございます！\nここから先は、自分だけの神社を少しずつ建て増していく旅です。\n（神社ビルダーモードを完成させると、歴史編も自動的に解放されます）");
-    }
-}
-
-// 🏯 歴史編（第六弾-A）の史跡を1つ訪れる（購入する）
-async function buyHistorySpot(eraKey, spotKey) {
-    if (!isHistoryMapUnlocked()) {
-        alert("🙅 歴史編は、世界の絶景・名所編（第五弾）を完成させた後の分岐で選ぶと解放されます。");
-        return;
-    }
-
-    const era = HISTORY_ERAS.find(e => e.key === eraKey);
-    if (!era) return;
-    const spot = era.spots.find(s => s.key === spotKey);
-    if (!spot) return;
-
-    if (isHistorySpotOwned(spot)) {
-        alert("🏯 「" + spot.name + "」はすでに訪れています。");
-        return;
-    }
-
-    if (currentMoney < spot.cost) {
-        alert("🙅 所持金が足りません！\n「" + spot.name + "」を訪れるには" + spot.cost.toLocaleString() + "円必要です。");
-        return;
-    }
-
-    currentMoney -= spot.cost;
-    ownedHistorySpots[spot.key] = true;
-
-    updateMoneyDisplay();
-    playSE("se-coin");
-
-    let milestoneMsg = "";
-    let eraCompleteMsg = "";
-    let completeMsg = "";
-    let autoUnlockMsg = "";
-
-    // 🎉 節目（訪れたスポットの数）に到達したらお祝い金を授与する
-    const newCount = getHistoryOwnedCount();
-    const milestone = MAP_HISTORY_MILESTONES.find(m => m.count === newCount);
-    if (milestone) {
-        currentMoney += milestone.prize;
-        totalWinnings += milestone.prize;
-        updateMoneyDisplay();
-        recordHistory("🏯歴史編・節目ボーナス", milestone.prize, currentMoney);
-        milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n訪れた史跡が" + newCount + "箇所に達したお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
-    }
-
-    // 🏯 その時代の史跡をすべて訪れ終えたらお祝いメッセージ
-    if (isHistoryEraComplete(era)) {
-        eraCompleteMsg = "\n\n🏯【" + era.name + "コンプリート！】🏯\n" + era.name + "の史跡をすべて訪れました！";
-    }
-
-    if (isHistoryMapComplete()) {
-        completeMsg = "\n\n👑🏯【歴史編、完全制覇！】🏯👑\n全" + HISTORY_SPOT_COUNT + "箇所の史跡をすべて訪れました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_HISTORY_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！";
-
-        // 🏗️ もう一方の「神社ビルダーモード」がまだ未解放なら、ここで自動的に解放する
-        if (!builderModeRevealed) {
-            builderModeRevealed = true;
-            autoUnlockMsg = "\n\n🏗️✨【神社ビルダーモード、自動解放！】✨🏗️\n歴史編の完成により、もう一方の道「神社ビルダーモード」も解放されました！";
-        }
-
-        // 🌏 両方の道を制覇していたら、最終称号のお祝いも追加する
-        if (isBuilderModeComplete()) {
-            completeMsg += "\n\n⛩️🌟👑【二道を極めし者】👑🌟⛩️\n歴史編と神社ビルダーモード、両方の道を制覇しました。本当にお疲れさまでした！";
-        }
-    }
-
-    updateShrineMapUI();
-    updateTitlesUI();
-    await saveUserState();
-
-    alert("🏯 「" + spot.name + "」を訪れました！\n（" + era.name + "）" + milestoneMsg + eraCompleteMsg + completeMsg + autoUnlockMsg);
-}
-
-// 🏗️ 神社ビルダーモード（第六弾-B）の次のパーツを1つ完成させる（境内マップと同じく、順番に1つずつ購入する形式）
-async function buyNextBuilderPart() {
-    if (!isBuilderModeUnlocked()) {
-        alert("🙅 神社ビルダーモードは、世界の絶景・名所編（第五弾）を完成させた後の分岐で選ぶと解放されます。");
-        return;
-    }
-
-    const part = BUILDER_PARTS[builderLevel];
-    if (!part) {
-        alert("🏗️ 神社ビルダーモードはすでに完成しています！");
-        return;
-    }
-    if (currentMoney < part.cost) {
-        alert("🙅 所持金が足りません！\n「" + part.name + "」の建立には" + part.cost.toLocaleString() + "円必要です。");
-        return;
-    }
-
-    currentMoney -= part.cost;
-    builderLevel++;
-
-    updateMoneyDisplay();
-    playSE("se-coin");
-
-    let milestoneMsg = "";
-    let completeMsg = "";
-    let autoUnlockMsg = "";
-
-    // 🎉 節目（完成させたパーツ数）に到達したらお祝い金を授与する
-    const milestone = MAP_BUILDER_MILESTONES.find(m => m.count === builderLevel);
-    if (milestone) {
-        currentMoney += milestone.prize;
-        totalWinnings += milestone.prize;
-        updateMoneyDisplay();
-        recordHistory("🏗️神社ビルダー・節目ボーナス", milestone.prize, currentMoney);
-        milestoneMsg = "\n\n🎉【節目ボーナス！】🎉\n境内の建て増しが" + builderLevel + "パーツ完成したお祝いに【" + milestone.prize.toLocaleString() + "円】を授かりました！";
-    }
-
-    if (isBuilderModeComplete()) {
-        completeMsg = "\n\n👑🏗️【神社ビルダーモード、完成！】🏗️👑\nすべてのパーツが完成し、自分だけの神社が出来上がりました！\n永続的に大吉ボーナス+" + (SHRINE_MAP_BUILDER_COMPLETE_BONUS * 100).toFixed(1) + "%を授かりました！";
-
-        // 🏯 もう一方の「歴史編」がまだ未解放なら、ここで自動的に解放する
-        if (!historyMapRevealed) {
-            historyMapRevealed = true;
-            autoUnlockMsg = "\n\n🏯✨【歴史編、自動解放！】✨🏯\n神社ビルダーモードの完成により、もう一方の道「歴史編」も解放されました！";
-        }
-
-        // 🌏 両方の道を制覇していたら、最終称号のお祝いも追加する
-        if (isHistoryMapComplete()) {
-            completeMsg += "\n\n⛩️🌟👑【二道を極めし者】👑🌟⛩️\n歴史編と神社ビルダーモード、両方の道を制覇しました。本当にお疲れさまでした！";
-        }
-    }
-
-    updateShrineMapUI();
-    updateTitlesUI();
-    await saveUserState();
-
-    alert("🏗️ 「" + part.emoji + " " + part.name + "」が完成しました！\n" + part.desc + milestoneMsg + completeMsg + autoUnlockMsg);
 }

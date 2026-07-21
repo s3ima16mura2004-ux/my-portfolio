@@ -54,20 +54,15 @@
                     <p id="active-equip-text" class="hidden">-</p>
                 </div>
 
-                <div id="season-badge-row" class="season-badge-row hidden"></div>
-                <p id="seasonal-missions-bell" class="seasonal-missions-bell hidden" onclick="jumpToSeasonalMissions()">-</p>
-
-                <details id="sidebar-daily-notices" class="daily-notices" open>
+                <details class="daily-notices" open>
                     <summary>📢 本日のお知らせ</summary>
                     <div class="daily-notices-body">
                 <p id="taian-status-box" class="taian-status-box hidden">-</p>
                 <p id="birthday-ticket-box" class="taian-status-box hidden">-</p>
                 <p id="shop-fever-box" class="taian-status-box hidden">-</p>
                 <p id="community-status-box" class="community-status-box hidden">-</p>
-                <p id="natsumatsuri-community-box" class="community-status-box hidden">-</p>
                 <p id="countdown-season-box" class="taian-status-box hidden">-</p>
                 <p id="countdown-bonus-box" class="taian-status-box hidden">-</p>
-                <p id="yearly-combo-box" class="taian-status-box hidden">-</p>
                 <p id="ushimitsu-banner" class="ushimitsu-banner hidden">🌙 ただいま「丑三つ時」…大大吉・大大凶の確率が跳ね上がっています…</p>
                 <p id="natsumatsuri-banner" class="ushimitsu-banner hidden">🎆 ただいま「夏祭り」開催中！（夜・週末限定）収集アイテムのドロップ率が1.5倍です！</p>
                 <p id="summer-theme-banner" class="ushimitsu-banner hidden">🌻 8月の昼下がり…夏の日差しがまぶしいですね（夏祭りは夜と週末に開催されます）</p>
@@ -76,7 +71,6 @@
                 <p id="koyo-banner" class="ushimitsu-banner hidden">🍁 ただいま「紅葉狩り」シーズン！山々が赤や橙色に色づいています</p>
                 <p id="oshogatsu-banner" class="ushimitsu-banner hidden">🎍 謹賀新年！初日の出とともに、新しい一年が始まりました</p>
                 <p id="kannazuki-banner" class="ushimitsu-banner hidden">🌫️ ただいま「神無月」…神様は出雲へお出かけ中です</p>
-                <p id="halloween-banner" class="ushimitsu-banner hidden">👻 ただいま「ハロウィン（妖怪祭り）」…境内に和風の妖怪たちが集っています…</p>
                 <p id="shichigosan-banner" class="ushimitsu-banner hidden">👘 ただいま「七五三」シーズン！ショップに「千歳飴」が並んでいます</p>
                 <p id="christmas-banner" class="ushimitsu-banner hidden">🎄 ただいま「クリスマス」の夜…イルミネーションが輝いています！低確率で「サンタの袋」が見つかるかも…？</p>
                 <p id="christmas-day-banner" class="ushimitsu-banner hidden">❄️ クリスマスシーズンの昼下がり…静かに雪がちらついています</p>
@@ -87,6 +81,31 @@
                 <p id="haru-banner" class="ushimitsu-banner hidden">🌱 ただいま「春の芽吹き」シーズン！ショップに新生活を応援する「若葉のお守り」が並んでいます</p>
                 <p id="hanami-banner" class="ushimitsu-banner hidden">🌸 ただいま「桜満開・花見」シーズン！境内に桜吹雪が舞い、「お花見団子」が手に入ることも</p>
                 <p id="kodomonohi-banner" class="ushimitsu-banner hidden">🎏 ただいま「こどもの日」シーズン！黄金の鯉のぼりが空を泳ぎ、大大吉以上の出現率がアップ中！</p>
+
+                <div id="tanabata-box" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">🎋 七夕・短冊に願いを書く（7/1〜7/7限定） 🎋</p>
+                    <p id="tanabata-status-text" class="lucky-item-desc">-</p>
+                    <p id="tanabata-star-text" class="lucky-item-desc">-</p>
+                    <button id="tanabata-wish-btn" class="btn-equip" onclick="tanabataWish()" type="button">🎋 短冊に願いを書く</button>
+                </div>
+
+                <div id="valentine-box" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">💝 バレンタイン・チョコおみくじ（2/1〜2/14限定） 💝</p>
+                    <p id="choco-status-text" class="lucky-item-desc">-</p>
+                    <button id="choco-omikuji-btn" class="btn-equip" onclick="chocoOmikuji()" type="button">🍫 チョコおみくじを引く</button>
+                </div>
+
+                <div id="nagoshi-box" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">⛩️ 夏越の大祓・茅の輪くぐり（6/25〜6/30限定） ⛩️</p>
+                    <p id="nagoshi-status-text" class="lucky-item-desc">-</p>
+                    <button id="nagoshi-btn" class="btn-equip" onclick="nagoshiChinowaKuguri()" type="button">⛩️ 茅の輪をくぐる</button>
+                </div>
+
+                <div id="nenmatsu-bell-box" class="lucky-item-box hidden">
+                    <p class="lucky-item-title">🔔 年末・除夜の鐘をつく（12/26〜12/31限定） 🔔</p>
+                    <p id="joya-bell-status-text" class="lucky-item-desc">-</p>
+                    <button id="joya-bell-btn" class="btn-equip" onclick="ringJoyaBell()" type="button">🔔 鐘をつく</button>
+                </div>
                     </div>
                 </details>
 
@@ -133,14 +152,6 @@
                 </div>
 
                 <div id="tab-missions" class="hidden">
-                    <details id="tutorial-missions-section" class="daily-notices" open>
-                        <summary>🔰 はじめてガイド <span id="tutorial-missions-badge">-</span></summary>
-                        <div class="daily-notices-body">
-                            <p class="bank-desc">サイトの主な機能を一通り試してみましょう。それぞれ一度だけ達成できる特別なミッションです。</p>
-                            <div id="tutorial-missions-list" class="missions-list"></div>
-                        </div>
-                    </details>
-
                     <div class="shop-section">
                         <h3 class="shop-section-title">🎯 本日のデイリーミッション（ランダム5個）</h3>
                         <p id="missions-summary" class="missions-summary">-</p>
@@ -150,88 +161,6 @@
                         <h3 class="shop-section-title">🌙 常設ミッション</h3>
                         <div id="missions-always-list" class="missions-list"></div>
                     </div>
-
-                    <details id="seasonal-missions-section" class="daily-notices">
-                        <summary>🎐 季節限定ミッション <span id="seasonal-missions-badge">-</span></summary>
-                        <div class="daily-notices-body">
-                        <p class="bank-desc">その季節・その日だけできる特別なミッションです。開催中のものだけここに表示されます。</p>
-
-                        <div id="tanabata-box" class="lucky-item-box hidden">
-                            <p class="lucky-item-title">🎋 七夕・短冊に願いを書く（7/1〜7/7限定） 🎋</p>
-                            <p id="tanabata-status-text" class="lucky-item-desc">-</p>
-                            <p id="tanabata-star-text" class="lucky-item-desc">-</p>
-                            <button id="tanabata-wish-btn" class="btn-equip" onclick="tanabataWish()" type="button">🎋 短冊に願いを書く</button>
-                        </div>
-
-                        <div id="valentine-box" class="lucky-item-box hidden">
-                            <p class="lucky-item-title">💝 バレンタイン・チョコおみくじ（2/1〜2/14限定） 💝</p>
-                            <p id="choco-status-text" class="lucky-item-desc">-</p>
-                            <button id="choco-omikuji-btn" class="btn-equip" onclick="chocoOmikuji()" type="button">🍫 チョコおみくじを引く</button>
-                        </div>
-
-                        <div id="halloween-box" class="lucky-item-box hidden">
-                            <p class="lucky-item-title">👻 ハロウィン・肝試し（10/25〜10/31限定） 👻</p>
-                            <p id="kimodameshi-status-text" class="lucky-item-desc">-</p>
-                            <button id="kimodameshi-btn" class="btn-equip" onclick="kimodameshi()" type="button">🏮 肝試しに出かける</button>
-                        </div>
-
-                        <div id="seasonal-action-box-otsukimi" class="lucky-item-box hidden">
-                            <p class="lucky-item-title">🌕 お月見・お供え物（9/15〜9/30限定） 🌕</p>
-                            <p id="seasonal-action-status-otsukimi" class="lucky-item-desc">-</p>
-                            <button id="seasonal-action-btn-otsukimi" class="btn-equip" onclick="performSeasonalDailyAction('otsukimi')" type="button">🌕 お供え物をする</button>
-                        </div>
-
-                        <div id="seasonal-action-box-koyo" class="lucky-item-box hidden">
-                            <p class="lucky-item-title">🍁 紅葉狩り（11月限定） 🍁</p>
-                            <p id="seasonal-action-status-koyo" class="lucky-item-desc">-</p>
-                            <button id="seasonal-action-btn-koyo" class="btn-equip" onclick="performSeasonalDailyAction('koyo')" type="button">🍁 紅葉狩りをする</button>
-                        </div>
-
-                        <div id="seasonal-action-box-shichigosan" class="lucky-item-box hidden">
-                            <p class="lucky-item-title">👘 七五三・千歳飴（11月限定） 👘</p>
-                            <p id="seasonal-action-status-shichigosan" class="lucky-item-desc">-</p>
-                            <button id="seasonal-action-btn-shichigosan" class="btn-equip" onclick="performSeasonalDailyAction('shichigosan')" type="button">👘 千歳飴を結ぶ</button>
-                        </div>
-
-                        <div id="seasonal-action-box-christmas" class="lucky-item-box hidden">
-                            <p class="lucky-item-title">🎄 クリスマス・ツリー飾り（12/1〜12/25限定） 🎄</p>
-                            <p id="seasonal-action-status-christmas" class="lucky-item-desc">-</p>
-                            <button id="seasonal-action-btn-christmas" class="btn-equip" onclick="performSeasonalDailyAction('christmas')" type="button">🎄 ツリーを飾り付ける</button>
-                        </div>
-
-                        <div id="seasonal-action-box-haru" class="lucky-item-box hidden">
-                            <p class="lucky-item-title">🌱 春の芽吹き（3月限定） 🌱</p>
-                            <p id="seasonal-action-status-haru" class="lucky-item-desc">-</p>
-                            <button id="seasonal-action-btn-haru" class="btn-equip" onclick="performSeasonalDailyAction('haru')" type="button">🌱 若葉を摘む</button>
-                        </div>
-
-                        <div id="seasonal-action-box-hanami" class="lucky-item-box hidden">
-                            <p class="lucky-item-title">🌸 お花見（4月限定） 🌸</p>
-                            <p id="seasonal-action-status-hanami" class="lucky-item-desc">-</p>
-                            <button id="seasonal-action-btn-hanami" class="btn-equip" onclick="performSeasonalDailyAction('hanami')" type="button">🌸 お花見をする</button>
-                        </div>
-
-                        <div id="seasonal-action-box-kodomonohi" class="lucky-item-box hidden">
-                            <p class="lucky-item-title">🎏 こどもの日（5/1〜5/5限定） 🎏</p>
-                            <p id="seasonal-action-status-kodomonohi" class="lucky-item-desc">-</p>
-                            <button id="seasonal-action-btn-kodomonohi" class="btn-equip" onclick="performSeasonalDailyAction('kodomonohi')" type="button">🎏 兜を飾る</button>
-                        </div>
-
-                        <div id="nagoshi-box" class="lucky-item-box hidden">
-                            <p class="lucky-item-title">⛩️ 夏越の大祓・茅の輪くぐり（6/25〜6/30限定） ⛩️</p>
-                            <p id="nagoshi-status-text" class="lucky-item-desc">-</p>
-                            <button id="nagoshi-btn" class="btn-equip" onclick="nagoshiChinowaKuguri()" type="button">⛩️ 茅の輪をくぐる</button>
-                        </div>
-
-                        <div id="nenmatsu-bell-box" class="lucky-item-box hidden">
-                            <p class="lucky-item-title">🔔 年末・除夜の鐘をつく（12/26〜12/31限定） 🔔</p>
-                            <p id="joya-bell-status-text" class="lucky-item-desc">-</p>
-                            <button id="joya-bell-btn" class="btn-equip" onclick="ringJoyaBell()" type="button">🔔 鐘をつく</button>
-                        </div>
-
-                        <p id="seasonal-missions-empty" class="collect-item-note hidden">現在、開催中の季節限定ミッションはありません。</p>
-                        </div>
-                    </details>
                 </div>
 
                 <div id="tab-prizes">
@@ -490,12 +419,6 @@
                         <div id="dex-grid" class="dex-grid"></div>
                         <p id="dex-reward-status" class="dex-reward-status hidden">-</p>
                     </div>
-
-                    <div id="yearly-album-section" class="shop-section hidden">
-                        <h3 class="shop-section-title">📖 年間アルバム</h3>
-                        <p class="bank-desc">年が変わるたびに、その年の実績が自動的に記録されます。これまでの歩みを振り返ってみましょう。</p>
-                        <div id="yearly-album-list"></div>
-                    </div>
                 </div>
 
                 <div id="tab-map" class="hidden">
@@ -529,26 +452,28 @@
                         </div>
                     </div>
 
-                    <div class="shop-section">
-                        <h3 class="shop-section-title">🌄 パワースポット編（第三弾）</h3>
+                    <div id="powerspot-inline-slot">
+                        <div id="powerspot-section" class="shop-section">
+                            <h3 class="shop-section-title">🌄 パワースポット編（第三弾）</h3>
 
-                        <div id="map-powerspot-locked" class="hidden">
-                            <p class="bank-desc">🔒 全国神社巡りマップ（第一弾）と、奥宮・摂社（第二弾）を両方完成させると進めるようになります。</p>
-                        </div>
-
-                        <div id="map-powerspot-ready" class="hidden">
-                            <p class="bank-desc">🎉 全国神社巡りと奥宮の完成、おめでとうございます！パワースポット編（第三弾）へ進む準備が整いました。</p>
-                            <button class="btn-shop-buy" onclick="startPowerSpotMap()" type="button">🌄 パワースポット編へ進む</button>
-                        </div>
-
-                        <div id="map-powerspot-unlocked" class="hidden">
-                            <p class="bank-desc">日本各地の自然のパワースポットを1箇所ずつ訪れていきましょう。各都道府県に2箇所ずつ、全国で94箇所あります。神社と違って1箇所ごとの一括購入です。訪れた箇所数の節目でお祝い金、全国制覇でさらに永続の大吉ボーナスがもらえます。</p>
-                            <p id="map-powerspot-progress" class="dex-progress">🌄 訪れたスポット：0 / 94箇所　｜　🗾 コンプリートした都道府県：0 / 47県</p>
-                            <div class="map-japan-grid-wrap">
-                                <div id="map-powerspot-grid" class="map-japan-grid"></div>
+                            <div id="map-powerspot-locked" class="hidden">
+                                <p class="bank-desc">🔒 全国神社巡りマップ（第一弾）と、奥宮・摂社（第二弾）を両方完成させると進めるようになります。</p>
                             </div>
-                            <div id="map-powerspot-detail" class="map-japan-detail">
-                                <p class="collect-item-desc">👆 上の地図から、好きな都道府県をタップして訪問先を選びましょう。</p>
+
+                            <div id="map-powerspot-ready" class="hidden">
+                                <p class="bank-desc">🎉 全国神社巡りと奥宮の完成、おめでとうございます！パワースポット編（第三弾）へ進む準備が整いました。</p>
+                                <button class="btn-shop-buy" onclick="startPowerSpotMap()" type="button">🌄 パワースポット編へ進む</button>
+                            </div>
+
+                            <div id="map-powerspot-unlocked" class="hidden">
+                                <p class="bank-desc">日本各地の自然のパワースポットを1箇所ずつ訪れていきましょう。各都道府県に2箇所ずつ、全国で94箇所あります。神社と違って1箇所ごとの一括購入です。訪れた箇所数の節目でお祝い金、全国制覇でさらに永続の大吉ボーナスがもらえます。</p>
+                                <p id="map-powerspot-progress" class="dex-progress">🌄 訪れたスポット：0 / 94箇所　｜　🗾 コンプリートした都道府県：0 / 47県</p>
+                                <div class="map-japan-grid-wrap">
+                                    <div id="map-powerspot-grid" class="map-japan-grid"></div>
+                                </div>
+                                <div id="map-powerspot-detail" class="map-japan-detail">
+                                    <p class="collect-item-desc">👆 上の地図から、好きな都道府県をタップして訪問先を選びましょう。</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -558,93 +483,62 @@
                         <div id="japan-map-archive-body" class="daily-notices-body"></div>
                     </details>
 
-                    <div class="shop-section">
-                        <h3 class="shop-section-title">🎏 日本三大○○（第四弾）</h3>
+                    <details id="powerspot-archive" class="daily-notices hidden" style="margin-top:15px;">
+                        <summary>📜 過去のマップ：パワースポット編（第三弾）を見る</summary>
+                        <div id="powerspot-archive-body" class="daily-notices-body"></div>
+                    </details>
 
-                        <div id="map-minitheme-locked" class="hidden">
-                            <p class="bank-desc">🔒 パワースポット編（第三弾）を完成させると進めるようになります。</p>
-                        </div>
+                    <div id="minitheme-inline-slot">
+                        <div id="minitheme-section" class="shop-section">
+                            <h3 class="shop-section-title">🎏 日本三大○○（第四弾）</h3>
 
-                        <div id="map-minitheme-ready" class="hidden">
-                            <p class="bank-desc">🎉 パワースポット編の完成、おめでとうございます！「日本三大○○」ミニマップ集（第四弾）へ進む準備が整いました。</p>
-                            <button class="btn-shop-buy" onclick="startMiniThemeMap()" type="button">🎏 日本三大○○へ進む</button>
-                        </div>
-
-                        <div id="map-minitheme-unlocked" class="hidden">
-                            <p class="bank-desc">日本各地の「日本三大○○」を巡るコンパクトなコレクションです。稲荷・八幡宮・天神・東照宮・弁天・三景・名瀑・がっかり名所の8テーマ×3箇所、全24箇所。訪れたスポット数の節目でお祝い金、全制覇でさらに永続の大吉ボーナスがもらえます。</p>
-                            <p id="map-minitheme-progress" class="dex-progress">🎏 訪れたスポット：0 / 24箇所　｜　🏆 コンプリートしたテーマ：0 / 8</p>
-                            <div id="minitheme-list"></div>
-                        </div>
-                    </div>
-
-                    <div class="shop-section">
-                        <h3 class="shop-section-title">🌍 世界の絶景・名所編（第五弾）</h3>
-
-                        <div id="map-worldspot-locked" class="hidden">
-                            <p class="bank-desc">🔒 「日本三大○○」ミニマップ集（第四弾）を完成させると進めるようになります。</p>
-                        </div>
-
-                        <div id="map-worldspot-ready" class="hidden">
-                            <p class="bank-desc">🎉 「日本三大○○」の完成、おめでとうございます！世界の絶景・名所編（第五弾）へ進む準備が整いました。</p>
-                            <button class="btn-shop-buy" onclick="startWorldSpotMap()" type="button">🌍 世界の絶景・名所へ進む</button>
-                        </div>
-
-                        <div id="map-worldspot-unlocked" class="hidden">
-                            <p class="bank-desc">舞台は日本を飛び出し、世界へ。東アジア・南アジア・中東・ヨーロッパ・北米・南米・オセアニアの7地域×2箇所、全14箇所を巡ります。訪れたスポット数の節目でお祝い金、全制覇でさらに永続の大吉ボーナスがもらえます。</p>
-                            <p id="map-worldspot-progress" class="dex-progress">🌍 訪れたスポット：0 / 14箇所　｜　🏆 コンプリートした地域：0 / 7</p>
-                            <div id="worldspot-list"></div>
-                        </div>
-                    </div>
-
-                    <!-- 🔀 第六弾：世界の絶景・名所編（第五弾）完成後に分岐する「歴史編」／「神社ビルダーモード」 -->
-                    <div id="map-path6-choice" class="shop-section hidden">
-                        <h3 class="shop-section-title">🔀 神社巡りマップ・第六弾（最終章）</h3>
-                        <p class="bank-desc">🎉 世界の絶景・名所編（第五弾）の完成、おめでとうございます！ここからは、2つの道のどちらかを選んで進みます。<br>
-                        どちらを先に選んでも構いません。片方を完成させると、もう一方も自動的に解放されるので、最終的には両方とも制覇できます。</p>
-                        <div class="boost-cards-grid">
-                            <div>
-                                <p class="shop-item-name">🏯 歴史編</p>
-                                <p class="shop-item-desc" style="white-space:normal;">縄文時代から近代まで、日本の歴史を彩る史跡を時代ごとに巡るコレクション。</p>
-                                <button class="btn-shop-buy" onclick="selectMapPath6('history')" type="button" style="width:100%;margin-top:6px;">🏯 歴史編を選ぶ</button>
+                            <div id="map-minitheme-locked" class="hidden">
+                                <p class="bank-desc">🔒 パワースポット編（第三弾）を完成させると進めるようになります。</p>
                             </div>
-                            <div>
-                                <p class="shop-item-name">🏗️ 神社ビルダーモード</p>
-                                <p class="shop-item-desc" style="white-space:normal;">自分だけの神社を、鳥居や神楽殿など10のパーツで少しずつ建て増していくモード。</p>
-                                <button class="btn-shop-buy" onclick="selectMapPath6('builder')" type="button" style="width:100%;margin-top:6px;">🏗️ 神社ビルダーモードを選ぶ</button>
+
+                            <div id="map-minitheme-ready" class="hidden">
+                                <p class="bank-desc">🎉 パワースポット編の完成、おめでとうございます！「日本三大○○」ミニマップ集（第四弾）へ進む準備が整いました。</p>
+                                <button class="btn-shop-buy" onclick="startMiniThemeMap()" type="button">🎏 日本三大○○へ進む</button>
+                            </div>
+
+                            <div id="map-minitheme-unlocked" class="hidden">
+                                <p class="bank-desc">日本各地の「日本三大○○」を巡るコンパクトなコレクションです。稲荷・八幡宮・天神・東照宮・弁天・三景・名瀑・がっかり名所の8テーマ×3箇所、全24箇所。訪れたスポット数の節目でお祝い金、全制覇でさらに永続の大吉ボーナスがもらえます。</p>
+                                <p id="map-minitheme-progress" class="dex-progress">🎏 訪れたスポット：0 / 24箇所　｜　🏆 コンプリートしたテーマ：0 / 8</p>
+                                <div id="minitheme-list"></div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="shop-section">
-                        <h3 class="shop-section-title">🏯 歴史編（第六弾-A）</h3>
+                    <details id="minitheme-archive" class="daily-notices hidden" style="margin-top:15px;">
+                        <summary>📜 過去のマップ：日本三大○○（第四弾）を見る</summary>
+                        <div id="minitheme-archive-body" class="daily-notices-body"></div>
+                    </details>
 
-                        <div id="map-history-locked" class="hidden">
-                            <p class="bank-desc">🔒 世界の絶景・名所編（第五弾）完成後の分岐選択で「歴史編」を選ぶと進めるようになります。</p>
-                        </div>
+                    <div id="worldspot-inline-slot">
+                        <div id="worldspot-section" class="shop-section">
+                            <h3 class="shop-section-title">🌍 世界の絶景・名所編（第五弾・最終章）</h3>
 
-                        <div id="map-history-unlocked" class="hidden">
-                            <p class="bank-desc">縄文・弥生から明治・近代まで、日本の8つの時代×3箇所、全24箇所の史跡を巡ります。訪れたスポット数の節目でお祝い金、全制覇でさらに永続の大吉ボーナスがもらえます。</p>
-                            <p id="map-history-progress" class="dex-progress">🏯 訪れた史跡：0 / 24箇所　｜　🏆 コンプリートした時代：0 / 8</p>
-                            <div id="map-history-era-grid" class="map-grid"></div>
-                            <div id="map-history-detail" class="map-japan-detail" style="margin-top:10px;"></div>
-                        </div>
-                    </div>
+                            <div id="map-worldspot-locked" class="hidden">
+                                <p class="bank-desc">🔒 「日本三大○○」ミニマップ集（第四弾）を完成させると進めるようになります。</p>
+                            </div>
 
-                    <div class="shop-section">
-                        <h3 class="shop-section-title">🏗️ 神社ビルダーモード（第六弾-B）</h3>
+                            <div id="map-worldspot-ready" class="hidden">
+                                <p class="bank-desc">🎉 「日本三大○○」の完成、おめでとうございます！世界の絶景・名所編（第五弾・最終章）へ進む準備が整いました。</p>
+                                <button class="btn-shop-buy" onclick="startWorldSpotMap()" type="button">🌍 世界の絶景・名所へ進む</button>
+                            </div>
 
-                        <div id="map-builder-locked" class="hidden">
-                            <p class="bank-desc">🔒 世界の絶景・名所編（第五弾）完成後の分岐選択で「神社ビルダーモード」を選ぶと進めるようになります。</p>
-                        </div>
-
-                        <div id="map-builder-unlocked" class="hidden">
-                            <p class="bank-desc">自分だけの神社を、鳥居の新調から御本殿の大改築まで、全10パーツで少しずつ建て増していきます。境内マップと同じく、順番に1つずつ購入していく形式です。</p>
-                            <p id="map-builder-progress" class="dex-progress">🏗️ 完成状況：0 / 10パーツ</p>
-                            <div id="map-builder-list" style="margin-bottom:10px;"></div>
-                            <p id="map-builder-next-text" style="font-size:0.85rem;color:#666;margin:0 0 8px;">-</p>
-                            <button id="map-builder-buy-btn" class="btn-shop-buy hidden" onclick="buyNextBuilderPart()" type="button" style="width:100%;">🏗️ このパーツを建てる</button>
+                            <div id="map-worldspot-unlocked" class="hidden">
+                                <p class="bank-desc">舞台は日本を飛び出し、世界へ。東アジア・南アジア・中東・ヨーロッパ・北米・南米・オセアニアの7地域×2箇所、全14箇所を巡ります。これが神社巡りマップの最終章です。訪れたスポット数の節目でお祝い金、全制覇でさらに永続の大吉ボーナスがもらえます。</p>
+                                <p id="map-worldspot-progress" class="dex-progress">🌍 訪れたスポット：0 / 14箇所　｜　🏆 コンプリートした地域：0 / 7</p>
+                                <div id="worldspot-list"></div>
+                            </div>
                         </div>
                     </div>
+
+                    <details id="worldspot-archive" class="daily-notices hidden" style="margin-top:15px;">
+                        <summary>📜 過去のマップ：世界の絶景・名所編（第五弾）を見る</summary>
+                        <div id="worldspot-archive-body" class="daily-notices-body"></div>
+                    </details>
                 </div>
             </div>
 
@@ -663,6 +557,12 @@
     <audio id="se-win" src="../sounds/win.mp3" preload="auto"></audio>
     <audio id="se-lose" src="../sounds/lose.mp3" preload="auto"></audio>
     <audio id="se-doom" src="../sounds/doom.mp3" preload="auto"></audio>
+    <audio id="se-daidaikichi" src="../sounds/daidaikichi.mp3" preload="auto"></audio>
+    <audio id="se-kamikichi" src="../sounds/kamikichi.mp3" preload="auto"></audio>
+    <audio id="se-purchase" src="../sounds/purchase.mp3" preload="auto"></audio>
+    <audio id="se-milestone" src="../sounds/milestone.mp3" preload="auto"></audio>
+    <audio id="se-complete" src="../sounds/complete.mp3" preload="auto"></audio>
+    <audio id="se-levelup" src="../sounds/levelup.mp3" preload="auto"></audio>
     <div id="more-menu-overlay" class="more-menu-overlay" onclick="closeMoreMenu()"></div>
     <div id="more-menu-drawer" class="more-menu-drawer">
         <div class="more-menu-header">
@@ -723,16 +623,16 @@
     <script src="../js/omikuji-state.js?v=8"></script>
     <script src="../js/omikuji-ui-core.js?v=2"></script>
     <script src="../js/omikuji-ui-shop.js?v=8"></script>
-    <script src="../js/omikuji-ui-effects.js?v=2"></script>
+    <script src="../js/omikuji-ui-effects.js?v=3"></script>
     <script src="../js/omikuji-ui-seasonal1.js?v=2"></script>
     <script src="../js/omikuji-ui-seasonal2.js?v=2"></script>
     <script src="../js/omikuji-ui-seasonal3.js?v=2"></script>
-    <script src="../js/omikuji-ui-map.js?v=8"></script>
-    <script src="../js/omikuji-shop.js?v=8"></script>
+    <script src="../js/omikuji-ui-map.js?v=9"></script>
+    <script src="../js/omikuji-shop.js?v=9"></script>
     <script src="../js/omikuji-missions.js?v=1"></script>
     <script src="../js/omikuji-draw-helpers.js?v=2"></script>
-    <script src="../js/omikuji-draw-single.js?v=8"></script>
-    <script src="../js/omikuji-draw-multi.js?v=8"></script>
+    <script src="../js/omikuji-draw-single.js?v=10"></script>
+    <script src="../js/omikuji-draw-multi.js?v=10"></script>
     <script src="../js/omikuji-main.js?v=8"></script>
     <script src="../js/omikuji-phantom.js?v=1"></script>
     <script>
