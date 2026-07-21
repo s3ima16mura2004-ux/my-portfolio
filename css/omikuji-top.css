@@ -32,7 +32,8 @@
 }
 
 .intro-section {
-    margin-bottom: 15px;
+    margin: 0 auto 15px;
+    max-width: 640px; /* 🖥️ 大きな画面でも1行が間延びしすぎないよう、読みやすい幅に制限して中央寄せにする */
 }
 
 .catchphrase {

@@ -254,13 +254,9 @@ function updateRankUI() {
     }
 }
 
-// 🎖️ 称号バッジの表示を更新する
-function updateTitlesUI() {
-    const box = document.querySelector("#titles-box");
-    const list = document.querySelector("#titles-list");
-    if (!box || !list) return;
-
-    const stats = {
+// 🎖️ 称号の達成条件判定に使う統計値をまとめて構築する（updateTitlesUIとequipTitleの両方から共通で使う）
+function buildTitleStats() {
+    return {
         totalDraws, totalDaikichi, totalProfit, urnLevel, ownedItems, dexRewardClaimed,
         gotDaidaikichi, gotKamikichi, gotDaidaikyou, gotUshimitsuDraw, ishikoro500Claimed,
         communityDraws, orihimeHikoboshiMeetCount, hatsuyumeComplete, steadyVisitorEarned,
@@ -269,20 +265,86 @@ function updateTitlesUI() {
         japanShrinePartsOwnedCount: getJapanShrinePartsTotalOwnedCount(), companionExp, ownedFriends,
         okumiyaCompleteCount: getOkumiyaCompleteCount(), okumiyaPartsOwnedCount: getOkumiyaPartsTotalOwnedCount(),
         powerSpotOwnedCount: getPowerSpotOwnedCount(), miniThemeOwnedCount: getMiniThemeOwnedCount(),
-        worldSpotOwnedCount: getWorldSpotOwnedCount()
+        worldSpotOwnedCount: getWorldSpotOwnedCount(),
+        historyOwnedCount: getHistoryOwnedCount(), builderLevel,
+        comboCompletedYears, gotHalloweenRareYokai, seasonalActionCounts
     };
+}
+
+// 🎖️ 称号選択パネルの表示を更新する（普段は折りたたんでおき、獲得した称号の中から1つだけ選んで名前の横に表示する）
+function updateTitlesUI() {
+    const box = document.querySelector("#titles-box");
+    const list = document.querySelector("#titles-list");
+    const badge = document.querySelector("#titles-count-badge");
+    if (!box || !list) return;
+
+    const stats = buildTitleStats();
     const earned = TITLES.filter(t => t.condition(stats));
+
+    if (badge) {
+        badge.textContent = earned.length > 0 ? "（獲得数：" + earned.length + "個）" : "（まだ獲得した称号はありません）";
+    }
 
     if (earned.length === 0) {
         box.classList.add("hidden");
         list.innerHTML = "";
+        updateEquippedTitleDisplay();
         return;
     }
 
     box.classList.remove("hidden");
-    list.innerHTML = earned.map(t =>
-        '<span class="title-badge" title="' + t.desc.replace(/"/g, "&quot;") + '">' + t.emoji + " " + t.name + "</span>"
-    ).join("");
+    list.innerHTML = earned.map(t => {
+        const equipped = equippedTitleKey === t.key;
+        return (
+            '<button type="button" class="title-badge' + (equipped ? " title-badge-equipped" : "") + '" ' +
+            'onclick="equipTitle(\'' + t.key + '\')" title="' + t.desc.replace(/"/g, "&quot;") + '">' +
+            t.emoji + " " + t.name + (equipped ? " ✅" : "") +
+            "</button>"
+        );
+    }).join("");
+
+    updateEquippedTitleDisplay();
+}
+
+// 🎖️ 装備中の称号を、参拝者名の横（user-info欄）に反映する
+function updateEquippedTitleDisplay() {
+    const display = document.querySelector("#equipped-title-display");
+    if (!display) return;
+
+    if (equippedTitleKey && equippedTitleEmoji) {
+        display.textContent = equippedTitleEmoji + " " + equippedTitleName + " ";
+        display.classList.remove("hidden");
+    } else {
+        display.textContent = "";
+        display.classList.add("hidden");
+    }
+}
+
+// 📖 年間アルバム（年が変わるたびに自動記録される、過去の年の実績スナップショット）の表示を更新する
+function updateYearlyAlbumUI() {
+    const section = document.querySelector("#yearly-album-section");
+    const list = document.querySelector("#yearly-album-list");
+    if (!section || !list) return;
+
+    if (!yearlyAlbum || yearlyAlbum.length === 0) {
+        section.classList.add("hidden");
+        return;
+    }
+    section.classList.remove("hidden");
+
+    // 新しい年が上に来るように並べ替えて表示する
+    const sorted = yearlyAlbum.slice().sort((a, b) => b.year - a.year);
+    list.innerHTML = sorted.map(entry => (
+        '<div class="map-japan-shrine-block">' +
+        '<p class="map-japan-shrine-title">' + entry.year + "年の記録 " +
+        (entry.comboCompleted ? '<span class="mission-status-tag mission-status-done">🎐 年間コンボ達成</span>' : '') +
+        '</p>' +
+        '<div class="map-japan-part-row"><span>⛩️ 参拝回数</span><span>' + (entry.totalDraws || 0).toLocaleString() + '回</span></div>' +
+        '<div class="map-japan-part-row"><span>🎉 大吉の回数</span><span>' + (entry.totalDaikichi || 0).toLocaleString() + '回</span></div>' +
+        '<div class="map-japan-part-row"><span>💰 年末時点の所持金</span><span>' + (entry.moneyAtEnd || 0).toLocaleString() + '円</span></div>' +
+        '<div class="map-japan-part-row"><span>🏦 年末時点の貯金</span><span>' + (entry.bankMoneyAtEnd || 0).toLocaleString() + '円</span></div>' +
+        '</div>'
+    )).join("");
 }
 
 // 📖 図鑑タブの表示を更新する

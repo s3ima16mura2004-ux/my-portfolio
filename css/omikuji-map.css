@@ -131,6 +131,26 @@
     font-size: 0.45rem;
 }
 
+/* 🖥️ ある程度広い画面では、常に横スクロールさせるのではなく、タイル自体を一回り大きく見やすくする
+   （都道府県の配置はJS側でgrid-row/grid-columnの位置番号を指定しているだけなので、
+   タイル1個のサイズを変えても配置には影響しない） */
+@media (min-width: 700px) {
+    .map-japan-grid {
+        grid-template-columns: repeat(10, 46px);
+        grid-auto-rows: 46px;
+        gap: 4px;
+        min-width: 500px;
+    }
+
+    .map-japan-tile-label {
+        font-size: 0.68rem;
+    }
+
+    .map-japan-tile-count {
+        font-size: 0.55rem;
+    }
+}
+
 .map-japan-tile.map-japan-tile-partial {
     background: #ffe9b3;
     color: #a06a00;

@@ -109,7 +109,10 @@ function updateJoyaBellUI() {
 
     const active = isSeasonalEventActive("nenmatsu");
     box.classList.toggle("hidden", !active);
-    if (!active) return;
+    if (!active) {
+        updateSeasonalMissionsBellUI();
+        return;
+    }
 
     const today = todayStr();
     const count = joyaBellDate === today ? joyaBellCount : 0;
@@ -121,6 +124,8 @@ function updateJoyaBellUI() {
             ? "🔔 今年の除夜の鐘は108回つき終えました。良いお年を…！"
             : "🔔 除夜の鐘：" + count + " / " + JOYA_BELL_TARGET + "回（108回つくと煩悩祓いのご褒美があります）";
     }
+
+    updateSeasonalMissionsBellUI();
 }
 
 // 🎁 サンタの袋の演出テキストを組み立てる
@@ -141,7 +146,10 @@ function updateValentineUI() {
     if (!box) return;
 
     box.classList.toggle("hidden", !active);
-    if (!active) return;
+    if (!active) {
+        updateSeasonalMissionsBellUI();
+        return;
+    }
 
     const usedToday = chocoDrawDate === todayStr();
     if (btn) btn.disabled = usedToday;
@@ -150,6 +158,8 @@ function updateValentineUI() {
             ? "💝 今日はもうチョコおみくじを引きました。また明日挑戦してください。（これまでに引いた回数：" + chocoDrawCount + "回）"
             : "💝 チョコおみくじを引くと、運勢とあなたの「ペア運勢」がわかります！（ハズレなし・1日1回）";
     }
+
+    updateSeasonalMissionsBellUI();
 }
 
 // 🎆 夏祭り（8月限定・夜と週末は本格的な演出、それ以外は夏っぽい軽い演出）の表示を更新する
@@ -167,6 +177,25 @@ function updateNatsumatsuriUI() {
 
     if (matsuriBanner) matsuriBanner.classList.toggle("hidden", !(isAugust && festivalActive));
     if (summerBanner) summerBanner.classList.toggle("hidden", !(isAugust && !festivalActive));
+
+    updateNatsumatsuriCommunityUI(); // 🎆 8月以外に切り替わった際も、コミュニティ目標欄を確実に非表示にする
+}
+
+// 🎆 夏祭り限定コミュニティ目標「みんなで花火玉を集めよう」の進捗表示を更新する
+function updateNatsumatsuriCommunityUI() {
+    const box = document.querySelector("#natsumatsuri-community-box");
+    if (!box) return;
+
+    const isAugust = (new Date().getMonth() + 1) === NATSUMATSURI_MONTH;
+    box.classList.toggle("hidden", !isAugust);
+    if (!isAugust) return;
+
+    const year = new Date().getFullYear();
+    if (communityNatsumatsuriGoalYear === year) {
+        box.textContent = "🎆 夏祭り・みんなで花火玉：目標達成しました！（合計" + communityNatsumatsuriCount.toLocaleString() + "個。今年参拝した方全員にボーナスが贈られました）";
+    } else {
+        box.textContent = "🎆 夏祭り・みんなで花火玉：" + communityNatsumatsuriCount.toLocaleString() + " / " + NATSUMATSURI_COMMUNITY_GOAL.toLocaleString() + "個（達成すると、今年参拝した方全員にボーナスがあります）";
+    }
 }
 
 // 🫘 節分中に豆まきの豆（稀に退治される鬼）を1つだけ画面に出す

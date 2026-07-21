@@ -149,7 +149,10 @@ function updateNagoshiUI() {
 
     const active = isSeasonalEventActive("nagoshi");
     box.classList.toggle("hidden", !active);
-    if (!active) return;
+    if (!active) {
+        updateSeasonalMissionsBellUI();
+        return;
+    }
 
     if (btn) btn.disabled = nagoshiBadCount <= 0;
     if (statusText) {
@@ -157,6 +160,65 @@ function updateNagoshiUI() {
             ? "🌾 半年間で祓うべき凶事：" + nagoshiBadCount + "回（茅の輪をくぐると清められます）"
             : "🌾 現在、祓うべき凶事は記録されていません。清らかな半年でしたね！";
     }
+
+    updateSeasonalMissionsBellUI();
 }
 
 // 🗺️ 境内マップタブの表示を更新する（所持金を使って1マスずつ買い進めるマップの完成状況）
+
+// 👻 ハロウィン中に提灯お化け・幽霊がふわりと漂う演出を1つだけ画面に出す
+function spawnGhostPiece() {
+    const overlay = document.querySelector("#season-fx-overlay");
+    if (!overlay) return;
+    const ghosts = ["👻", "🏮"];
+    const ghost = document.createElement("span");
+    ghost.textContent = ghosts[Math.floor(Math.random() * ghosts.length)];
+    ghost.className = "ghost-piece";
+    ghost.style.left = Math.random() * 100 + "vw";
+    ghost.style.animationDuration = (Math.random() * 3 + 6) + "s";
+    overlay.appendChild(ghost);
+    setTimeout(() => { ghost.remove(); }, 9500);
+}
+
+// 提灯お化け・幽霊を定期的に漂わせるタイマー（ハロウィン期間中だけ動かす）
+let halloweenGhostInterval = null;
+
+// 👻 ハロウィン（妖怪祭り・10/25〜10/31）の表示を更新する
+function updateHalloweenUI() {
+    const container = document.querySelector(".container");
+    const banner = document.querySelector("#halloween-banner");
+    const box = document.querySelector("#halloween-box");
+    const btn = document.querySelector("#kimodameshi-btn");
+    const statusText = document.querySelector("#kimodameshi-status-text");
+    const active = isSeasonalEventActive("halloween");
+
+    if (container) container.classList.toggle("halloween-active", active);
+    if (banner) banner.classList.toggle("hidden", !active);
+
+    if (active && !halloweenGhostInterval) {
+        halloweenGhostInterval = setInterval(spawnGhostPiece, 1000);
+    } else if (!active && halloweenGhostInterval) {
+        clearInterval(halloweenGhostInterval);
+        halloweenGhostInterval = null;
+    }
+
+    if (!box) {
+        updateSeasonalMissionsBellUI();
+        return;
+    }
+    box.classList.toggle("hidden", !active);
+    if (!active) {
+        updateSeasonalMissionsBellUI();
+        return;
+    }
+
+    const usedToday = kimodameshiDate === todayStr();
+    if (btn) btn.disabled = usedToday;
+    if (statusText) {
+        statusText.textContent = usedToday
+            ? "👻 今日はもう肝試しに出かけました。また明日挑戦してください。（これまでに挑戦した回数：" + kimodameshiCount + "回）"
+            : "👻 肝試しに出かけると、出会った妖怪に応じたご褒美がもらえます！（ハズレなし・1日1回）";
+    }
+
+    updateSeasonalMissionsBellUI();
+}
