@@ -12,7 +12,6 @@ function updateTanabataUI() {
 
     if (!isTanabataActive()) {
         box.classList.add("hidden");
-        updateSeasonalMissionsBellUI();
         return;
     }
     box.classList.remove("hidden");
