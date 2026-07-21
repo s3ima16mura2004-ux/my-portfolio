@@ -1521,3 +1521,13 @@ const SEASONAL_DAILY_ACTIONS = [
 // 神社改築コミュニティ目標（累計参拝回数）とは別に、その年の夏祭り期間だけ集計される
 const NATSUMATSURI_COMMUNITY_GOAL = 500;     // 全ユーザー合計でこの個数に達すると目標達成
 const NATSUMATSURI_COMMUNITY_PRIZE = 20000;  // 目標達成年に参拝した全員が受け取れる、その年1回きりのボーナス
+
+// 🎰 季節限定ガチャ：その季節の限定ドロップアイテムを合計5個集めると1回引ける（ハズレなし・4段階）
+// 実際の金額は、各イベント（omikuji-seasonal.js の SEASONAL_EVENTS）の gachaMultiplier を掛けて決まる
+const SEASONAL_GACHA_COST = 5;
+const SEASONAL_GACHA_BASE_TIERS = [
+    { min: 0.99, name: "🎉大当たり", basePrize: 100000 },
+    { min: 0.90, name: "✨当たり", basePrize: 20000 },
+    { min: 0.60, name: "😊小当たり", basePrize: 5000 },
+    { min: 0, name: "🍀ご縁の恵み", basePrize: 1500 }
+];

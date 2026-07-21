@@ -157,6 +157,33 @@ function updateSeasonalActionsUI() {
     updateSeasonalMissionsBellUI();
 }
 
+// 🎰 季節限定ガチャ（全季節共通）の表示を更新する。開催中のイベントの分だけボックスを表示する
+function updateSeasonalGachaUI() {
+    SEASONAL_EVENTS.forEach(event => {
+        const box = document.querySelector("#seasonal-gacha-box-" + event.key);
+        const btn = document.querySelector("#seasonal-gacha-btn-" + event.key);
+        const statusText = document.querySelector("#seasonal-gacha-status-" + event.key);
+        if (!box) return;
+
+        const active = isSeasonalEventActive(event.key);
+        box.classList.toggle("hidden", !active);
+        if (!active) return;
+
+        const items = DROP_ITEMS.filter(i => i.seasonal === event.key);
+        const totalOwned = items.reduce((sum, i) => sum + (ownedItems[i.key] || 0), 0);
+        const ready = totalOwned >= SEASONAL_GACHA_COST;
+
+        if (btn) btn.disabled = !ready;
+        if (statusText) {
+            statusText.textContent = ready
+                ? event.emoji + " 限定アイテムが" + totalOwned + "個集まりました！ガチャに挑戦できます（" + SEASONAL_GACHA_COST + "個消費）"
+                : event.emoji + " 限定アイテムを集めよう：" + totalOwned + " / " + SEASONAL_GACHA_COST + "個（3種類の合計でOK）";
+        }
+    });
+
+    updateSeasonalMissionsBellUI();
+}
+
 // 🎐 季節限定ミッション（七夕・バレンタイン・ハロウィン肝試し・季節ミニアクション等）の
 // 「本日まだやっていないものが何件あるか」を数えて、サイドバーの通知ベルに表示する。
 // 各ボックス自身の表示/非表示・ボタンのdisabled状態は既存の各update関数がすでに正しく設定しているので、

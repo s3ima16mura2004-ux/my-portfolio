@@ -116,6 +116,56 @@ async function drawGacha() {
     alert("🎰 ガチャ結果…🎰\n" + item.emoji + "「" + item.name + "」が出ました！\n（残りガチャ券：" + gachaTickets + "枚）");
 }
 
+// 🎰 季節限定ガチャ：開催中のイベントの限定ドロップアイテムを合計5個消費して1回引く（ハズレなし。金額は開催日数に応じて変わる）
+async function drawSeasonalGacha(eventKey) {
+    const event = SEASONAL_EVENTS.find(e => e.key === eventKey);
+    if (!event || !isSeasonalEventActive(eventKey)) return;
+
+    const items = DROP_ITEMS.filter(i => i.seasonal === eventKey);
+    const totalOwned = items.reduce((sum, i) => sum + (ownedItems[i.key] || 0), 0);
+
+    if (totalOwned < SEASONAL_GACHA_COST) {
+        alert(
+            "🙅 「" + event.name + "」の限定アイテムがまだ足りません！\n" +
+            "現在：" + totalOwned + " / " + SEASONAL_GACHA_COST + "個（3種類の合計でOKです）"
+        );
+        return;
+    }
+
+    // 所持数が多いアイテムから優先的に消費する（種類は問わず合計5個）
+    let remaining = SEASONAL_GACHA_COST;
+    items.slice().sort((a, b) => (ownedItems[b.key] || 0) - (ownedItems[a.key] || 0)).forEach(item => {
+        if (remaining <= 0) return;
+        const have = ownedItems[item.key] || 0;
+        const use = Math.min(have, remaining);
+        ownedItems[item.key] = have - use;
+        remaining -= use;
+    });
+
+    unlockAllAudio();
+    const roll = Math.random();
+    const tier = SEASONAL_GACHA_BASE_TIERS.find(t => roll >= t.min);
+    const multiplier = event.gachaMultiplier || 1;
+    const prize = Math.round(tier.basePrize * multiplier / 100) * 100; // 100円単位に丸める
+
+    currentMoney += prize;
+    totalWinnings += prize;
+
+    updateMoneyDisplay();
+    playSE("se-found");
+    startConfetti();
+    recordHistory(event.emoji + event.name + "・季節限定ガチャ(" + tier.name + ")", prize, currentMoney);
+    updateSeasonalGachaUI();
+    updateTitlesUI();
+    await saveUserState();
+
+    alert(
+        event.emoji + "🎰【" + event.name + "・季節限定ガチャ】🎰\n" +
+        "結果：" + tier.name + "！\n" +
+        "【" + prize.toLocaleString() + "円】を授かりました！"
+    );
+}
+
 async function equipCollectible(key) {
     // すでに装備中のアイテムをクリックした場合は「外す」動作にする
     if (key && equippedCollectible === key) {
@@ -416,6 +466,7 @@ function rollDrops() {
     checkOrihimeHikoboshiMeeting();
     checkOshogatsuHatsuyumeSet();
     updateYearlyComboUI(); // 🎐 年間コンボの進捗表示を更新
+    updateSeasonalGachaUI(); // 🎰 季節限定ガチャのアイテム所持数表示を更新
 
     if (dropped.length > 0) trackMissionDropItem(); // 🎯「収集家見習い」ミッションの進捗を更新
 

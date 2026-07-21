@@ -232,6 +232,102 @@
                             <button id="joya-bell-btn" class="btn-equip" onclick="ringJoyaBell()" type="button">🔔 鐘をつく</button>
                         </div>
 
+                        <h4 style="margin:14px 0 8px;color:#8b5a2b;font-size:0.9rem;">🎰 季節限定ガチャ（限定アイテムを5個集めると挑戦できます）</h4>
+                        <div id="seasonal-gacha-box-tanabata" class="lucky-item-box hidden">
+                            <p class="lucky-item-title">🎋 七夕・季節限定ガチャ 🎋</p>
+                            <p id="seasonal-gacha-status-tanabata" class="lucky-item-desc">-</p>
+                            <button id="seasonal-gacha-btn-tanabata" class="btn-equip" onclick="drawSeasonalGacha('tanabata')" type="button">🎰 ガチャを回す（5個消費）</button>
+                        </div>
+
+                        <div id="seasonal-gacha-box-natsumatsuri" class="lucky-item-box hidden">
+                            <p class="lucky-item-title">🎆 夏祭り・季節限定ガチャ 🎆</p>
+                            <p id="seasonal-gacha-status-natsumatsuri" class="lucky-item-desc">-</p>
+                            <button id="seasonal-gacha-btn-natsumatsuri" class="btn-equip" onclick="drawSeasonalGacha('natsumatsuri')" type="button">🎰 ガチャを回す（5個消費）</button>
+                        </div>
+
+                        <div id="seasonal-gacha-box-otsukimi" class="lucky-item-box hidden">
+                            <p class="lucky-item-title">🌕 お月見・季節限定ガチャ 🌕</p>
+                            <p id="seasonal-gacha-status-otsukimi" class="lucky-item-desc">-</p>
+                            <button id="seasonal-gacha-btn-otsukimi" class="btn-equip" onclick="drawSeasonalGacha('otsukimi')" type="button">🎰 ガチャを回す（5個消費）</button>
+                        </div>
+
+                        <div id="seasonal-gacha-box-koyo" class="lucky-item-box hidden">
+                            <p class="lucky-item-title">🍁 紅葉狩り・季節限定ガチャ 🍁</p>
+                            <p id="seasonal-gacha-status-koyo" class="lucky-item-desc">-</p>
+                            <button id="seasonal-gacha-btn-koyo" class="btn-equip" onclick="drawSeasonalGacha('koyo')" type="button">🎰 ガチャを回す（5個消費）</button>
+                        </div>
+
+                        <div id="seasonal-gacha-box-oshogatsu" class="lucky-item-box hidden">
+                            <p class="lucky-item-title">🎍 お正月・季節限定ガチャ 🎍</p>
+                            <p id="seasonal-gacha-status-oshogatsu" class="lucky-item-desc">-</p>
+                            <button id="seasonal-gacha-btn-oshogatsu" class="btn-equip" onclick="drawSeasonalGacha('oshogatsu')" type="button">🎰 ガチャを回す（5個消費）</button>
+                        </div>
+
+                        <div id="seasonal-gacha-box-valentine" class="lucky-item-box hidden">
+                            <p class="lucky-item-title">💝 バレンタイン・季節限定ガチャ 💝</p>
+                            <p id="seasonal-gacha-status-valentine" class="lucky-item-desc">-</p>
+                            <button id="seasonal-gacha-btn-valentine" class="btn-equip" onclick="drawSeasonalGacha('valentine')" type="button">🎰 ガチャを回す（5個消費）</button>
+                        </div>
+
+                        <div id="seasonal-gacha-box-kannazuki" class="lucky-item-box hidden">
+                            <p class="lucky-item-title">🌫️ 神無月・季節限定ガチャ 🌫️</p>
+                            <p id="seasonal-gacha-status-kannazuki" class="lucky-item-desc">-</p>
+                            <button id="seasonal-gacha-btn-kannazuki" class="btn-equip" onclick="drawSeasonalGacha('kannazuki')" type="button">🎰 ガチャを回す（5個消費）</button>
+                        </div>
+
+                        <div id="seasonal-gacha-box-shichigosan" class="lucky-item-box hidden">
+                            <p class="lucky-item-title">👘 七五三・季節限定ガチャ 👘</p>
+                            <p id="seasonal-gacha-status-shichigosan" class="lucky-item-desc">-</p>
+                            <button id="seasonal-gacha-btn-shichigosan" class="btn-equip" onclick="drawSeasonalGacha('shichigosan')" type="button">🎰 ガチャを回す（5個消費）</button>
+                        </div>
+
+                        <div id="seasonal-gacha-box-christmas" class="lucky-item-box hidden">
+                            <p class="lucky-item-title">🎄 クリスマス・季節限定ガチャ 🎄</p>
+                            <p id="seasonal-gacha-status-christmas" class="lucky-item-desc">-</p>
+                            <button id="seasonal-gacha-btn-christmas" class="btn-equip" onclick="drawSeasonalGacha('christmas')" type="button">🎰 ガチャを回す（5個消費）</button>
+                        </div>
+
+                        <div id="seasonal-gacha-box-nenmatsu" class="lucky-item-box hidden">
+                            <p class="lucky-item-title">🎊 年末・季節限定ガチャ 🎊</p>
+                            <p id="seasonal-gacha-status-nenmatsu" class="lucky-item-desc">-</p>
+                            <button id="seasonal-gacha-btn-nenmatsu" class="btn-equip" onclick="drawSeasonalGacha('nenmatsu')" type="button">🎰 ガチャを回す（5個消費）</button>
+                        </div>
+
+                        <div id="seasonal-gacha-box-halloween" class="lucky-item-box hidden">
+                            <p class="lucky-item-title">👻 ハロウィン（妖怪祭り）・季節限定ガチャ 👻</p>
+                            <p id="seasonal-gacha-status-halloween" class="lucky-item-desc">-</p>
+                            <button id="seasonal-gacha-btn-halloween" class="btn-equip" onclick="drawSeasonalGacha('halloween')" type="button">🎰 ガチャを回す（5個消費）</button>
+                        </div>
+
+                        <div id="seasonal-gacha-box-setsubun" class="lucky-item-box hidden">
+                            <p class="lucky-item-title">🫘 節分・季節限定ガチャ 🫘</p>
+                            <p id="seasonal-gacha-status-setsubun" class="lucky-item-desc">-</p>
+                            <button id="seasonal-gacha-btn-setsubun" class="btn-equip" onclick="drawSeasonalGacha('setsubun')" type="button">🎰 ガチャを回す（5個消費）</button>
+                        </div>
+
+                        <div id="seasonal-gacha-box-haru" class="lucky-item-box hidden">
+                            <p class="lucky-item-title">🌱 春の芽吹き・季節限定ガチャ 🌱</p>
+                            <p id="seasonal-gacha-status-haru" class="lucky-item-desc">-</p>
+                            <button id="seasonal-gacha-btn-haru" class="btn-equip" onclick="drawSeasonalGacha('haru')" type="button">🎰 ガチャを回す（5個消費）</button>
+                        </div>
+
+                        <div id="seasonal-gacha-box-hanami" class="lucky-item-box hidden">
+                            <p class="lucky-item-title">🌸 お花見・季節限定ガチャ 🌸</p>
+                            <p id="seasonal-gacha-status-hanami" class="lucky-item-desc">-</p>
+                            <button id="seasonal-gacha-btn-hanami" class="btn-equip" onclick="drawSeasonalGacha('hanami')" type="button">🎰 ガチャを回す（5個消費）</button>
+                        </div>
+
+                        <div id="seasonal-gacha-box-kodomonohi" class="lucky-item-box hidden">
+                            <p class="lucky-item-title">🎏 こどもの日・季節限定ガチャ 🎏</p>
+                            <p id="seasonal-gacha-status-kodomonohi" class="lucky-item-desc">-</p>
+                            <button id="seasonal-gacha-btn-kodomonohi" class="btn-equip" onclick="drawSeasonalGacha('kodomonohi')" type="button">🎰 ガチャを回す（5個消費）</button>
+                        </div>
+
+                        <div id="seasonal-gacha-box-nagoshi" class="lucky-item-box hidden">
+                            <p class="lucky-item-title">🌾 夏越の大祓・季節限定ガチャ 🌾</p>
+                            <p id="seasonal-gacha-status-nagoshi" class="lucky-item-desc">-</p>
+                            <button id="seasonal-gacha-btn-nagoshi" class="btn-equip" onclick="drawSeasonalGacha('nagoshi')" type="button">🎰 ガチャを回す（5個消費）</button>
+                        </div>
                         <p id="seasonal-missions-empty" class="collect-item-note hidden">現在、開催中の季節限定ミッションはありません。</p>
                         </div>
                     </details>
@@ -748,23 +844,23 @@
         window.omikujiCommunityRef = doc(db, "global", "community");
     </script>
 
-    <script src="../js/omikuji-seasonal.js?v=3"></script>
+    <script src="../js/omikuji-seasonal.js?v=4"></script>
     <script src="../js/omikuji-countdown.js?v=2"></script>
-    <script src="../js/omikuji-data.js?v=9"></script>
+    <script src="../js/omikuji-data.js?v=10"></script>
     <script src="../js/omikuji-state.js?v=9"></script>
     <script src="../js/omikuji-ui-core.js?v=3"></script>
     <script src="../js/omikuji-ui-shop.js?v=9"></script>
-    <script src="../js/omikuji-ui-effects.js?v=3"></script>
+    <script src="../js/omikuji-ui-effects.js?v=4"></script>
     <script src="../js/omikuji-ui-seasonal1.js?v=3"></script>
     <script src="../js/omikuji-ui-seasonal2.js?v=3"></script>
     <script src="../js/omikuji-ui-seasonal3.js?v=3"></script>
     <script src="../js/omikuji-ui-map.js?v=9"></script>
-    <script src="../js/omikuji-shop.js?v=9"></script>
+    <script src="../js/omikuji-shop.js?v=10"></script>
     <script src="../js/omikuji-missions.js?v=2"></script>
     <script src="../js/omikuji-draw-helpers.js?v=3"></script>
     <script src="../js/omikuji-draw-single.js?v=9"></script>
     <script src="../js/omikuji-draw-multi.js?v=9"></script>
-    <script src="../js/omikuji-main.js?v=9"></script>
+    <script src="../js/omikuji-main.js?v=10"></script>
     <script src="../js/omikuji-phantom.js?v=2"></script>
     <script>
         // 🚪 ログアウト処理：ログイン情報を消してログインページへ戻る
