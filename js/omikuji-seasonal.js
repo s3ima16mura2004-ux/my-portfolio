@@ -71,6 +71,36 @@ const SEASONAL_EVENTS = [
         startMonth: 10, startDay: 25, endMonth: 10, endDay: 31,
         nightWeekendOnly: false,
         desc: "和風の妖怪たちが境内に集う夜。「肝試し」に挑戦すると、出会う妖怪次第でご褒美がもらえます（ハズレなし・1日1回）"
+    },
+    {
+        key: "setsubun", name: "節分", emoji: "🫘",
+        startMonth: 2, startDay: 1, endMonth: 2, endDay: 3,
+        nightWeekendOnly: false,
+        desc: "豆まきで厄払いをする季節。境内に豆まきの豆（稀に鬼）が舞い、おみくじの結果次第で「福は内」の恩恵が"
+    },
+    {
+        key: "haru", name: "春の芽吹き", emoji: "🌱",
+        startMonth: 3, startDay: 1, endMonth: 3, endDay: 31,
+        nightWeekendOnly: false,
+        desc: "花が咲く前の若葉・新芽の季節。境内に若葉がふわりと立ちのぼり、限定アイテムが出現します"
+    },
+    {
+        key: "hanami", name: "お花見", emoji: "🌸",
+        startMonth: 4, startDay: 1, endMonth: 4, endDay: 30,
+        nightWeekendOnly: false,
+        desc: "桜満開の季節。花びらが舞い散る中、お花見団子などの限定アイテムが出現します"
+    },
+    {
+        key: "kodomonohi", name: "こどもの日", emoji: "🎏",
+        startMonth: 5, startDay: 1, endMonth: 5, endDay: 5,
+        nightWeekendOnly: false,
+        desc: "黄金の鯉のぼり（稀に昇り龍）が空を泳ぐ期間。大大吉以上の出現率がアップし、限定アイテムも出現します"
+    },
+    {
+        key: "nagoshi", name: "夏越の大祓", emoji: "🌾",
+        startMonth: 6, startDay: 25, endMonth: 6, endDay: 30,
+        nightWeekendOnly: false,
+        desc: "半年間の穢れを祓う「茅の輪くぐり」の季節。これまでに引いた「凶」「大凶」の回数に応じたご褒美がもらえます"
     }
 ];
 
