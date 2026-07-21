@@ -25,95 +25,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 🎋 ラッキーアイテムの一覧（index.htmlと同じ内容。表示用に名前・説明のみ使用）
-const LUCKY_ITEMS = [
-    { key: "daikichi_up", emoji: "🍀", name: "四つ葉のクローバー", desc: "今日1日、大吉運が少しだけアップ！" },
-    { key: "prize_up", emoji: "🐟", name: "立派な鯛", desc: "今日1日、獲得賞金が10%アップ！" },
-    { key: "tax_half", emoji: "🐍", name: "白蛇の抜け殻", desc: "今日1日、大凶のお祓い料がさらに半額に！" },
-    { key: "fever_extra", emoji: "🔔", name: "縁起の良い鈴の音", desc: "今日1日、大凶時のフィーバー回数が+1回に！" },
-    { key: "zorome_up", emoji: "🌟", name: "流れ星のかけら", desc: "今日1日、ゾロ目ボーナスが+2,000円に！" }
-];
-
-// 🗓️ 季節イベント（omikuji-seasonal.jsと同じ内容。運勢カレンダーへの表示用）
-const SEASONAL_EVENTS = [
-    { key: "tanabata", name: "七夕", emoji: "🎋", startMonth: 7, startDay: 1, endMonth: 7, endDay: 7, nightWeekendOnly: false,
-      desc: "織姫と彦星にちなんだ限定アイテムが出現。7/7は短冊の願いが必ず叶う特別な日" },
-    { key: "natsumatsuri", name: "夏祭り", emoji: "🎆", startMonth: 8, startDay: 1, endMonth: 8, endDay: 31, nightWeekendOnly: true,
-      desc: "8月の夜・週末だけ限定アイテムが出現＆ドロップ率1.5倍（それ以外の8月は夏の軽い演出に）" },
-    { key: "otsukimi", name: "お月見", emoji: "🌕", startMonth: 9, startDay: 15, endMonth: 9, endDay: 30, nightWeekendOnly: false,
-      desc: "お月見にちなんだ限定アイテムが出現（十五夜の目安期間）" },
-    { key: "koyo", name: "紅葉狩り", emoji: "🍁", startMonth: 11, startDay: 1, endMonth: 11, endDay: 30, nightWeekendOnly: false,
-      desc: "紅葉にちなんだ限定アイテムが出現" },
-    { key: "oshogatsu", name: "お正月", emoji: "🎍", startMonth: 1, startDay: 1, endMonth: 1, endDay: 3, nightWeekendOnly: false,
-      desc: "初夢の縁起物「一富士二鷹三茄子」が出現。三つ揃うと特別なご褒美が！" },
-    { key: "valentine", name: "バレンタイン", emoji: "💝", startMonth: 2, startDay: 1, endMonth: 2, endDay: 14, nightWeekendOnly: false,
-      desc: "縁結びの祈りの季節。「チョコおみくじ」を引くと、相性の良い運勢との「ペア運勢」が履歴に残ります（1日1回）" },
-    { key: "kannazuki", name: "神無月", emoji: "🌫️", startMonth: 10, startDay: 1, endMonth: 10, endDay: 31, nightWeekendOnly: false,
-      desc: "神様が出雲へ出かけ、神社が少し寂しくなる期間。この間に賽銭箱へ預けたお金は、11月に神様が戻った時「倍返し」されます" },
-    { key: "shichigosan", name: "七五三", emoji: "👘", startMonth: 11, startDay: 1, endMonth: 11, endDay: 30, nightWeekendOnly: false,
-      desc: "成長祈願の季節。ショップに「千歳飴」が並び、装備するとフィーバータイムの回数が延長されます" },
-    { key: "christmas", name: "クリスマス", emoji: "🎄", startMonth: 12, startDay: 1, endMonth: 12, endDay: 25, nightWeekendOnly: false,
-      desc: "神社が彩られる特別な期間。昼は雪がちらちら降り、夜はイルミネーションが点滅。低確率で「サンタの袋」が現れます" },
-    { key: "nenmatsu", name: "年末", emoji: "🎊", startMonth: 12, startDay: 26, endMonth: 12, endDay: 31, nightWeekendOnly: false,
-      desc: "一年の締めくくりの期間。昼は静かに雪が降り、夜は「除夜の鐘」が響きます。鐘を108回つくと煩悩祓いのご褒美が" }
-];
-
-// 指定した日付（省略時は今日）が、あるイベントの期間内かどうか
-function isDateInSeasonWindow(event, baseDate) {
-    const now = baseDate || new Date();
-    const month = now.getMonth() + 1;
-    const day = now.getDate();
-
-    if (event.startMonth === event.endMonth) {
-        return month === event.startMonth && day >= event.startDay && day <= event.endDay;
-    }
-    if (event.startMonth < event.endMonth) {
-        if (month === event.startMonth) return day >= event.startDay;
-        if (month === event.endMonth) return day <= event.endDay;
-        return month > event.startMonth && month < event.endMonth;
-    }
-    if (month === event.startMonth) return day >= event.startDay;
-    if (month === event.endMonth) return day <= event.endDay;
-    return month > event.startMonth || month < event.endMonth;
-}
-
-// 指定した日付が期間内に含まれる季節イベントの一覧を返す
-function getSeasonalEventsForDate(dateObj) {
-    return SEASONAL_EVENTS.filter(e => isDateInSeasonWindow(e, dateObj));
-}
-
-// 🏺 壺のランクアップ段階数（omikuji2.jsと同じ内容。称号判定の最大値参照に使用）
-const URN_LEVEL_COUNT = 6;
-
-// 🎖️ 称号（omikuji2.jsと同じ条件。トップページのプロフィール欄にも表示するため）
-// ⛩️ 参拝ランク（omikuji2.jsと同じ内容。累計獲得賞金額で判定）
-const VISITOR_RANKS = [
-    { tier: 0, name: "平参拝者", threshold: 0 },
-    { tier: 1, name: "常連客", threshold: 50000 },
-    { tier: 2, name: "氏子", threshold: 300000 },
-    { tier: 3, name: "神の寵愛者", threshold: 1500000 },
-    { tier: 4, name: "神社の重鎮", threshold: 5000000 },
-    { tier: 5, name: "生き神様", threshold: 20000000 }
-];
-
-const TITLES = [
-    { key: "hyakuman", emoji: "💰", name: "百万長者", desc: "累計収支+1,000,000円を達成", condition: s => s.totalProfit >= 1000000 },
-    { key: "juman", emoji: "💴", name: "実は儲かってる人", desc: "累計収支+100,000円を達成", condition: s => s.totalProfit >= 100000 },
-    { key: "daikichi_hunter", emoji: "🎯", name: "大吉ハンター", desc: "大吉を合計10回引いた", condition: s => s.totalDaikichi >= 10 },
-    { key: "daikichi_master", emoji: "🏹", name: "大吉マスター", desc: "大吉を合計30回引いた", condition: s => s.totalDaikichi >= 30 },
-    { key: "veteran", emoji: "⛩️", name: "生き字引", desc: "累計参拝回数500回を達成", condition: s => s.totalDraws >= 500 },
-    { key: "regular", emoji: "🙏", name: "常連参拝者", desc: "累計参拝回数100回を達成", condition: s => s.totalDraws >= 100 },
-    { key: "first_visit", emoji: "🔰", name: "初参拝", desc: "はじめての参拝を達成", condition: s => s.totalDraws >= 1 },
-    { key: "urn_master", emoji: "🏺", name: "壺のマイスター", desc: "おみくじの壺を最大までランクアップ", condition: s => s.urnLevel >= URN_LEVEL_COUNT - 1 },
-    { key: "stone_collector", emoji: "🪨", name: "石ころコレクター", desc: "謎の石ころを100個集めた", condition: s => (s.ownedItems && s.ownedItems.ishikoro || 0) >= 100 },
-    { key: "dex_complete", emoji: "📖", name: "図鑑コンプリート", desc: "大吉〜大凶(神の試練)まで全種類を達成", condition: s => s.dexRewardClaimed === true },
-    { key: "daidaikichi_title", emoji: "☀️", name: "天啓を受けし者", desc: "「大大吉」を引いた", condition: s => s.gotDaidaikichi === true },
-    { key: "kamikichi_title", emoji: "😊", name: "神様に微笑まれし者", desc: "「神吉」を引いた", condition: s => s.gotKamikichi === true },
-    { key: "daidaikyou_title", emoji: "💀", name: "丑三つ時の生還者", desc: "「大大凶」を乗り越えた", condition: s => s.gotDaidaikyou === true },
-    { key: "ushimitsu_title", emoji: "🌙", name: "丑三つ時の参拝者", desc: "深夜2時〜4時の「丑三つ時」に参拝した", condition: s => s.gotUshimitsuDraw === true },
-    { key: "sages_stone", emoji: "🪨✨", name: "賢者の石の使い手", desc: "謎の石ころを500個集め「賢者の石」に変化させた", condition: s => s.ishikoro500Claimed === true },
-    { key: "founding_priest", emoji: "⛩️👑", name: "初代宮司", desc: "神社改築が「国宝指定」まで到達した（全員に付与）", condition: s => s.communityDraws >= 1000000 }
-];
+// 🎋🗓️⛩️🏺🎖️ ラッキーアイテム・季節イベント・参拝ランク・壺・称号のデータは、
+// omikuji-data.js / omikuji-seasonal.js を先に読み込むことで共有している（top.js側での二重管理をやめた）。
+// これにより、omikuji2.html側でデータが増えても、top.html側が自動的に追従するようになる。
 
 const username = localStorage.getItem("logged_in_user");
 
@@ -179,6 +93,15 @@ async function loadUserInfo() {
                 console.error("称号判定用のコミュニティデータ取得に失敗しました: ", e);
             }
 
+            // 🗺️ 称号判定に必要な「コンプリート状況」を、omikuji-state.js側の集計関数でそのまま計算できるよう、
+            // 関連する生データをomikuji-state.jsのグローバル変数へ反映しておく（omikuji2.html側と全く同じロジックを再利用するため）
+            japanShrinePartsOwned = data.japanShrinePartsOwned || {};
+            japanOkumiyaPartsOwned = data.japanOkumiyaPartsOwned || {};
+            ownedPowerSpots = data.ownedPowerSpots || {};
+            ownedMiniThemeSpots = data.ownedMiniThemeSpots || {};
+            ownedWorldSpots = data.ownedWorldSpots || {};
+            ownedHistorySpots = data.ownedHistorySpots || {};
+
             const stats = {
                 totalDraws: typeof data.totalDraws === "number" ? data.totalDraws : 0,
                 totalDaikichi: typeof data.totalDaikichi === "number" ? data.totalDaikichi : 0,
@@ -191,7 +114,34 @@ async function loadUserInfo() {
                 gotDaidaikyou: data.gotDaidaikyou === true,
                 gotUshimitsuDraw: data.gotUshimitsuDraw === true,
                 ishikoro500Claimed: data.ishikoro500Claimed === true,
-                communityDraws: communityDrawsForTitle
+                communityDraws: communityDrawsForTitle,
+                orihimeHikoboshiMeetCount: typeof data.orihimeHikoboshiMeetCount === "number" ? data.orihimeHikoboshiMeetCount : 0,
+                hatsuyumeComplete: data.hatsuyumeComplete === true,
+                steadyVisitorEarned: data.steadyVisitorEarned === true,
+                hanamiDangoTotalCollected: typeof data.hanamiDangoTotalCollected === "number" ? data.hanamiDangoTotalCollected : 0,
+                gotKodomonohiExtreme: data.gotKodomonohiExtreme === true,
+                mamemakiSuccessCount: typeof data.mamemakiSuccessCount === "number" ? data.mamemakiSuccessCount : 0,
+                nagoshiLastResetYear: data.nagoshiLastResetYear || 0,
+                chocoDrawCount: typeof data.chocoDrawCount === "number" ? data.chocoDrawCount : 0,
+                joyaBellCompleteYear: data.joyaBellCompleteYear || 0,
+                kannazukiRewardedYear: data.kannazukiRewardedYear || 0,
+                santaBagCount: typeof data.santaBagCount === "number" ? data.santaBagCount : 0,
+                shrineMapLevel: typeof data.shrineMapLevel === "number" ? data.shrineMapLevel : 0,
+                companionExp: typeof data.companionExp === "number" ? data.companionExp : 0,
+                ownedFriends: data.ownedFriends || {},
+                builderLevel: typeof data.builderLevel === "number" ? data.builderLevel : 0,
+                comboCompletedYears: typeof data.comboCompletedYears === "number" ? data.comboCompletedYears : 0,
+                gotHalloweenRareYokai: data.gotHalloweenRareYokai === true,
+                seasonalActionCounts: data.seasonalActionCounts || {},
+                // 🗺️ 以下は、上で反映した生データをもとにomikuji-state.jsの集計関数でそのまま計算する
+                japanShrineOwnedCount: getJapanShrineOwnedCount(),
+                japanPrefCompleteCount: getJapanPrefectureCompleteCount(),
+                japanShrinePartsOwnedCount: getJapanShrinePartsTotalOwnedCount(),
+                okumiyaCompleteCount: getOkumiyaCompleteCount(),
+                powerSpotOwnedCount: getPowerSpotOwnedCount(),
+                miniThemeOwnedCount: getMiniThemeOwnedCount(),
+                worldSpotOwnedCount: getWorldSpotOwnedCount(),
+                historyOwnedCount: getHistoryOwnedCount()
             };
             renderTitles(stats);
 
@@ -215,15 +165,7 @@ async function loadCommunityStatus() {
         const snap = await getDoc(doc(db, "global", "community"));
         const totalDraws = (snap.exists() && typeof snap.data().totalDraws === "number") ? snap.data().totalDraws : 0;
 
-        const tiers = [
-            { threshold: 0, name: "いつもの境内" },
-            { threshold: 1000, name: "少し賑わう境内（金色の輝き）" },
-            { threshold: 5000, name: "大改築された境内（🎊福だるま登場！）" },
-            { threshold: 20000, name: "大鳥居建立（10連おみくじが1,000円割引）" },
-            { threshold: 100000, name: "本殿完成（新しい収集アイテム「五色の短冊」解放）" },
-            { threshold: 500000, name: "全国的に有名な神社に（福だるまの発生率アップ）" },
-            { threshold: 1000000, name: "国宝指定（称号「初代宮司」を全員に付与）" }
-        ];
+        const tiers = COMMUNITY_TIERS; // 🏘️ omikuji-data.js側の定義をそのまま使う（二重管理をやめた）
         let tierIndex = 0;
         tiers.forEach((t, i) => { if (totalDraws >= t.threshold) tierIndex = i; });
 
@@ -553,147 +495,18 @@ function renderCalendarGrid(grid, year, month, dayTotals) {
     grid.innerHTML = html;
 }
 
-// 🌅🌇🌙 時間帯（朝・昼・夜・丑三つ時）の背景演出（omikuji2.jsと同じロジック）
-function getTimePeriod() {
-    const hour = new Date().getHours();
-    if (hour >= 2 && hour < 4) return "ushimitsu";
-    if (hour >= 5 && hour < 11) return "morning";
-    if (hour >= 11 && hour < 17) return "afternoon";
-    return "evening";
-}
-
-function applyTimeTheme() {
-    const container = document.querySelector(".container");
-    const period = getTimePeriod();
-
-    if (container) {
-        container.classList.remove("time-morning", "time-afternoon", "time-evening", "time-ushimitsu");
-        container.classList.add("time-" + period);
-    }
-
-    const banner = document.querySelector("#ushimitsu-banner");
-    if (banner) {
-        if (period === "ushimitsu") {
-            banner.classList.remove("hidden");
-        } else {
-            banner.classList.add("hidden");
-        }
-    }
-}
-
-// ============================================================
-// ⏳ カウントダウン（次の季節イベント／次のボーナスタイムまで）
-// ============================================================
-
-function formatCountdown(ms) {
-    if (ms <= 0) return "まもなく";
-    const totalSec = Math.floor(ms / 1000);
-    const days = Math.floor(totalSec / 86400);
-    const hours = Math.floor((totalSec % 86400) / 3600);
-    const minutes = Math.floor((totalSec % 3600) / 60);
-    const seconds = totalSec % 60;
-
-    if (days > 0) return days + "日 " + hours + "時間 " + minutes + "分";
-    if (hours > 0) return hours + "時間 " + minutes + "分 " + seconds + "秒";
-    return minutes + "分 " + seconds + "秒";
-}
-
-function getEventDateRangeForYear(event, year) {
-    const start = new Date(year, event.startMonth - 1, event.startDay, 0, 0, 0);
-    const end = new Date(year, event.endMonth - 1, event.endDay, 23, 59, 59);
-    return { start: start, end: end };
-}
-
-function getNextSeasonalEventInfo() {
-    const now = new Date();
-    const year = now.getFullYear();
-
-    const candidates = [];
-    [year, year + 1].forEach(y => {
-        SEASONAL_EVENTS.forEach(event => {
-            const range = getEventDateRangeForYear(event, y);
-            candidates.push({ event: event, start: range.start, end: range.end });
-        });
-    });
-
-    const active = candidates.find(c => now >= c.start && now <= c.end);
-    if (active) {
-        return { phase: "active", event: active.event, targetDate: active.end };
-    }
-
-    const upcoming = candidates
-        .filter(c => c.start > now)
-        .sort((a, b) => a.start - b.start)[0];
-
-    return upcoming ? { phase: "upcoming", event: upcoming.event, targetDate: upcoming.start } : null;
-}
-
-function getNextBonusTimeInfo() {
-    const now = new Date();
-    const todayStart = new Date(now);
-    todayStart.setHours(2, 0, 0, 0);
-    const todayEnd = new Date(now);
-    todayEnd.setHours(4, 0, 0, 0);
-
-    if (now >= todayStart && now < todayEnd) {
-        return { phase: "active", targetDate: todayEnd };
-    }
-
-    const nextStart = new Date(todayStart);
-    if (now >= todayEnd) {
-        nextStart.setDate(nextStart.getDate() + 1);
-    }
-    return { phase: "upcoming", targetDate: nextStart };
-}
-
-function updateSeasonCountdownUI() {
-    const box = document.querySelector("#countdown-season-box");
-    if (!box) return;
-
-    const info = getNextSeasonalEventInfo();
-    if (!info) {
-        box.classList.add("hidden");
-        return;
-    }
-    box.classList.remove("hidden");
-
-    const remaining = info.targetDate - new Date();
-    if (info.phase === "active") {
-        box.textContent = info.event.emoji + "【" + info.event.name + "】開催中！終了まで残り " + formatCountdown(remaining);
-    } else {
-        box.textContent = "⏳ 次の季節イベント " + info.event.emoji + info.event.name + " まで あと " + formatCountdown(remaining);
-    }
-}
-
-function updateBonusCountdownUI() {
-    const box = document.querySelector("#countdown-bonus-box");
-    if (!box) return;
-
-    const info = getNextBonusTimeInfo();
-    const remaining = info.targetDate - new Date();
-
-    if (info.phase === "active") {
-        box.textContent = "🌙【丑三つ時ボーナスタイム】発動中！終了まで残り " + formatCountdown(remaining);
-    } else {
-        box.textContent = "🌙 次のボーナスタイム（丑三つ時）まで あと " + formatCountdown(remaining);
-    }
-}
-
-function updateAllCountdownUI() {
-    updateSeasonCountdownUI();
-    updateBonusCountdownUI();
-}
+// 🌅🌇🌙⏳ 時間帯の背景演出・カウントダウンは omikuji-ui-core.js / omikuji-countdown.js の
+// applyTimeTheme() / startCountdownTimers() をそのまま使う（init()内で呼び出す）
 
 async function init() {
     if (!username) {
         // 未ログインの場合はログインページへ
-        window.location.href = "index.html";
+        window.location.href = "../index.html"; // index.htmlはルートフォルダに移動したため
         return;
     }
     applyTimeTheme();
     setInterval(applyTimeTheme, 60000);
-    updateAllCountdownUI();
-    setInterval(updateAllCountdownUI, 1000);
+    startCountdownTimers();
     await loadUserInfo();
     await loadCommunityStatus();
     await loadHistory();
