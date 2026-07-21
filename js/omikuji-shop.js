@@ -140,6 +140,43 @@ async function equipCollectible(key) {
         alert("🎒 「" + (item ? item.name : "") + "」を装備しました！");
     }
 }
+
+// 🎖️ 獲得した称号から1つを選んで、参拝者名の横に表示する（もう一度同じ称号を選ぶと解除）
+async function equipTitle(key) {
+    if (key && equippedTitleKey === key) {
+        equippedTitleKey = "";
+        equippedTitleEmoji = "";
+        equippedTitleName = "";
+        updateTitlesUI();
+        updateEquippedTitleDisplay();
+        await saveUserState();
+        return;
+    }
+
+    if (!key) {
+        equippedTitleKey = "";
+        equippedTitleEmoji = "";
+        equippedTitleName = "";
+        updateTitlesUI();
+        updateEquippedTitleDisplay();
+        await saveUserState();
+        return;
+    }
+
+    const title = TITLES.find(t => t.key === key);
+    if (!title) return;
+
+    // 🛡️ 実際に条件を満たしている称号だけを装備できるようにする（不正な直接呼び出し対策）
+    const stats = buildTitleStats();
+    if (!title.condition(stats)) return;
+
+    equippedTitleKey = title.key;
+    equippedTitleEmoji = title.emoji;
+    equippedTitleName = title.name;
+    updateTitlesUI();
+    updateEquippedTitleDisplay();
+    await saveUserState();
+}
 async function upgradeUrn() {
     const next = URN_LEVELS[urnLevel + 1];
     if (!next) {

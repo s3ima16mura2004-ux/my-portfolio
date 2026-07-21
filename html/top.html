@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>豪華おみくじ神社 - トップ</title>
-    <link rel="stylesheet" href="../css/omikuji-core.css?v=10">
-    <link rel="stylesheet" href="../css/omikuji-shop.css?v=10">
-    <link rel="stylesheet" href="../css/omikuji-map.css?v=10">
-    <link rel="stylesheet" href="../css/omikuji-missions.css?v=10">
-    <link rel="stylesheet" href="../css/omikuji-seasonal-effects.css?v=10">
-    <link rel="stylesheet" href="../css/omikuji-status-effects.css?v=10">
-    <link rel="stylesheet" href="../css/omikuji-widgets.css?v=10">
-    <link rel="stylesheet" href="../css/omikuji-top.css?v=10">
+    <link rel="stylesheet" href="../css/omikuji-core.css?v=2">
+    <link rel="stylesheet" href="../css/omikuji-shop.css?v=2">
+    <link rel="stylesheet" href="../css/omikuji-map.css?v=2">
+    <link rel="stylesheet" href="../css/omikuji-missions.css?v=2">
+    <link rel="stylesheet" href="../css/omikuji-seasonal-effects.css?v=2">
+    <link rel="stylesheet" href="../css/omikuji-status-effects.css?v=2">
+    <link rel="stylesheet" href="../css/omikuji-widgets.css?v=2">
+    <link rel="stylesheet" href="../css/omikuji-top.css?v=2">
 </head>
 <body>
     <div class="container container-wide text-center">
         <div class="user-info">
-            👤 参拝者：<span id="user-display">ゲスト参拝者</span>様
+            👤 参拝者：<span id="equipped-title-display" class="hidden"></span><span id="user-display">ゲスト参拝者</span>様
             <button type="button" class="logout-btn" onclick="logout()">ログアウト</button>
         </div>
 
@@ -46,10 +46,13 @@
                     <p id="rank-progress-display" class="rank-progress-display">累計獲得賞金：0円</p>
                 </div>
 
-                <div id="titles-box" class="titles-box hidden">
-                    <p class="titles-title">🎖️ 獲得称号</p>
-                    <div id="titles-list" class="titles-list"></div>
-                </div>
+                <details id="titles-box" class="daily-notices titles-box hidden">
+                    <summary>🎖️ 称号を選ぶ <span id="titles-count-badge">-</span></summary>
+                    <div class="daily-notices-body">
+                        <p class="collect-item-desc">獲得した称号から1つだけ選んで、参拝者名の横に表示できます。もう一度タップすると外れます。</p>
+                        <div id="titles-list" class="titles-list"></div>
+                    </div>
+                </details>
 
                 <div class="money-box">
                     💰 あなたの所持金：<span id="money-display">読み込み中…</span>円
@@ -123,7 +126,7 @@
             function logout() {
                 if (confirm("ログアウトしますか？")) {
                     localStorage.removeItem("logged_in_user");
-                    window.location.href = "../index.html";
+                    window.location.href = "../index.html"; // index.htmlはルートフォルダに移動したため
                 }
             }
         </script>

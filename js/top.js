@@ -128,6 +128,7 @@ const myRankNote = document.querySelector("#my-rank-note");
 
 async function loadUserInfo() {
     if (userDisplay) userDisplay.textContent = username;
+    const equippedTitleDisplay = document.querySelector("#equipped-title-display");
 
     try {
         const snap = await getDoc(doc(db, "users", username));
@@ -136,6 +137,17 @@ async function loadUserInfo() {
             const data = snap.data();
             const money = typeof data.money === "number" ? data.money : 0;
             if (moneyDisplay) moneyDisplay.textContent = money.toLocaleString();
+
+            // 🎖️ 装備中の称号（omikuji2.html側で選んだものを、そのまま名前の横に表示する）
+            if (equippedTitleDisplay) {
+                if (data.equippedTitleKey && data.equippedTitleEmoji) {
+                    equippedTitleDisplay.textContent = data.equippedTitleEmoji + " " + data.equippedTitleName + " ";
+                    equippedTitleDisplay.classList.remove("hidden");
+                } else {
+                    equippedTitleDisplay.textContent = "";
+                    equippedTitleDisplay.classList.add("hidden");
+                }
+            }
 
             const bankMoney = typeof data.bankMoney === "number" ? data.bankMoney : 0;
             const bankDisplayTop = document.querySelector("#bank-money-display-top");
@@ -232,13 +244,18 @@ async function loadCommunityStatus() {
     }
 }
 
-// 🎖️ 称号バッジの表示
+// 🎖️ 称号バッジの表示（閲覧のみ。装備の切り替えはomikuji2.html側で行う）
 function renderTitles(stats) {
     const box = document.querySelector("#titles-box");
     const list = document.querySelector("#titles-list");
+    const badge = document.querySelector("#titles-count-badge");
     if (!box || !list) return;
 
     const earned = TITLES.filter(t => t.condition(stats));
+
+    if (badge) {
+        badge.textContent = earned.length > 0 ? "（獲得数：" + earned.length + "個）" : "（まだ獲得した称号はありません）";
+    }
 
     if (earned.length === 0) {
         box.classList.add("hidden");

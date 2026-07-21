@@ -19,7 +19,7 @@
 
     <div class="container container-wide">
         <div class="user-info">
-            👤 参拝者：<span id="user-display">ゲスト参拝者</span>様
+            👤 参拝者：<span id="equipped-title-display" class="hidden"></span><span id="user-display">ゲスト参拝者</span>様
             <button type="button" class="logout-btn" onclick="logout()">ログアウト</button>
         </div>
 
@@ -32,10 +32,13 @@
                     <p id="rank-progress-display" class="rank-progress-display">累計獲得賞金：0円</p>
                 </div>
 
-                <div id="titles-box" class="titles-box hidden">
-                    <p class="titles-title">🎖️ 獲得称号</p>
-                    <div id="titles-list" class="titles-list"></div>
-                </div>
+                <details id="titles-box" class="daily-notices titles-box hidden">
+                    <summary>🎖️ 称号を選ぶ <span id="titles-count-badge">-</span></summary>
+                    <div class="daily-notices-body">
+                        <p class="collect-item-desc">獲得した称号から1つだけ選んで、参拝者名の横に表示できます。もう一度タップすると外れます。</p>
+                        <div id="titles-list" class="titles-list"></div>
+                    </div>
+                </details>
 
                 <div class="money-box">
                     💰 あなたの所持金：<span id="money">10000</span>円
@@ -565,43 +568,57 @@
                         <div id="powerspot-map-archive-body" class="daily-notices-body"></div>
                     </details>
 
-                    <div class="shop-section">
-                        <h3 class="shop-section-title">🎏 日本三大○○（第四弾）</h3>
+                    <div id="minitheme-inline-slot">
+                        <div id="map-minitheme-section" class="shop-section">
+                            <h3 class="shop-section-title">🎏 日本三大○○（第四弾）</h3>
 
-                        <div id="map-minitheme-locked" class="hidden">
-                            <p class="bank-desc">🔒 パワースポット編（第三弾）を完成させると進めるようになります。</p>
+                            <div id="map-minitheme-locked" class="hidden">
+                                <p class="bank-desc">🔒 パワースポット編（第三弾）を完成させると進めるようになります。</p>
+                            </div>
+
+                            <div id="map-minitheme-ready" class="hidden">
+                                <p class="bank-desc">🎉 パワースポット編の完成、おめでとうございます！「日本三大○○」ミニマップ集（第四弾）へ進む準備が整いました。</p>
+                                <button class="btn-shop-buy" onclick="startMiniThemeMap()" type="button">🎏 日本三大○○へ進む</button>
+                            </div>
+
+                            <div id="map-minitheme-unlocked" class="hidden">
+                                <p class="bank-desc">日本各地の「日本三大○○」を巡るコンパクトなコレクションです。稲荷・八幡宮・天神・東照宮・弁天・三景・名瀑・がっかり名所の8テーマ×3箇所、全24箇所。訪れたスポット数の節目でお祝い金、全制覇でさらに永続の大吉ボーナスがもらえます。</p>
+                                <p id="map-minitheme-progress" class="dex-progress">🎏 訪れたスポット：0 / 24箇所　｜　🏆 コンプリートしたテーマ：0 / 8</p>
+                                <div id="minitheme-list"></div>
+                            </div>
                         </div>
+                    </div>
 
-                        <div id="map-minitheme-ready" class="hidden">
-                            <p class="bank-desc">🎉 パワースポット編の完成、おめでとうございます！「日本三大○○」ミニマップ集（第四弾）へ進む準備が整いました。</p>
-                            <button class="btn-shop-buy" onclick="startMiniThemeMap()" type="button">🎏 日本三大○○へ進む</button>
-                        </div>
+                    <details id="minitheme-map-archive" class="daily-notices hidden" style="margin-top:15px;">
+                        <summary>📜 過去のマップ：日本三大○○（第四弾）を見る</summary>
+                        <div id="minitheme-map-archive-body" class="daily-notices-body"></div>
+                    </details>
 
-                        <div id="map-minitheme-unlocked" class="hidden">
-                            <p class="bank-desc">日本各地の「日本三大○○」を巡るコンパクトなコレクションです。稲荷・八幡宮・天神・東照宮・弁天・三景・名瀑・がっかり名所の8テーマ×3箇所、全24箇所。訪れたスポット数の節目でお祝い金、全制覇でさらに永続の大吉ボーナスがもらえます。</p>
-                            <p id="map-minitheme-progress" class="dex-progress">🎏 訪れたスポット：0 / 24箇所　｜　🏆 コンプリートしたテーマ：0 / 8</p>
-                            <div id="minitheme-list"></div>
+                    <div id="worldspot-inline-slot">
+                        <div id="map-worldspot-section" class="shop-section">
+                            <h3 class="shop-section-title">🌍 世界の絶景・名所編（第五弾）</h3>
+
+                            <div id="map-worldspot-locked" class="hidden">
+                                <p class="bank-desc">🔒 「日本三大○○」ミニマップ集（第四弾）を完成させると進めるようになります。</p>
+                            </div>
+
+                            <div id="map-worldspot-ready" class="hidden">
+                                <p class="bank-desc">🎉 「日本三大○○」の完成、おめでとうございます！世界の絶景・名所編（第五弾）へ進む準備が整いました。</p>
+                                <button class="btn-shop-buy" onclick="startWorldSpotMap()" type="button">🌍 世界の絶景・名所へ進む</button>
+                            </div>
+
+                            <div id="map-worldspot-unlocked" class="hidden">
+                                <p class="bank-desc">舞台は日本を飛び出し、世界へ。東アジア・南アジア・中東・ヨーロッパ・北米・南米・オセアニアの7地域×2箇所、全14箇所を巡ります。訪れたスポット数の節目でお祝い金、全制覇でさらに永続の大吉ボーナスがもらえます。</p>
+                                <p id="map-worldspot-progress" class="dex-progress">🌍 訪れたスポット：0 / 14箇所　｜　🏆 コンプリートした地域：0 / 7</p>
+                                <div id="worldspot-list"></div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="shop-section">
-                        <h3 class="shop-section-title">🌍 世界の絶景・名所編（第五弾）</h3>
-
-                        <div id="map-worldspot-locked" class="hidden">
-                            <p class="bank-desc">🔒 「日本三大○○」ミニマップ集（第四弾）を完成させると進めるようになります。</p>
-                        </div>
-
-                        <div id="map-worldspot-ready" class="hidden">
-                            <p class="bank-desc">🎉 「日本三大○○」の完成、おめでとうございます！世界の絶景・名所編（第五弾）へ進む準備が整いました。</p>
-                            <button class="btn-shop-buy" onclick="startWorldSpotMap()" type="button">🌍 世界の絶景・名所へ進む</button>
-                        </div>
-
-                        <div id="map-worldspot-unlocked" class="hidden">
-                            <p class="bank-desc">舞台は日本を飛び出し、世界へ。東アジア・南アジア・中東・ヨーロッパ・北米・南米・オセアニアの7地域×2箇所、全14箇所を巡ります。訪れたスポット数の節目でお祝い金、全制覇でさらに永続の大吉ボーナスがもらえます。</p>
-                            <p id="map-worldspot-progress" class="dex-progress">🌍 訪れたスポット：0 / 14箇所　｜　🏆 コンプリートした地域：0 / 7</p>
-                            <div id="worldspot-list"></div>
-                        </div>
-                    </div>
+                    <details id="worldspot-map-archive" class="daily-notices hidden" style="margin-top:15px;">
+                        <summary>📜 過去のマップ：世界の絶景・名所編（第五弾）を見る</summary>
+                        <div id="worldspot-map-archive-body" class="daily-notices-body"></div>
+                    </details>
 
                     <!-- 🔀 第六弾：世界の絶景・名所編（第五弾）完成後に分岐する「歴史編」／「神社ビルダーモード」 -->
                     <div id="map-path6-choice" class="shop-section hidden">

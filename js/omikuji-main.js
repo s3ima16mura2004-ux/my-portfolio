@@ -134,6 +134,28 @@ window.addEventListener("DOMContentLoaded", async () => {
             miniThemeMapRevealed = data.miniThemeMapRevealed === true;
             ownedWorldSpots = (data.ownedWorldSpots && typeof data.ownedWorldSpots === "object") ? data.ownedWorldSpots : {};
             worldSpotMapRevealed = data.worldSpotMapRevealed === true;
+            mapPath6Choice = data.mapPath6Choice || "";
+            historyMapRevealed = data.historyMapRevealed === true;
+            ownedHistorySpots = (data.ownedHistorySpots && typeof data.ownedHistorySpots === "object") ? data.ownedHistorySpots : {};
+            builderModeRevealed = data.builderModeRevealed === true;
+            builderLevel = typeof data.builderLevel === "number" ? data.builderLevel : 0;
+            comboYear = typeof data.comboYear === "number" ? data.comboYear : 0;
+            comboItemsGotThisYear = (data.comboItemsGotThisYear && typeof data.comboItemsGotThisYear === "object") ? data.comboItemsGotThisYear : {};
+            comboLastClaimedYear = typeof data.comboLastClaimedYear === "number" ? data.comboLastClaimedYear : 0;
+            comboCompletedYears = typeof data.comboCompletedYears === "number" ? data.comboCompletedYears : 0;
+            checkYearlyComboReset(); // 🎐 年をまたいでいた場合はここで今年分にリセットしておく
+            kimodameshiDate = data.kimodameshiDate || "";
+            kimodameshiCount = typeof data.kimodameshiCount === "number" ? data.kimodameshiCount : 0;
+            gotHalloweenRareYokai = data.gotHalloweenRareYokai === true;
+            seasonalActionDates = (data.seasonalActionDates && typeof data.seasonalActionDates === "object") ? data.seasonalActionDates : {};
+            seasonalActionCounts = (data.seasonalActionCounts && typeof data.seasonalActionCounts === "object") ? data.seasonalActionCounts : {};
+            natsumatsuriRewardClaimedYear = typeof data.natsumatsuriRewardClaimedYear === "number" ? data.natsumatsuriRewardClaimedYear : 0;
+            yearlyAlbum = Array.isArray(data.yearlyAlbum) ? data.yearlyAlbum : [];
+            tutorialMissionProgress = (data.tutorialMissionProgress && typeof data.tutorialMissionProgress === "object") ? data.tutorialMissionProgress : {};
+            tutorialMissionClaimed = (data.tutorialMissionClaimed && typeof data.tutorialMissionClaimed === "object") ? data.tutorialMissionClaimed : {};
+            equippedTitleKey = data.equippedTitleKey || "";
+            equippedTitleEmoji = data.equippedTitleEmoji || "";
+            equippedTitleName = data.equippedTitleName || "";
             if (data.japanShrinesOwned && typeof data.japanShrinesOwned === "object") {
                 JAPAN_PREFECTURES.forEach(pref => {
                     pref.shrines.forEach(shrine => {
@@ -152,6 +174,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         updateMoneyDisplay();
         updateTitlesUI();
         updateDexUI();
+        updateYearlyAlbumUI(); // 📖 年間アルバムの表示を初期化
         updateBankUI();
         updateCompanionUI(); // 🐱 相棒「招き猫」の成長状況を表示
         updateBirthdayTicketUI();
@@ -163,6 +186,8 @@ window.addEventListener("DOMContentLoaded", async () => {
         setInterval(applyTimeTheme, 60000); // 1分ごとに時間帯を再チェック（長時間開いたままでも自動で切り替わる）
         setInterval(updateShopFeverUI, 30000); // 😲 神の気まぐれフィーバーの残り時間を定期的に更新
         setInterval(updateNatsumatsuriUI, 60000); // 🎆 夏祭り（夜・週末）の切り替わりを定期的に再チェック
+        checkNatsumatsuriCommunityReward();
+        setInterval(checkNatsumatsuriCommunityReward, 60000); // 🎆 夏祭りコミュニティ目標（みんなで花火玉を集めよう）の状況を定期的に再チェック
         updateOtsukimiUI();
         setInterval(updateOtsukimiUI, 60000); // 🌕 お月見（夜・昼の切り替わり／月が昇る演出）を定期的に再チェック
         updateKoyoUI();
@@ -171,6 +196,12 @@ window.addEventListener("DOMContentLoaded", async () => {
         setInterval(updateOshogatsuUI, 60000); // 🎍 お正月（初日の出演出）の開催状況を定期的に再チェック
         updateKannazukiUI();
         setInterval(updateKannazukiUI, 60000); // 🌫️ 神無月（寂しい演出）の開催状況を定期的に再チェック
+        updateHalloweenUI();
+        setInterval(updateHalloweenUI, 60000); // 👻 ハロウィン（妖怪祭り・肝試し欄）の開催状況を定期的に再チェック
+        updateSeasonalActionsUI();
+        setInterval(updateSeasonalActionsUI, 60000); // 🎐 季節イベント共通ミニアクション（お月見・紅葉狩り等）の開催状況を定期的に再チェック
+        updateSeasonBadgeRow();
+        setInterval(updateSeasonBadgeRow, 60000); // 🎐 サイドバーの季節バッジ行を定期的に再チェック
         updateShichigosanUI();
         setInterval(updateShichigosanUI, 60000); // 👘 七五三（千歳飴バナー）の開催状況を定期的に再チェック
         updateChristmasUI();
@@ -189,6 +220,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         updateKodomonohiUI();
         setInterval(updateKodomonohiUI, 60000); // 🎏 こどもの日（鯉のぼり演出）の開催状況を定期的に再チェック
         updateNagoshiUI(); // 🌾 夏越の大祓（茅の輪くぐり）の進捗表示を初期化
+        updateYearlyComboUI(); // 🎐 年間コンボの進捗表示を初期化
         updateShrineMapUI(); // 🗺️ 境内マップの進捗表示を初期化
         checkKannazukiReturn(); // ⛩️ 11月になっていれば、神無月に貯めた賽銭箱の預け入れ額を「倍返し」する
         startCountdownTimers(); // ⏳ 次の季節イベント／次のボーナスタイムまでのカウントダウンを開始

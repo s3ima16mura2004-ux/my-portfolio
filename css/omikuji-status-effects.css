@@ -185,27 +185,12 @@
     }
 }
 
-/* 🎖️ 称号バッジ */
-.titles-box {
-    background: #fdf6e3;
-    border: 1px solid #e0c98c;
-    padding: 8px 10px;
-    border-radius: 5px;
-    margin-bottom: 15px;
-    text-align: left;
-}
-
-.titles-title {
-    font-weight: bold;
-    color: #8b5a2b;
-    margin: 0 0 6px;
-    font-size: 0.9rem;
-}
-
+/* 🎖️ 称号選択パネル（本体の見た目は.daily-noticesが担うため、ここでは中の一覧だけを整える） */
 .titles-list {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
+    margin-top: 8px;
 }
 
 .title-badge {
@@ -217,7 +202,30 @@
     font-weight: bold;
     color: #6b4a1b;
     white-space: nowrap;
-    cursor: help;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.title-badge:hover {
+    transform: scale(1.03);
+}
+
+.title-badge:active {
+    transform: scale(0.97);
+}
+
+.title-badge.title-badge-equipped {
+    background: linear-gradient(135deg, #8b5a2b, #4a3728);
+    border-color: #4a3728;
+    color: #fff8eb;
+    box-shadow: 0 0 8px rgba(139, 90, 43, 0.6);
+}
+
+/* 🎖️ 参拝者名の横に表示する、装備中の称号 */
+#equipped-title-display {
+    font-weight: bold;
+    color: #8b5a2b;
 }
 
 /* 🏺 壺のランクアップ */

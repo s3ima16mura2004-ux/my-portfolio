@@ -287,6 +287,42 @@ function updatePowerSpotMapArchiveUI(revealed) {
     }
 }
 
+// 🌍 世界の絶景・名所編（第五弾）が解放されたら、日本三大○○（第四弾）のセクションを
+// メインの位置から折りたたみ式のアーカイブへ移動する（同じ考え方の繰り返し）
+function updateMiniThemeMapArchiveUI(revealed) {
+    const section = document.querySelector("#map-minitheme-section");
+    const inlineSlot = document.querySelector("#minitheme-inline-slot");
+    const archiveBox = document.querySelector("#minitheme-map-archive");
+    const archiveBody = document.querySelector("#minitheme-map-archive-body");
+    if (!section || !inlineSlot || !archiveBox || !archiveBody) return;
+
+    if (revealed) {
+        if (section.parentElement !== archiveBody) archiveBody.appendChild(section);
+        archiveBox.classList.remove("hidden");
+    } else {
+        if (section.parentElement !== inlineSlot) inlineSlot.appendChild(section);
+        archiveBox.classList.add("hidden");
+    }
+}
+
+// 🔀 歴史編／神社ビルダーモード（第六弾）のどちらかが解放されたら、世界の絶景・名所編（第五弾）のセクションを
+// メインの位置から折りたたみ式のアーカイブへ移動する（同じ考え方の繰り返し）
+function updateWorldSpotMapArchiveUI(revealed) {
+    const section = document.querySelector("#map-worldspot-section");
+    const inlineSlot = document.querySelector("#worldspot-inline-slot");
+    const archiveBox = document.querySelector("#worldspot-map-archive");
+    const archiveBody = document.querySelector("#worldspot-map-archive-body");
+    if (!section || !inlineSlot || !archiveBox || !archiveBody) return;
+
+    if (revealed) {
+        if (section.parentElement !== archiveBody) archiveBody.appendChild(section);
+        archiveBox.classList.remove("hidden");
+    } else {
+        if (section.parentElement !== inlineSlot) inlineSlot.appendChild(section);
+        archiveBox.classList.add("hidden");
+    }
+}
+
 function updateMiniThemeMapUI() {
     const lockedBox = document.querySelector("#map-minitheme-locked");
     const readyBox = document.querySelector("#map-minitheme-ready");
@@ -345,6 +381,7 @@ function updateWorldSpotMapUI() {
     lockedBox.classList.toggle("hidden", eligible || revealed);
     readyBox.classList.toggle("hidden", !(eligible && !revealed));
     unlockedBox.classList.toggle("hidden", !revealed);
+    updateMiniThemeMapArchiveUI(revealed); // 🌍 第五弾解放時、第四弾（日本三大○○）をアーカイブ（折りたたみ）へ移動する
     if (!revealed) return;
 
     const progressEl = document.querySelector("#map-worldspot-progress");
@@ -388,6 +425,7 @@ function updateMapPath6UI() {
     if (choiceBox) {
         choiceBox.classList.toggle("hidden", !isMapPath6ChoicePending());
     }
+    updateWorldSpotMapArchiveUI(historyMapRevealed || builderModeRevealed); // 🔀 どちらかの道を選んだら、第五弾（世界の絶景）をアーカイブ（折りたたみ）へ移動する
     updateHistoryMapUI();
     updateBuilderModeUI();
 }
