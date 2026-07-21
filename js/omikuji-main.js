@@ -183,7 +183,6 @@ window.addEventListener("DOMContentLoaded", async () => {
         setInterval(applyTimeTheme, 60000); // 1分ごとに時間帯を再チェック（長時間開いたままでも自動で切り替わる）
         setInterval(updateShopFeverUI, 30000); // 😲 神の気まぐれフィーバーの残り時間を定期的に更新
         setInterval(updateNatsumatsuriUI, 60000); // 🎆 夏祭り（夜・週末）の切り替わりを定期的に再チェック
-        checkNatsumatsuriCommunityReward();
         setInterval(checkNatsumatsuriCommunityReward, 60000); // 🎆 夏祭りコミュニティ目標（みんなで花火玉を集めよう）の状況を定期的に再チェック
         updateOtsukimiUI();
         setInterval(updateOtsukimiUI, 60000); // 🌕 お月見（夜・昼の切り替わり／月が昇る演出）を定期的に再チェック
