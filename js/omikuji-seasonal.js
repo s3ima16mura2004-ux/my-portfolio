@@ -65,12 +65,6 @@ const SEASONAL_EVENTS = [
         startMonth: 12, startDay: 26, endMonth: 12, endDay: 31,
         nightWeekendOnly: false,
         desc: "一年の締めくくりの期間。昼は静かに雪が降り、夜は「除夜の鐘」が響きます。鐘を108回つくと煩悩祓いのご褒美が"
-    },
-    {
-        key: "halloween", name: "ハロウィン（妖怪祭り）", emoji: "👻",
-        startMonth: 10, startDay: 25, endMonth: 10, endDay: 31,
-        nightWeekendOnly: false,
-        desc: "和風の妖怪たちが境内に集う夜。「肝試し」に挑戦すると、出会う妖怪次第でご褒美がもらえます（ハズレなし・1日1回）"
     }
 ];
 

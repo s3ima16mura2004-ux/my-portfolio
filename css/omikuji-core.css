@@ -626,9 +626,8 @@ h1 {
     color: #fff;
 }
 
-/* 📱 サイドバーが縦積みになるのと同じ幅（900px以下）で、タブも4つ+「もっと」ボタンの2列グリッドに整理する
-   （以前は600pxが境目だったため、601〜900pxの範囲でタブだけ6個横並びのまま窮屈になっていたのを解消） */
-@media (max-width: 900px) {
+/* 📱 幅の狭い画面では、タブを4つ+「もっと」ボタンの2列グリッドに整理する */
+@media (max-width: 600px) {
     .tab-buttons {
         display: grid;
         grid-template-columns: 1fr 1fr;

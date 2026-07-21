@@ -100,36 +100,6 @@ const ALWAYS_ACTIVE_MISSIONS = [
     }
 ];
 
-// 🔰 「はじめてガイド」：初めて訪れた参拝者向けの一度きりのチュートリアルミッション
-// （日付が変わってもリセットされない。デイリーミッションとは別の専用の進捗・受取状態で管理する）
-const TUTORIAL_MISSIONS = [
-    {
-        key: "hajimete_omikuji", emoji: "🎯", name: "はじめてのおみくじ",
-        desc: "おみくじを1回引いてみよう", target: 1,
-        rewardType: "money", rewardAmount: 1000, rewardText: "軍資金 1,000円"
-    },
-    {
-        key: "shop_wo_nozoku", emoji: "🛍️", name: "ショップをのぞいてみよう",
-        desc: "「アイテムショップ」タブを開いてみよう", target: 1,
-        rewardType: "money", rewardAmount: 500, rewardText: "軍資金 500円"
-    },
-    {
-        key: "zukan_wo_miru", emoji: "📖", name: "おみくじ図鑑を見てみよう",
-        desc: "「図鑑」タブを開いてみよう", target: 1,
-        rewardType: "money", rewardAmount: 500, rewardText: "軍資金 500円"
-    },
-    {
-        key: "map_wo_miru", emoji: "🗺️", name: "境内マップを見てみよう",
-        desc: "「境内マップ」タブを開いてみよう", target: 1,
-        rewardType: "money", rewardAmount: 500, rewardText: "軍資金 500円"
-    },
-    {
-        key: "chokin_shite_miru", emoji: "🏦", name: "賽銭箱に預けてみよう",
-        desc: "賽銭箱（貯金）に1円でも預けてみよう", target: 1,
-        rewardType: "money", rewardAmount: 500, rewardText: "軍資金 500円"
-    }
-];
-
 function findMissionByKey(key) {
     return MISSION_POOL.find(m => m.key === key) || ALWAYS_ACTIVE_MISSIONS.find(m => m.key === key);
 }
@@ -175,8 +145,6 @@ function refreshDailyMissions() {
 // おみくじを1回引くたびに呼び出す（単発・10連どちらの1回分にも対応）
 function trackMissionDraw(resultName, prizeMoney) {
     if (!resultName) return;
-
-    trackTutorialMission("hajimete_omikuji"); // 🔰 はじめてガイド：はじめてのおみくじの進捗を記録
 
     missionDrawsToday++;
     missionProgress.asa_sanpai = Math.min(1, missionDrawsToday);
@@ -281,34 +249,6 @@ async function claimMission(key) {
     alert("🎯【デイリーミッション達成】🎯\n「" + mission.emoji + " " + mission.name + "」の報酬を受け取りました！\n🎁 " + rewardMsg);
 }
 
-// 🔰 はじめてガイド：進捗を記録する（デイリーミッションとは別の専用の状態で管理し、日付が変わってもリセットされない）
-function trackTutorialMission(key) {
-    if ((tutorialMissionProgress[key] || 0) >= 1) return; // すでに達成済みなら何もしない
-    tutorialMissionProgress[key] = 1;
-    updateMissionsUI();
-}
-
-// 🔰 はじめてガイドの報酬を受け取る
-async function claimTutorialMission(key) {
-    const mission = TUTORIAL_MISSIONS.find(m => m.key === key);
-    if (!mission) return;
-    if (tutorialMissionClaimed[key]) return;
-    if ((tutorialMissionProgress[key] || 0) < mission.target) return;
-
-    tutorialMissionClaimed[key] = true;
-
-    if (mission.rewardType === "money") {
-        currentMoney += mission.rewardAmount;
-        updateMoneyDisplay();
-    }
-
-    playSE("se-coin");
-    updateMissionsUI();
-    await saveUserState();
-
-    alert("🔰🎉【はじめてガイド達成】🎉🔰\n「" + mission.emoji + " " + mission.name + "」の報酬を受け取りました！\n🎁 " + mission.rewardText);
-}
-
 // 🎟️ ブースト券を1枚使って所持金を1.1倍にする
 async function useBoostTicket() {
     if (boostTicketCount <= 0) {
@@ -328,16 +268,12 @@ async function useBoostTicket() {
     alert("🎟️【ブースト券使用】🎟️\n所持金が1.1倍になりました！\n" + before.toLocaleString() + "円 → " + currentMoney.toLocaleString() + "円");
 }
 
-// 1件分のミッションカードHTMLを作る（progressStore/claimedStoreを省略すると通常のデイリーミッション扱いになる）
-function buildMissionCardHtml(mission, progressStore, claimedStore) {
-    const progressSrc = progressStore || missionProgress;
-    const claimedSrc = claimedStore || missionClaimed;
-
-    const progress = Math.min(mission.target, progressSrc[mission.key] || 0);
-    const claimed = !!claimedSrc[mission.key];
+// 1件分のミッションカードHTMLを作る
+function buildMissionCardHtml(mission) {
+    const progress = Math.min(mission.target, missionProgress[mission.key] || 0);
+    const claimed = !!missionClaimed[mission.key];
     const isAuto = mission.rewardType === "title";
     const complete = progress >= mission.target;
-    const isTutorial = progressStore === tutorialMissionProgress;
 
     let actionHtml;
     if (isAuto) {
@@ -347,8 +283,7 @@ function buildMissionCardHtml(mission, progressStore, claimedStore) {
     } else if (claimed) {
         actionHtml = '<span class="mission-status-tag mission-status-done">✅ 受取済み</span>';
     } else if (complete) {
-        const claimFn = isTutorial ? "claimTutorialMission" : "claimMission";
-        actionHtml = '<button class="btn-shop-buy mission-claim-btn" onclick="' + claimFn + '(\'' + mission.key + '\')" type="button">🎁 受け取る</button>';
+        actionHtml = '<button class="btn-shop-buy mission-claim-btn" onclick="claimMission(\'' + mission.key + '\')" type="button">🎁 受け取る</button>';
     } else {
         actionHtml = '<span class="mission-status-tag">未達成</span>';
     }
@@ -375,29 +310,16 @@ function buildMissionCardHtml(mission, progressStore, claimedStore) {
 function updateMissionsUI() {
     const list = document.querySelector("#missions-list");
     const alwaysList = document.querySelector("#missions-always-list");
-    const tutorialList = document.querySelector("#tutorial-missions-list");
-    const tutorialBadge = document.querySelector("#tutorial-missions-badge");
     if (!list) return;
 
     const todaysMissions = missionKeysToday
         .map(key => MISSION_POOL.find(m => m.key === key))
         .filter(Boolean);
 
-    list.innerHTML = todaysMissions.map(m => buildMissionCardHtml(m)).join("");
+    list.innerHTML = todaysMissions.map(buildMissionCardHtml).join("");
 
     if (alwaysList) {
-        alwaysList.innerHTML = ALWAYS_ACTIVE_MISSIONS.map(m => buildMissionCardHtml(m)).join("");
-    }
-
-    // 🔰 はじめてガイド（一度きりのチュートリアルミッション。専用の進捗・受取状態で管理する）
-    if (tutorialList) {
-        tutorialList.innerHTML = TUTORIAL_MISSIONS.map(m => buildMissionCardHtml(m, tutorialMissionProgress, tutorialMissionClaimed)).join("");
-    }
-    if (tutorialBadge) {
-        const doneCount = TUTORIAL_MISSIONS.filter(m => tutorialMissionClaimed[m.key]).length;
-        tutorialBadge.textContent = doneCount >= TUTORIAL_MISSIONS.length
-            ? "（すべて達成✅）"
-            : "（" + doneCount + " / " + TUTORIAL_MISSIONS.length + "）";
+        alwaysList.innerHTML = ALWAYS_ACTIVE_MISSIONS.map(buildMissionCardHtml).join("");
     }
 
     const claimableCount = todaysMissions.filter(m =>

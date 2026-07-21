@@ -83,13 +83,6 @@ function showTab(tabName) {
     if (moreBtn) moreBtn.classList.toggle("tab-active", isMoreTab);
     if (moreDexBtn) moreDexBtn.classList.toggle("more-menu-item-active", tabName === "dex");
     if (moreMapBtn) moreMapBtn.classList.toggle("more-menu-item-active", tabName === "map");
-
-    // 🔰 はじめてガイド：ショップ・図鑑・マップのタブを初めて開いた記録を取る
-    if (typeof trackTutorialMission === "function") {
-        if (tabName === "shop") trackTutorialMission("shop_wo_nozoku");
-        if (tabName === "dex") trackTutorialMission("zukan_wo_miru");
-        if (tabName === "map") trackTutorialMission("map_wo_miru");
-    }
 }
 
 // 📂 モバイル用サイドメニュー（図鑑・境内マップ）の開閉
@@ -117,12 +110,4 @@ function closeMoreMenu() {
 function selectMoreTab(tabName) {
     showTab(tabName);
     closeMoreMenu();
-}
-
-// 🔔 サイドバーの通知ベルをタップした時、ミッションタブの「季節限定ミッション」まで移動する
-function jumpToSeasonalMissions() {
-    showTab("missions");
-    closeMoreMenu();
-    const section = document.querySelector("#seasonal-missions-section");
-    if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
 }

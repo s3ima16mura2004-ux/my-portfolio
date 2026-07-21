@@ -100,7 +100,7 @@
 }
 
 .shop-item-desc {
-    white-space: normal;
+    white-space: nowrap;
     font-size: 0.8rem;
     color: #666;
     margin: 0;

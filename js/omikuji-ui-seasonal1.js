@@ -43,8 +43,6 @@ function updateTanabataUI() {
                 "（両方1個ずつ揃うと特別なご縁が結ばれます）";
         }
     }
-
-    updateSeasonalMissionsBellUI();
 }
 
 // 🎐🌠🏮🍁🌕🗻 季節限定アイテム（七夕・夏祭り・お月見・紅葉狩り・お正月）の収集状況を表示する

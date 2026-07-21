@@ -269,9 +269,7 @@ function updateTitlesUI() {
         japanShrinePartsOwnedCount: getJapanShrinePartsTotalOwnedCount(), companionExp, ownedFriends,
         okumiyaCompleteCount: getOkumiyaCompleteCount(), okumiyaPartsOwnedCount: getOkumiyaPartsTotalOwnedCount(),
         powerSpotOwnedCount: getPowerSpotOwnedCount(), miniThemeOwnedCount: getMiniThemeOwnedCount(),
-        worldSpotOwnedCount: getWorldSpotOwnedCount(),
-        historyOwnedCount: getHistoryOwnedCount(), builderLevel,
-        comboCompletedYears, gotHalloweenRareYokai, seasonalActionCounts
+        worldSpotOwnedCount: getWorldSpotOwnedCount()
     };
     const earned = TITLES.filter(t => t.condition(stats));
 
@@ -285,33 +283,6 @@ function updateTitlesUI() {
     list.innerHTML = earned.map(t =>
         '<span class="title-badge" title="' + t.desc.replace(/"/g, "&quot;") + '">' + t.emoji + " " + t.name + "</span>"
     ).join("");
-}
-
-// 📖 年間アルバム（年が変わるたびに自動記録される、過去の年の実績スナップショット）の表示を更新する
-function updateYearlyAlbumUI() {
-    const section = document.querySelector("#yearly-album-section");
-    const list = document.querySelector("#yearly-album-list");
-    if (!section || !list) return;
-
-    if (!yearlyAlbum || yearlyAlbum.length === 0) {
-        section.classList.add("hidden");
-        return;
-    }
-    section.classList.remove("hidden");
-
-    // 新しい年が上に来るように並べ替えて表示する
-    const sorted = yearlyAlbum.slice().sort((a, b) => b.year - a.year);
-    list.innerHTML = sorted.map(entry => (
-        '<div class="map-japan-shrine-block">' +
-        '<p class="map-japan-shrine-title">' + entry.year + "年の記録 " +
-        (entry.comboCompleted ? '<span class="mission-status-tag mission-status-done">🎐 年間コンボ達成</span>' : '') +
-        '</p>' +
-        '<div class="map-japan-part-row"><span>⛩️ 参拝回数</span><span>' + (entry.totalDraws || 0).toLocaleString() + '回</span></div>' +
-        '<div class="map-japan-part-row"><span>🎉 大吉の回数</span><span>' + (entry.totalDaikichi || 0).toLocaleString() + '回</span></div>' +
-        '<div class="map-japan-part-row"><span>💰 年末時点の所持金</span><span>' + (entry.moneyAtEnd || 0).toLocaleString() + '円</span></div>' +
-        '<div class="map-japan-part-row"><span>🏦 年末時点の貯金</span><span>' + (entry.bankMoneyAtEnd || 0).toLocaleString() + '円</span></div>' +
-        '</div>'
-    )).join("");
 }
 
 // 📖 図鑑タブの表示を更新する
