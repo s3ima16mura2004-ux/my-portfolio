@@ -38,21 +38,17 @@ function updateMoneyDisplay() {
     updateShopUI();
 }
 
-// 🛍️🎒 タブの切り替え
+// 🛍️🎒 タブの切り替え（📖図鑑・🗺️境内マップは別ページ(dex.html/map.html)に移設済み）
 function showTab(tabName) {
     const missionsTab = document.querySelector("#tab-missions");
     const prizeTab = document.querySelector("#tab-prizes");
     const shopTab = document.querySelector("#tab-shop");
     const collectTab = document.querySelector("#tab-collect");
-    const dexTab = document.querySelector("#tab-dex");
-    const mapTab = document.querySelector("#tab-map");
     const friendsTab = document.querySelector("#tab-friends");
     const missionsBtn = document.querySelector("#tabBtn-missions");
     const prizeBtn = document.querySelector("#tabBtn-prizes");
     const shopBtn = document.querySelector("#tabBtn-shop");
     const collectBtn = document.querySelector("#tabBtn-collect");
-    const dexBtn = document.querySelector("#tabBtn-dex");
-    const mapBtn = document.querySelector("#tabBtn-map");
     const friendsBtn = document.querySelector("#tabBtn-friends");
 
     const tabs = [
@@ -60,8 +56,6 @@ function showTab(tabName) {
         { name: "prizes", el: prizeTab, btn: prizeBtn },
         { name: "shop", el: shopTab, btn: shopBtn },
         { name: "collect", el: collectTab, btn: collectBtn },
-        { name: "dex", el: dexTab, btn: dexBtn },
-        { name: "map", el: mapTab, btn: mapBtn },
         { name: "friends", el: friendsTab, btn: friendsBtn }
     ];
 
@@ -76,58 +70,15 @@ function showTab(tabName) {
         }
     });
 
-    // 📂 図鑑・境内マップはモバイルでは「もっと」ドロワー配下にあるので、
-    // 選択状態を「もっと」ボタン側にも反映させる
-    const moreBtn = document.querySelector("#tabBtn-more");
-    const moreDexBtn = document.querySelector("#moreBtn-dex");
-    const moreMapBtn = document.querySelector("#moreBtn-map");
-    const moreFriendsBtn = document.querySelector("#moreBtn-friends");
-    const isMoreTab = (tabName === "dex" || tabName === "map" || tabName === "friends");
-
-    if (moreBtn) moreBtn.classList.toggle("tab-active", isMoreTab);
-    if (moreDexBtn) moreDexBtn.classList.toggle("more-menu-item-active", tabName === "dex");
-    if (moreMapBtn) moreMapBtn.classList.toggle("more-menu-item-active", tabName === "map");
-    if (moreFriendsBtn) moreFriendsBtn.classList.toggle("more-menu-item-active", tabName === "friends");
-
-    // 🔰 はじめてガイド：ショップ・図鑑・マップのタブを初めて開いた記録を取る
+    // 🔰 はじめてガイド：ショップのタブを初めて開いた記録を取る（図鑑・マップは各ページ側で記録する）
     if (typeof trackTutorialMission === "function") {
         if (tabName === "shop") trackTutorialMission("shop_wo_nozoku");
-        if (tabName === "dex") trackTutorialMission("zukan_wo_miru");
-        if (tabName === "map") trackTutorialMission("map_wo_miru");
     }
-}
-
-// 📂 モバイル用サイドメニュー（図鑑・境内マップ）の開閉
-function toggleMoreMenu() {
-    const drawer = document.querySelector("#more-menu-drawer");
-    const overlay = document.querySelector("#more-menu-overlay");
-    if (!drawer || !overlay) return;
-
-    if (drawer.classList.contains("open")) {
-        closeMoreMenu();
-    } else {
-        drawer.classList.add("open");
-        overlay.classList.add("open");
-    }
-}
-
-function closeMoreMenu() {
-    const drawer = document.querySelector("#more-menu-drawer");
-    const overlay = document.querySelector("#more-menu-overlay");
-    if (drawer) drawer.classList.remove("open");
-    if (overlay) overlay.classList.remove("open");
-}
-
-// 📖🗺️ サイドメニューから図鑑／境内マップを選んだ時の処理
-function selectMoreTab(tabName) {
-    showTab(tabName);
-    closeMoreMenu();
 }
 
 // 🔔 サイドバーの通知ベルをタップした時、ミッションタブの「季節限定ミッション」まで移動する
 function jumpToSeasonalMissions() {
     showTab("missions");
-    closeMoreMenu();
     const section = document.querySelector("#seasonal-missions-section");
     if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -135,7 +86,6 @@ function jumpToSeasonalMissions() {
 // 👥 フレンド申請の通知ベルをタップした時、フレンドタブまで移動する
 function jumpToFriendsTab() {
     showTab("friends");
-    closeMoreMenu();
     const section = document.querySelector("#friend-requests-section");
     if (section) {
         section.open = true;

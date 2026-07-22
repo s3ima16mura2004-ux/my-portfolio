@@ -29,157 +29,12 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (draw10Btn) draw10Btn.disabled = true;
 
     try {
-        // omikuji2.html内のFirebase初期化(モジュール)が終わるのを少し待つ
-        let tries = 0;
-        while ((!window.omikujiDB || !window.omikujiDoc || !window.omikujiGetDoc) && tries < 50) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-            tries++;
-        }
-
-        const userRef = window.omikujiDoc(window.omikujiDB, "users", currentUser);
-        const snap = await window.omikujiGetDoc(userRef);
-
-        if (snap.exists()) {
-            const data = snap.data();
-            currentMoney = typeof data.money === "number" ? data.money : 10000;
-            feverCount = typeof data.feverCount === "number" ? data.feverCount : 0;
-            feverTier = typeof data.feverTier === "number" ? data.feverTier : 1;
-            prayDate = data.prayDate || "";
-            prayCount = typeof data.prayCount === "number" ? data.prayCount : 0;
-            luckyItemKey = data.luckyItem || "";
-            ownedItems = Object.assign({
-                koban: 0, shinboku: 0, ishikoro: 0, tanzaku: 0,
-                orihime_thread: 0, hikoboshi_star: 0, amanogawa_kirameki: 0,
-                natsumatsuri_lantern: 0, kingyo: 0, kakigori: 0, hanabi_tama: 0,
-                tsukimi_mochi: 0, susuki_hoshi: 0, tsukimi_dango: 0,
-                momiji_shiori: 0, icho_leaf: 0, kuri: 0,
-                hatsuyume_fuji: 0, hatsuyume_taka: 0, hatsuyume_nasu: 0,
-                izumo_omamori: 0, kamisama_wasuremono: 0, kagura_suzu: 0,
-                chitose_fukuro: 0, orizuru_negai: 0, kinchaku_omamori: 0,
-                christmas_ribbon: 0, seiya_candle: 0, snowman_charm: 0,
-                choco_kakera: 0, akai_ito: 0, love_letter: 0,
-                joya_kane_hibiki: 0, toshikoshi_soba: 0, susuharai_houki: 0,
-                hanami_dango: 0, sakura_hanabira: 0, hanami_bento: 0,
-                fuku_mame: 0, oni_no_tsuno: 0, hiiragi_iwashi: 0,
-                wakaba_shinme: 0, haru_no_tsubomi: 0, harukaze_no_ha: 0,
-                koinobori_uroko: 0, kabuto_kazari: 0, shobu_no_ha: 0,
-                chinowa_kaya: 0, minazuki_gashi: 0, oharai_no_gohei: 0
-            }, data.ownedItems || {});
-            equippedCollectible = data.equippedCollectible || "";
-            shopItemKey = data.shopItemKey || "";
-            shopItemRemaining = typeof data.shopItemRemaining === "number" ? data.shopItemRemaining : 0;
-            totalDraws = typeof data.totalDraws === "number" ? data.totalDraws : 0;
-            totalDaikichi = typeof data.totalDaikichi === "number" ? data.totalDaikichi : 0;
-            totalProfit = typeof data.totalProfit === "number" ? data.totalProfit : 0;
-            totalWinnings = typeof data.totalWinnings === "number" ? data.totalWinnings : 0;
-            urnLevel = typeof data.urnLevel === "number" ? data.urnLevel : 0;
-            companionExp = typeof data.companionExp === "number" ? data.companionExp : 0;
-            ownedFriends = Object.assign({ shirohebi: false, kitsune: false }, data.ownedFriends || {});
-
-            const today = todayStr();
-            taianActive = (data.taianDate === today) && data.taianActive === true;
-            bankMoney = typeof data.bankMoney === "number" ? data.bankMoney : 0;
-            dexAchieved = Object.assign(
-                { daidaikichi: false, daikichi: false, kamikichi: false, kichi: false, chuukichi: false, syoukichi: false, suekichi: false, kyou: false, daikyou: false, daidaikyou: false },
-                data.dexAchieved || {}
-            );
-            dexRewardClaimed = data.dexRewardClaimed === true;
-            gotDaidaikichi = data.gotDaidaikichi === true;
-            gotKamikichi = data.gotKamikichi === true;
-            gotDaidaikyou = data.gotDaidaikyou === true;
-            gotUshimitsuDraw = data.gotUshimitsuDraw === true;
-            kamikichiBonus = typeof data.kamikichiBonus === "number" ? data.kamikichiBonus : 0;
-            ishikoro500Claimed = data.ishikoro500Claimed === true;
-            gachaTickets = typeof data.gachaTickets === "number" ? data.gachaTickets : 0;
-            birthdayTicket = data.birthdayTicket === true;
-            kimagureFeverUntil = typeof data.kimagureFeverUntil === "number" ? data.kimagureFeverUntil : 0;
-            tanabataWishDate = data.tanabataWishDate || "";
-            tanabataLuckDate = data.tanabataLuckDate || "";
-            orihimeHikoboshiMeetCount = typeof data.orihimeHikoboshiMeetCount === "number" ? data.orihimeHikoboshiMeetCount : 0;
-            orihimeHikoboshiLastMetYear = typeof data.orihimeHikoboshiLastMetYear === "number" ? data.orihimeHikoboshiLastMetYear : 0;
-            hatsuyumeComplete = data.hatsuyumeComplete === true;
-
-            missionDate = data.missionDate || "";
-            missionKeysToday = Array.isArray(data.missionKeysToday) ? data.missionKeysToday : [];
-            missionProgress = data.missionProgress || {};
-            missionClaimed = data.missionClaimed || {};
-            missionDrawsToday = typeof data.missionDrawsToday === "number" ? data.missionDrawsToday : 0;
-            wentBankruptToday = data.wentBankruptToday === true;
-            steadyVisitorEarned = data.steadyVisitorEarned === true;
-            kiyomeShioActive = data.kiyomeShioActive === true;
-            boostTicketCount = typeof data.boostTicketCount === "number" ? data.boostTicketCount : 0;
-            kannazukiDeposits = typeof data.kannazukiDeposits === "number" ? data.kannazukiDeposits : 0;
-            kannazukiRewardedYear = typeof data.kannazukiRewardedYear === "number" ? data.kannazukiRewardedYear : 0;
-            santaBagCount = typeof data.santaBagCount === "number" ? data.santaBagCount : 0;
-            chocoDrawDate = data.chocoDrawDate || "";
-            chocoDrawCount = typeof data.chocoDrawCount === "number" ? data.chocoDrawCount : 0;
-            joyaBellDate = data.joyaBellDate || "";
-            joyaBellCount = typeof data.joyaBellCount === "number" ? data.joyaBellCount : 0;
-            joyaBellCompleteYear = typeof data.joyaBellCompleteYear === "number" ? data.joyaBellCompleteYear : 0;
-            hanamiDangoActive = data.hanamiDangoActive === true;
-            hanamiDangoTotalCollected = typeof data.hanamiDangoTotalCollected === "number" ? data.hanamiDangoTotalCollected : 0;
-            gotKodomonohiExtreme = data.gotKodomonohiExtreme === true;
-            mamemakiSuccessCount = typeof data.mamemakiSuccessCount === "number" ? data.mamemakiSuccessCount : 0;
-            nagoshiBadCount = typeof data.nagoshiBadCount === "number" ? data.nagoshiBadCount : 0;
-            nagoshiLastResetYear = typeof data.nagoshiLastResetYear === "number" ? data.nagoshiLastResetYear : 0;
-            shrineMapLevel = typeof data.shrineMapLevel === "number" ? data.shrineMapLevel : 0;
-
-            // 🔨 神社パーツ単位の所持データを読み込む。旧形式（神社ごとのtrue/false）が残っていた場合は、
-            // その神社の全パーツを完成済みとして自動的に引き継ぐ（過去の参拝実績を失わないための移行措置）
-            japanShrinePartsOwned = (data.japanShrinePartsOwned && typeof data.japanShrinePartsOwned === "object") ? data.japanShrinePartsOwned : {};
-            japanOkumiyaPartsOwned = (data.japanOkumiyaPartsOwned && typeof data.japanOkumiyaPartsOwned === "object") ? data.japanOkumiyaPartsOwned : {};
-            ownedPowerSpots = (data.ownedPowerSpots && typeof data.ownedPowerSpots === "object") ? data.ownedPowerSpots : {};
-            powerSpotMapRevealed = data.powerSpotMapRevealed === true;
-            ownedMiniThemeSpots = (data.ownedMiniThemeSpots && typeof data.ownedMiniThemeSpots === "object") ? data.ownedMiniThemeSpots : {};
-            miniThemeMapRevealed = data.miniThemeMapRevealed === true;
-            ownedWorldSpots = (data.ownedWorldSpots && typeof data.ownedWorldSpots === "object") ? data.ownedWorldSpots : {};
-            worldSpotMapRevealed = data.worldSpotMapRevealed === true;
-            mapPath6Choice = data.mapPath6Choice || "";
-            historyMapRevealed = data.historyMapRevealed === true;
-            ownedHistorySpots = (data.ownedHistorySpots && typeof data.ownedHistorySpots === "object") ? data.ownedHistorySpots : {};
-            builderModeRevealed = data.builderModeRevealed === true;
-            builderLevel = typeof data.builderLevel === "number" ? data.builderLevel : 0;
-            comboYear = typeof data.comboYear === "number" ? data.comboYear : 0;
-            comboItemsGotThisYear = (data.comboItemsGotThisYear && typeof data.comboItemsGotThisYear === "object") ? data.comboItemsGotThisYear : {};
-            comboLastClaimedYear = typeof data.comboLastClaimedYear === "number" ? data.comboLastClaimedYear : 0;
-            comboCompletedYears = typeof data.comboCompletedYears === "number" ? data.comboCompletedYears : 0;
-            checkYearlyComboReset(); // 🎐 年をまたいでいた場合はここで今年分にリセットしておく
-            kimodameshiDate = data.kimodameshiDate || "";
-            kimodameshiCount = typeof data.kimodameshiCount === "number" ? data.kimodameshiCount : 0;
-            gotHalloweenRareYokai = data.gotHalloweenRareYokai === true;
-            seasonalActionDates = (data.seasonalActionDates && typeof data.seasonalActionDates === "object") ? data.seasonalActionDates : {};
-            seasonalActionCounts = (data.seasonalActionCounts && typeof data.seasonalActionCounts === "object") ? data.seasonalActionCounts : {};
-            natsumatsuriRewardClaimedYear = typeof data.natsumatsuriRewardClaimedYear === "number" ? data.natsumatsuriRewardClaimedYear : 0;
-            yearlyAlbum = Array.isArray(data.yearlyAlbum) ? data.yearlyAlbum : [];
-            tutorialMissionProgress = (data.tutorialMissionProgress && typeof data.tutorialMissionProgress === "object") ? data.tutorialMissionProgress : {};
-            tutorialMissionClaimed = (data.tutorialMissionClaimed && typeof data.tutorialMissionClaimed === "object") ? data.tutorialMissionClaimed : {};
-            equippedTitleKey = data.equippedTitleKey || "";
-            equippedTitleEmoji = data.equippedTitleEmoji || "";
-            equippedTitleName = data.equippedTitleName || "";
-            friends = (data.friends && typeof data.friends === "object") ? data.friends : {};
-            friendRequestsIncoming = (data.friendRequestsIncoming && typeof data.friendRequestsIncoming === "object") ? data.friendRequestsIncoming : {};
-            friendRequestsOutgoing = (data.friendRequestsOutgoing && typeof data.friendRequestsOutgoing === "object") ? data.friendRequestsOutgoing : {};
-            sendMoneyDate = data.sendMoneyDate || "";
-            sendMoneyCountToday = typeof data.sendMoneyCountToday === "number" ? data.sendMoneyCountToday : 0;
-            if (data.japanShrinesOwned && typeof data.japanShrinesOwned === "object") {
-                JAPAN_PREFECTURES.forEach(pref => {
-                    pref.shrines.forEach(shrine => {
-                        if (data.japanShrinesOwned[shrine.key]) {
-                            SHRINE_BUILD_PARTS.forEach(part => {
-                                japanShrinePartsOwned[shrine.key + ":" + part.key] = true;
-                            });
-                        }
-                    });
-                });
-            }
-        }
+        await loadUserState();
 
         refreshDailyMissions(); // 🎯 日付が変わっていればデイリーミッションをリセット（前日分の「お財布の達人」判定も含む）
 
         updateMoneyDisplay();
         updateTitlesUI();
-        updateDexUI();
-        updateYearlyAlbumUI(); // 📖 年間アルバムの表示を初期化
         updateFriendsUI(); // 👥 フレンド機能の表示を初期化
         setInterval(refreshFriendsFromServer, 30000); // 👥 他ユーザーからの申請・承認を定期的に反映
         updateBankUI();
@@ -230,7 +85,6 @@ window.addEventListener("DOMContentLoaded", async () => {
         setInterval(updateKodomonohiUI, 60000); // 🎏 こどもの日（鯉のぼり演出）の開催状況を定期的に再チェック
         updateNagoshiUI(); // 🌾 夏越の大祓（茅の輪くぐり）の進捗表示を初期化
         updateYearlyComboUI(); // 🎐 年間コンボの進捗表示を初期化
-        updateShrineMapUI(); // 🗺️ 境内マップの進捗表示を初期化
         checkKannazukiReturn(); // ⛩️ 11月になっていれば、神無月に貯めた賽銭箱の預け入れ額を「倍返し」する
         startCountdownTimers(); // ⏳ 次の季節イベント／次のボーナスタイムまでのカウントダウンを開始
         if (typeof schedulePhantomSpawn === "function") schedulePhantomSpawn(); // 🐱🐸 幻の参拝客の出現スケジュールを開始

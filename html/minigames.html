@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ミニゲーム広場 - 豪華おみくじ神社</title>
+    <link rel="stylesheet" href="../css/omikuji-core.css?v=5">
+    <link rel="stylesheet" href="../css/omikuji-shop.css?v=5">
+    <link rel="stylesheet" href="../css/omikuji-widgets.css?v=5">
+    <link rel="stylesheet" href="../css/omikuji-minigames.css?v=1">
+</head>
+<body>
+
+    <a href="top.html" class="back-to-top-btn">🏠 トップに戻る</a>
+
+    <div class="container container-wide">
+        <div class="user-info">
+            👤 参拝者：<span id="equipped-title-display" class="hidden"></span><span id="user-display">ゲスト参拝者</span>様
+            <button type="button" class="logout-btn" onclick="logout()">ログアウト</button>
+        </div>
+
+        <h1>🎲 ミニゲーム広場</h1>
+
+        <div class="page-columns">
+            <div class="col-side">
+                <div class="money-box">
+                    💰 あなたの所持金：<span id="money">10000</span>円
+                </div>
+
+                <div class="page-nav-links">
+                    <a href="omikuji2.html" class="page-nav-link">⛩️ おみくじに戻る</a>
+                    <a href="dex.html" class="page-nav-link">📖 おみくじ図鑑</a>
+                    <a href="map.html" class="page-nav-link">🗺️ 境内マップ</a>
+                </div>
+
+                <div class="minigame-stats-box">
+                    🎲 ミニゲーム累計プレイ回数：<span id="minigame-play-count">0</span>回<br>
+                    💰 ミニゲーム累計獲得額：<span id="minigame-total-won">0</span>円
+                </div>
+            </div>
+
+            <div class="col-main">
+                <p class="bank-desc" style="text-align:center;margin-bottom:16px;">
+                    賽銭箱に貯めたお金や所持金を元手に、境内の縁日で運試し。当たれば倍、外れれば没収です。
+                </p>
+
+                <div class="game-card-list">
+                    <div class="game-card">
+                        <div class="game-card-emoji">🎲</div>
+                        <div class="game-card-body">
+                            <p class="game-card-name">丁半博打</p>
+                            <p class="game-card-desc">サイコロ2つの目の合計が偶数(丁)か奇数(半)かを当てる、縁日の定番賭博。的中で賭け金が倍になって戻ります。</p>
+                        </div>
+                        <div class="game-card-action">
+                            <a href="chohan.html" class="btn-shop-buy" style="text-decoration:none;display:inline-block;">遊ぶ</a>
+                        </div>
+                    </div>
+
+                    <div class="game-card game-card-soon">
+                        <div class="game-card-emoji">🎰</div>
+                        <div class="game-card-body">
+                            <p class="game-card-name">神社スロット</p>
+                            <p class="game-card-desc">大吉・招き猫・小判・だるまの絵柄を揃えて配当を狙う3リールスロット。</p>
+                        </div>
+                        <div class="game-card-action">
+                            <span class="game-card-soon-tag">近日公開</span>
+                        </div>
+                    </div>
+
+                    <div class="game-card game-card-soon">
+                        <div class="game-card-emoji">🎯</div>
+                        <div class="game-card-body">
+                            <p class="game-card-name">境内すごろく</p>
+                            <p class="game-card-desc">賭け金でサイコロを振って進む、日本一周をイメージしたすごろく。</p>
+                        </div>
+                        <div class="game-card-action">
+                            <span class="game-card-soon-tag">近日公開</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../js/omikuji-firebase-bridge.js?v=1"></script>
+
+    <script src="../js/omikuji-data.js?v=11"></script>
+    <script src="../js/omikuji-state.js?v=12"></script>
+    <script src="../js/minigames.js?v=1"></script>
+    <script>
+        function logout() {
+            if (confirm("ログアウトしますか？")) {
+                localStorage.removeItem("logged_in_user");
+                window.location.href = "../index.html";
+            }
+        }
+    </script>
+</body>
+</html>

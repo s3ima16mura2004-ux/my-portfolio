@@ -174,3 +174,50 @@
 .seasonal-missions-bell:active {
     transform: scale(0.98);
 }
+/* ============================================================
+   🧭 ページ間ナビゲーション（図鑑・境内マップ・ミニゲーム等、
+   独立ページ化したコンテンツの間を行き来するための共通リンク一覧）
+   ============================================================ */
+.page-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.page-nav-link {
+    display: block;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #8b5a2b;
+    background: #f0e6d8;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.2s, transform 0.1s;
+    box-sizing: border-box;
+}
+
+.page-nav-link:hover {
+    background-color: #e6d8c3;
+}
+
+.page-nav-link:active {
+    transform: scale(0.98);
+}
+
+.page-nav-link.page-nav-link-current {
+    background: #8b5a2b;
+    color: #fff;
+}
+
+/* 🔗 omikuji2.htmlのタブ行に置く「図鑑」「境内マップ」への外部リンク
+   （見た目は他のタブボタンと揃えつつ、リンクなので下線やボタン特有のスタイルをリセットする） */
+a.tab-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-sizing: border-box;
+}

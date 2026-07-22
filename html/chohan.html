@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>丁半博打 - 豪華おみくじ神社</title>
+    <link rel="stylesheet" href="../css/omikuji-core.css?v=5">
+    <link rel="stylesheet" href="../css/omikuji-shop.css?v=5">
+    <link rel="stylesheet" href="../css/omikuji-widgets.css?v=5">
+    <link rel="stylesheet" href="../css/omikuji-minigames.css?v=1">
+</head>
+<body>
+
+    <a href="top.html" class="back-to-top-btn">🏠 トップに戻る</a>
+
+    <div class="container container-wide">
+        <div class="user-info">
+            👤 参拝者：<span id="equipped-title-display" class="hidden"></span><span id="user-display">ゲスト参拝者</span>様
+            <button type="button" class="logout-btn" onclick="logout()">ログアウト</button>
+        </div>
+
+        <h1>🎲 丁半博打</h1>
+
+        <div class="page-columns">
+            <div class="col-side">
+                <div class="money-box">
+                    💰 あなたの所持金：<span id="money">10000</span>円
+                </div>
+
+                <div class="page-nav-links">
+                    <a href="minigames.html" class="page-nav-link">🎲 ミニゲーム広場</a>
+                    <a href="omikuji2.html" class="page-nav-link">⛩️ おみくじに戻る</a>
+                    <a href="top.html" class="page-nav-link">🏠 トップページ</a>
+                </div>
+
+                <div class="minigame-stats-box">
+                    このゲームでのプレイ回数：<span id="chohan-session-count">0</span>回<br>
+                    直近の結果：<span id="chohan-session-streak">-</span>
+                </div>
+            </div>
+
+            <div class="col-main">
+                <div class="shop-section">
+                    <h3 class="shop-section-title">🎲 丁半博打のルール</h3>
+                    <p class="bank-desc">
+                        サイコロ2つの目の合計が偶数なら「丁（ちょう）」、奇数なら「半（はん）」です。<br>
+                        賭け金を決めて「丁」か「半」を選んでください。的中すれば賭け金と同額が払い戻され、実質倍額になります。外れると賭け金は没収されます。
+                    </p>
+
+                    <div class="dice-stage">
+                        <span id="dice-1" class="dice-face">🎲</span>
+                        <span id="dice-2" class="dice-face">🎲</span>
+                    </div>
+
+                    <p id="chohan-result-box" class="chohan-result-box">賭け金を決めて、「丁」か「半」を選んでください</p>
+
+                    <div class="bet-amount-row">
+                        <input type="number" id="chohan-bet-input" min="100" step="100" value="1000">
+                    </div>
+                    <div class="bet-preset-row">
+                        <button type="button" class="bet-preset-btn" onclick="setChohanBet(1000)">1,000円</button>
+                        <button type="button" class="bet-preset-btn" onclick="setChohanBet(5000)">5,000円</button>
+                        <button type="button" class="bet-preset-btn" onclick="setChohanBet(10000)">10,000円</button>
+                        <button type="button" class="bet-preset-btn" onclick="setChohanBet(50000)">50,000円</button>
+                        <button type="button" class="bet-preset-btn" id="chohan-bet-all-btn" onclick="setChohanBetAll()">全額</button>
+                    </div>
+
+                    <div class="chohan-choice-row">
+                        <button type="button" id="chohan-cho-btn" class="chohan-choice-btn chohan-choice-cho" onclick="playChohan('cho')">丁（偶数）</button>
+                        <button type="button" id="chohan-han-btn" class="chohan-choice-btn chohan-choice-han" onclick="playChohan('han')">半（奇数）</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="se-shuffle" src="../sounds/shuffle.mp3" preload="auto"></audio>
+    <audio id="se-win" src="../sounds/win.mp3" preload="auto"></audio>
+    <audio id="se-lose" src="../sounds/lose.mp3" preload="auto"></audio>
+
+    <script type="module" src="../js/omikuji-firebase-bridge.js?v=1"></script>
+
+    <script src="../js/omikuji-data.js?v=11"></script>
+    <script src="../js/omikuji-state.js?v=12"></script>
+    <script src="../js/omikuji-ui-effects.js?v=4"></script>
+    <script src="../js/chohan.js?v=1"></script>
+    <script>
+        function logout() {
+            if (confirm("ログアウトしますか？")) {
+                localStorage.removeItem("logged_in_user");
+                window.location.href = "../index.html";
+            }
+        }
+    </script>
+</body>
+</html>

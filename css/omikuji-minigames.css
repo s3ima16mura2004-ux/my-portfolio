@@ -1,0 +1,207 @@
+/* ============================================================
+   omikuji-minigames.css
+   🎲 ミニゲームハブ（minigames.html）・個別ゲームページ共通スタイル
+   ============================================================ */
+
+/* 🎮 ハブページ：ゲーム一覧カード */
+.game-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.game-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #fbf8f3;
+    border: 1px solid #e8dcc8;
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: left;
+}
+
+.game-card-emoji {
+    font-size: 2.2rem;
+    flex-shrink: 0;
+    width: 52px;
+    text-align: center;
+}
+
+.game-card-body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.game-card-name {
+    font-weight: bold;
+    color: #4a3728;
+    margin: 0 0 4px;
+    font-size: 1.05rem;
+}
+
+.game-card-desc {
+    font-size: 0.82rem;
+    color: #7a5c3e;
+    margin: 0;
+}
+
+.game-card-action {
+    flex-shrink: 0;
+}
+
+.game-card.game-card-soon {
+    opacity: 0.65;
+}
+
+.game-card-soon-tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #999;
+    background: #ececec;
+    border-radius: 999px;
+    padding: 4px 10px;
+}
+
+/* 🎲 丁半博打：サイコロ表示 */
+.dice-stage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    min-height: 100px;
+    margin: 16px 0;
+}
+
+.dice-face {
+    font-size: 3.6rem;
+    line-height: 1;
+    transition: transform 0.15s ease;
+}
+
+.dice-face.dice-rolling {
+    animation: dice-shake 0.15s infinite;
+}
+
+@keyframes dice-shake {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(-3px, 2px) rotate(-8deg); }
+    50% { transform: translate(3px, -2px) rotate(8deg); }
+    75% { transform: translate(-2px, -2px) rotate(-5deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+/* 💰 賭け金入力・プリセット */
+.bet-amount-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.bet-amount-row input {
+    flex: 1;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.bet-preset-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.bet-preset-btn {
+    flex: 1 1 auto;
+    min-width: 64px;
+    padding: 8px 6px;
+    font-size: 0.82rem;
+    font-weight: bold;
+    color: #8b5a2b;
+    background: #f0e6d8;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.bet-preset-btn:hover {
+    background-color: #e6d8c3;
+}
+
+.bet-preset-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 🀄 丁・半 選択ボタン */
+.chohan-choice-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.chohan-choice-btn {
+    flex: 1;
+    padding: 16px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
+    transition: transform 0.1s ease;
+}
+
+.chohan-choice-btn:active {
+    transform: translateY(3px);
+    box-shadow: none;
+}
+
+.chohan-choice-btn:disabled {
+    background-color: #ccc !important;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.chohan-choice-cho {
+    background-color: #3f6fb8;
+}
+
+.chohan-choice-han {
+    background-color: #c0392b;
+}
+
+/* 📢 結果表示欄 */
+.chohan-result-box {
+    text-align: center;
+    font-size: 1.05rem;
+    font-weight: bold;
+    min-height: 1.6em;
+    margin-bottom: 10px;
+}
+
+.chohan-result-box.chohan-result-win {
+    color: #2e7d32;
+}
+
+.chohan-result-box.chohan-result-lose {
+    color: #d9534f;
+}
+
+/* 📊 ミニゲーム集計 */
+.minigame-stats-box {
+    font-size: 0.85rem;
+    color: #7a5c3e;
+    background: #fff6e6;
+    border: 1px solid #e8dcc8;
+    border-radius: 6px;
+    padding: 8px 10px;
+    text-align: center;
+    margin-top: 4px;
+}

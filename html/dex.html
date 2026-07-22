@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>おみくじ図鑑 - 豪華おみくじ神社</title>
+    <link rel="stylesheet" href="../css/omikuji-core.css?v=5">
+    <link rel="stylesheet" href="../css/omikuji-shop.css?v=5">
+    <link rel="stylesheet" href="../css/omikuji-map.css?v=4">
+    <link rel="stylesheet" href="../css/omikuji-missions.css?v=4">
+    <link rel="stylesheet" href="../css/omikuji-seasonal-effects.css?v=4">
+    <link rel="stylesheet" href="../css/omikuji-status-effects.css?v=4">
+    <link rel="stylesheet" href="../css/omikuji-widgets.css?v=5">
+    <link rel="stylesheet" href="../css/omikuji-top.css?v=4">
+</head>
+<body>
+
+    <a href="top.html" class="back-to-top-btn">🏠 トップに戻る</a>
+
+    <div class="container container-wide">
+        <div class="user-info">
+            👤 参拝者：<span id="equipped-title-display" class="hidden"></span><span id="user-display">ゲスト参拝者</span>様
+            <button type="button" class="logout-btn" onclick="logout()">ログアウト</button>
+        </div>
+
+        <h1>📖 おみくじ図鑑</h1>
+
+        <div class="page-columns">
+            <div class="col-side">
+                <div class="money-box">
+                    💰 あなたの所持金：<span id="money">10000</span>円
+                </div>
+
+                <div class="page-nav-links">
+                    <a href="omikuji2.html" class="page-nav-link">⛩️ おみくじに戻る</a>
+                    <a href="map.html" class="page-nav-link">🗺️ 境内マップ</a>
+                    <a href="minigames.html" class="page-nav-link">🎲 ミニゲーム広場</a>
+                </div>
+            </div>
+
+            <div class="col-main">
+                <div class="shop-section">
+    <h3 class="shop-section-title">📖 おみくじ図鑑</h3>
+    <p id="dex-progress" class="dex-progress">達成状況：0 / 10</p>
+    <div id="dex-grid" class="dex-grid"></div>
+    <p id="dex-reward-status" class="dex-reward-status hidden">-</p>
+                </div>
+                
+                <div id="yearly-album-section" class="shop-section hidden">
+    <h3 class="shop-section-title">📖 年間アルバム</h3>
+    <p class="bank-desc">年が変わるたびに、その年の実績が自動的に記録されます。これまでの歩みを振り返ってみましょう。</p>
+    <div id="yearly-album-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../js/omikuji-firebase-bridge.js?v=1"></script>
+
+    <script src="../js/omikuji-data.js?v=11"></script>
+    <script src="../js/omikuji-state.js?v=12"></script>
+    <script src="../js/omikuji-ui-shop.js?v=9"></script>
+    <script src="../js/omikuji-missions.js?v=2"></script>
+    <script src="../js/dex.js?v=1"></script>
+    <script>
+        function logout() {
+            if (confirm("ログアウトしますか？")) {
+                localStorage.removeItem("logged_in_user");
+                window.location.href = "../index.html";
+            }
+        }
+    </script>
+</body>
+</html>
