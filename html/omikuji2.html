@@ -36,6 +36,7 @@
                     <a href="dex.html" class="page-nav-link">📖 おみくじ図鑑</a>
                     <a href="map.html" class="page-nav-link">🗺️ 境内マップ</a>
                     <a href="minigames.html" class="page-nav-link">🎲 ミニゲーム広場</a>
+                    <a href="goshuincho.html" class="page-nav-link">📔 御朱印帳</a>
                 </div>
 
                 <details id="titles-box" class="daily-notices titles-box hidden">
@@ -52,6 +53,7 @@
 
                 <p class="bank-balance">🏦 賽銭箱（貯金）：<span id="bank-money-display-side">0</span>円</p>
 
+                <p id="login-streak-box" class="taian-status-box hidden">-</p>
                 <div id="lucky-item-box" class="lucky-item-box hidden">
                     <p class="lucky-item-title">🎋 本日のラッキーアイテム 🎋</p>
                     <p id="lucky-item-name">-</p>
@@ -154,6 +156,13 @@
                         <p id="missions-summary" class="missions-summary">-</p>
                         <div id="missions-list" class="missions-list"></div>
                     </div>
+
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">📅 週間目標ミッション（ランダム3個・毎週月曜リセット）</h3>
+                        <p id="weekly-missions-summary" class="missions-summary">-</p>
+                        <div id="weekly-missions-list" class="missions-list"></div>
+                    </div>
+
                     <div class="shop-section">
                         <h3 class="shop-section-title">🌙 常設ミッション</h3>
                         <div id="missions-always-list" class="missions-list"></div>
@@ -576,6 +585,13 @@
                     </div>
 
                     <div class="shop-section">
+                        <h3 class="shop-section-title">🔄 アイテム交換所</h3>
+                        <p class="bank-desc">シーズンが終わって余った季節限定アイテムを、5個単位でガチャ券に交換できます（開催期間外でもOK）。</p>
+                        <select id="exchange-item-select" class="bank-amount-input"></select>
+                        <button id="exchange-btn" class="btn-shop-buy" onclick="exchangeItemForTicket()" type="button" style="width:100%;">5個をガチャ券1枚に交換する</button>
+                    </div>
+
+                    <div class="shop-section">
                         <h3 class="shop-section-title">🏦 賽銭箱（貯金）</h3>
                         <p class="bank-desc">預けたお金はおみくじには使えませんが、大凶（神の試練）で失うこともありません。いつでも自由に出し入れできます。</p>
                         <p class="bank-balance">賽銭箱の残高：<span id="bank-money-display">0</span>円</p>
@@ -655,25 +671,26 @@
     <div id="oshogatsu-glow" class="sunrise-glow hidden"></div>
 
     <!-- Firebaseの初期化（top.htmlと同じプロジェクトを使用） -->
-    <script type="module" src="../js/omikuji-firebase-bridge.js?v=1"></script>
+    <script type="module" src="../js/omikuji-firebase-bridge.js?v=2"></script>
 
     <script src="../js/omikuji-seasonal.js?v=4"></script>
     <script src="../js/omikuji-countdown.js?v=2"></script>
-    <script src="../js/omikuji-data.js?v=11"></script>
-    <script src="../js/omikuji-state.js?v=12"></script>
+    <script src="../js/omikuji-data.js?v=13"></script>
+    <script src="../js/omikuji-state.js?v=14"></script>
     <script src="../js/omikuji-ui-core.js?v=5"></script>
-    <script src="../js/omikuji-ui-shop.js?v=9"></script>
+    <script src="../js/omikuji-ui-shop.js?v=10"></script>
     <script src="../js/omikuji-ui-effects.js?v=4"></script>
     <script src="../js/omikuji-ui-seasonal1.js?v=3"></script>
     <script src="../js/omikuji-ui-seasonal2.js?v=3"></script>
     <script src="../js/omikuji-ui-seasonal3.js?v=3"></script>
     <script src="../js/omikuji-ui-map.js?v=9"></script>
-    <script src="../js/omikuji-shop.js?v=10"></script>
-    <script src="../js/omikuji-missions.js?v=2"></script>
+    <script src="../js/omikuji-shop.js?v=11"></script>
+    <script src="../js/omikuji-missions.js?v=3"></script>
+    <script src="../js/omikuji-weekly-missions.js?v=1"></script>
     <script src="../js/omikuji-draw-helpers.js?v=3"></script>
     <script src="../js/omikuji-draw-single.js?v=9"></script>
     <script src="../js/omikuji-draw-multi.js?v=9"></script>
-    <script src="../js/omikuji-main.js?v=12"></script>
+    <script src="../js/omikuji-main.js?v=14"></script>
     <script src="../js/omikuji-phantom.js?v=2"></script>
     <script src="../js/omikuji-friends.js?v=1"></script>
     <script>

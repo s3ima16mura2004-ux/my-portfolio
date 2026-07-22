@@ -116,6 +116,35 @@ async function drawGacha() {
     alert("🎰 ガチャ結果…🎰\n" + item.emoji + "「" + item.name + "」が出ました！\n（残りガチャ券：" + gachaTickets + "枚）");
 }
 
+// 🔄 アイテム交換所：シーズンを問わず、余った季節限定アイテムを5個消費してガチャ券1枚に交換する
+// （drawSeasonalGachaと違い、開催期間外でも使えるので、シーズンが終わって余ったアイテムの使い道になる）
+async function exchangeItemForTicket() {
+    const select = document.querySelector("#exchange-item-select");
+    if (!select || !select.value) {
+        alert("🙅 交換するアイテムを選んでください。");
+        return;
+    }
+
+    const itemKey = select.value;
+    const item = DROP_ITEMS.find(i => i.key === itemKey);
+    if (!item) return;
+
+    const have = ownedItems[itemKey] || 0;
+    if (have < ITEM_EXCHANGE_COST) {
+        alert("🙅 「" + item.name + "」が足りません！\n現在：" + have + " / " + ITEM_EXCHANGE_COST + "個");
+        return;
+    }
+
+    ownedItems[itemKey] = have - ITEM_EXCHANGE_COST;
+    gachaTickets++;
+
+    updateShopUI();
+    playSE("se-purchase");
+    await saveUserState();
+
+    alert("🔄 「" + item.emoji + item.name + "」を" + ITEM_EXCHANGE_COST + "個、ガチャ券1枚に交換しました！\n（現在のガチャ券：" + gachaTickets + "枚）");
+}
+
 // 🎰 季節限定ガチャ：開催中のイベントの限定ドロップアイテムを合計5個消費して1回引く（ハズレなし。金額は開催日数に応じて変わる）
 async function drawSeasonalGacha(eventKey) {
     const event = SEASONAL_EVENTS.find(e => e.key === eventKey);

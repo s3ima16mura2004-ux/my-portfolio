@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../css/omikuji-core.css?v=5">
     <link rel="stylesheet" href="../css/omikuji-shop.css?v=5">
     <link rel="stylesheet" href="../css/omikuji-widgets.css?v=5">
-    <link rel="stylesheet" href="../css/omikuji-minigames.css?v=1">
+    <link rel="stylesheet" href="../css/omikuji-minigames.css?v=2">
 </head>
 <body>
 
@@ -31,6 +31,7 @@
                     <a href="omikuji2.html" class="page-nav-link">⛩️ おみくじに戻る</a>
                     <a href="dex.html" class="page-nav-link">📖 おみくじ図鑑</a>
                     <a href="map.html" class="page-nav-link">🗺️ 境内マップ</a>
+                    <a href="goshuincho.html" class="page-nav-link">📔 御朱印帳</a>
                 </div>
 
                 <div class="minigame-stats-box">
@@ -78,15 +79,32 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="ranking-section">
+                    <h2>🎲 ミニゲーム番付</h2>
+                    <table id="minigame-ranking-table">
+                        <thead>
+                            <tr>
+                                <th>順位</th>
+                                <th>参拝者</th>
+                                <th>ミニゲーム累計獲得額</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="3">読み込み中…</td></tr>
+                        </tbody>
+                    </table>
+                    <p id="minigame-my-rank-note" class="my-rank-note"></p>
+                </div>
             </div>
         </div>
     </div>
 
-    <script type="module" src="../js/omikuji-firebase-bridge.js?v=1"></script>
+    <script type="module" src="../js/omikuji-firebase-bridge.js?v=2"></script>
 
-    <script src="../js/omikuji-data.js?v=11"></script>
-    <script src="../js/omikuji-state.js?v=12"></script>
-    <script src="../js/minigames.js?v=1"></script>
+    <script src="../js/omikuji-data.js?v=13"></script>
+    <script src="../js/omikuji-state.js?v=14"></script>
+    <script src="../js/minigames.js?v=2"></script>
     <script>
         function logout() {
             if (confirm("ログアウトしますか？")) {

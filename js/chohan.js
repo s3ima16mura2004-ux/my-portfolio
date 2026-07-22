@@ -128,6 +128,7 @@ async function playChohan(choice) {
 
         chohanSessionCount++;
         minigamePlayCount++;
+        if (typeof trackWeeklyMinigamePlay === "function") trackWeeklyMinigamePlay(); // 📅 週間ミッション「週間ミニゲーム挑戦」の進捗を更新
 
         if (win) {
             currentMoney += bet;

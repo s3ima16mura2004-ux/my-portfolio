@@ -51,6 +51,7 @@
                     <a href="dex.html" class="page-nav-link">📖 おみくじ図鑑</a>
                     <a href="map.html" class="page-nav-link">🗺️ 境内マップ</a>
                     <a href="minigames.html" class="page-nav-link">🎲 ミニゲーム広場</a>
+                    <a href="goshuincho.html" class="page-nav-link">📔 御朱印帳</a>
                 </div>
 
                 <a id="friend-notification-link" href="omikuji2.html" class="seasonal-missions-bell hidden" style="display:block;text-decoration:none;">-</a>
@@ -69,6 +70,7 @@
 
                 <p class="bank-balance">🏦 賽銭箱（貯金）：<span id="bank-money-display-top">0</span>円</p>
 
+                <p id="login-streak-box" class="taian-status-box hidden">-</p>
                 <div id="lucky-item-box" class="lucky-item-box hidden">
                     <p class="lucky-item-title">🎋 本日のラッキーアイテム 🎋</p>
                     <p id="lucky-item-name">-</p>
@@ -130,11 +132,11 @@
         </div>
 
 <script src="../js/omikuji-seasonal.js?v=4"></script>
-        <script src="../js/omikuji-data.js?v=11"></script>
-        <script src="../js/omikuji-state.js?v=12"></script>
+        <script src="../js/omikuji-data.js?v=13"></script>
+        <script src="../js/omikuji-state.js?v=14"></script>
         <script src="../js/omikuji-ui-core.js?v=5"></script>
         <script src="../js/omikuji-countdown.js?v=2"></script>
-        <script type="module" src="../js/top.js?v=8"></script>
+        <script type="module" src="../js/top.js?v=9"></script>
         <script>
             // 🚪 ログアウト処理：ログイン情報を消してログインページへ戻る
             function logout() {

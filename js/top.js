@@ -52,6 +52,18 @@ async function loadUserInfo() {
             const money = typeof data.money === "number" ? data.money : 0;
             if (moneyDisplay) moneyDisplay.textContent = money.toLocaleString();
 
+            // 📅 連続参拝ボーナス（カウント自体はomikuji2.html等でloadUserState()実行時に更新される。ここは表示のみ）
+            const streakBox = document.querySelector("#login-streak-box");
+            if (streakBox) {
+                const streakCount = typeof data.loginStreakCount === "number" ? data.loginStreakCount : 0;
+                if (streakCount > 0) {
+                    streakBox.textContent = "📅 連続参拝：" + streakCount + "日目";
+                    streakBox.classList.remove("hidden");
+                } else {
+                    streakBox.classList.add("hidden");
+                }
+            }
+
             // 🎖️ 装備中の称号（omikuji2.html側で選んだものを、そのまま名前の横に表示する）
             if (equippedTitleDisplay) {
                 if (data.equippedTitleKey && data.equippedTitleEmoji) {

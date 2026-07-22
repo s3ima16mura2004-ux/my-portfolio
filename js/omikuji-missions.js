@@ -205,12 +205,15 @@ function trackMissionDraw(resultName, prizeMoney) {
         missionProgress.taikin_kasegi = 1;
     }
 
+    if (typeof trackWeeklyDraw === "function") trackWeeklyDraw(resultName); // 📅 週間ミッションの進捗も合わせて更新
+
     updateMissionsUI();
 }
 
 // 10連おみくじを1回実行するたびに呼び出す
 function trackMissionDraw10() {
     missionProgress.juuren_chousen = 1;
+    if (typeof trackWeeklyDraw10 === "function") trackWeeklyDraw10(); // 📅 週間ミッションの進捗も合わせて更新
     updateMissionsUI();
 }
 
@@ -236,6 +239,7 @@ function trackMissionDropItem() {
 // ショップアイテムを購入した時に呼び出す
 function trackMissionShopBuy() {
     missionProgress.shop_jouren = 1;
+    if (typeof trackWeeklyShopBuy === "function") trackWeeklyShopBuy(); // 📅 週間ミッションの進捗も合わせて更新
     updateMissionsUI();
 }
 
@@ -243,6 +247,7 @@ function trackMissionShopBuy() {
 function trackMissionDeposit(amount) {
     if (!amount || amount <= 0) return;
     missionProgress.chochiku_ka = Math.min(1000, (missionProgress.chochiku_ka || 0) + amount);
+    if (typeof trackWeeklyDeposit === "function") trackWeeklyDeposit(amount); // 📅 週間ミッションの進捗も合わせて更新
     updateMissionsUI();
 }
 
@@ -328,8 +333,9 @@ async function useBoostTicket() {
     alert("🎟️【ブースト券使用】🎟️\n所持金が1.1倍になりました！\n" + before.toLocaleString() + "円 → " + currentMoney.toLocaleString() + "円");
 }
 
-// 1件分のミッションカードHTMLを作る（progressStore/claimedStoreを省略すると通常のデイリーミッション扱いになる）
-function buildMissionCardHtml(mission, progressStore, claimedStore) {
+// 1件分のミッションカードHTMLを作る（progressStore/claimedStoreを省略すると通常のデイリーミッション扱いになる。
+// claimFnNameを省略した場合は、tutorialMissionProgressかどうかで自動判定する）
+function buildMissionCardHtml(mission, progressStore, claimedStore, claimFnName) {
     const progressSrc = progressStore || missionProgress;
     const claimedSrc = claimedStore || missionClaimed;
 
@@ -347,7 +353,7 @@ function buildMissionCardHtml(mission, progressStore, claimedStore) {
     } else if (claimed) {
         actionHtml = '<span class="mission-status-tag mission-status-done">✅ 受取済み</span>';
     } else if (complete) {
-        const claimFn = isTutorial ? "claimTutorialMission" : "claimMission";
+        const claimFn = claimFnName || (isTutorial ? "claimTutorialMission" : "claimMission");
         actionHtml = '<button class="btn-shop-buy mission-claim-btn" onclick="' + claimFn + '(\'' + mission.key + '\')" type="button">🎁 受け取る</button>';
     } else {
         actionHtml = '<span class="mission-status-tag">未達成</span>';

@@ -3,15 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>おみくじ図鑑 - 豪華おみくじ神社</title>
+    <title>御朱印帳 - 豪華おみくじ神社</title>
     <link rel="stylesheet" href="../css/omikuji-core.css?v=5">
     <link rel="stylesheet" href="../css/omikuji-shop.css?v=5">
-    <link rel="stylesheet" href="../css/omikuji-map.css?v=4">
     <link rel="stylesheet" href="../css/omikuji-missions.css?v=4">
-    <link rel="stylesheet" href="../css/omikuji-seasonal-effects.css?v=4">
-    <link rel="stylesheet" href="../css/omikuji-status-effects.css?v=4">
     <link rel="stylesheet" href="../css/omikuji-widgets.css?v=5">
-    <link rel="stylesheet" href="../css/omikuji-top.css?v=4">
+    <link rel="stylesheet" href="../css/omikuji-goshuincho.css?v=1">
 </head>
 <body>
 
@@ -23,7 +20,7 @@
             <button type="button" class="logout-btn" onclick="logout()">ログアウト</button>
         </div>
 
-        <h1>📖 おみくじ図鑑</h1>
+        <h1>📔 御朱印帳</h1>
 
         <div class="page-columns">
             <div class="col-side">
@@ -33,24 +30,19 @@
 
                 <div class="page-nav-links">
                     <a href="omikuji2.html" class="page-nav-link">⛩️ おみくじに戻る</a>
+                    <a href="dex.html" class="page-nav-link">📖 おみくじ図鑑</a>
                     <a href="map.html" class="page-nav-link">🗺️ 境内マップ</a>
                     <a href="minigames.html" class="page-nav-link">🎲 ミニゲーム広場</a>
-                    <a href="goshuincho.html" class="page-nav-link">📔 御朱印帳</a>
                 </div>
             </div>
 
             <div class="col-main">
-                <div class="shop-section">
-    <h3 class="shop-section-title">📖 おみくじ図鑑</h3>
-    <p id="dex-progress" class="dex-progress">達成状況：0 / 10</p>
-    <div id="dex-grid" class="dex-grid"></div>
-    <p id="dex-reward-status" class="dex-reward-status hidden">-</p>
-                </div>
-                
-                <div id="yearly-album-section" class="shop-section hidden">
-    <h3 class="shop-section-title">📖 年間アルバム</h3>
-    <p class="bank-desc">年が変わるたびに、その年の実績が自動的に記録されます。これまでの歩みを振り返ってみましょう。</p>
-    <div id="yearly-album-list"></div>
+                <p class="bank-desc" style="text-align:center;margin-bottom:16px;">
+                    これまでの参拝の歩みをまとめた御朱印帳です。各項目をタップすると、そのページに移動できます。
+                </p>
+
+                <div id="goshuincho-list" class="goshuin-list">
+                    <p style="text-align:center;color:#999;">読み込み中…</p>
                 </div>
             </div>
         </div>
@@ -61,8 +53,7 @@
     <script src="../js/omikuji-data.js?v=13"></script>
     <script src="../js/omikuji-state.js?v=14"></script>
     <script src="../js/omikuji-ui-shop.js?v=10"></script>
-    <script src="../js/omikuji-missions.js?v=3"></script>
-    <script src="../js/dex.js?v=1"></script>
+    <script src="../js/goshuincho.js?v=1"></script>
     <script>
         function logout() {
             if (confirm("ログアウトしますか？")) {

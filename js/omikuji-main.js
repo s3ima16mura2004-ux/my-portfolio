@@ -32,9 +32,27 @@ window.addEventListener("DOMContentLoaded", async () => {
         await loadUserState();
 
         refreshDailyMissions(); // 🎯 日付が変わっていればデイリーミッションをリセット（前日分の「お財布の達人」判定も含む）
+        if (typeof refreshWeeklyMissions === "function") refreshWeeklyMissions(); // 📅 週が変わっていれば週間ミッションをリセット
 
         updateMoneyDisplay();
         updateTitlesUI();
+
+        // 📅 連続参拝ボーナスの表示・節目ボーナスの通知
+        const streakBox = document.querySelector("#login-streak-box");
+        if (streakBox) {
+            if (loginStreakCount > 0) {
+                streakBox.textContent = "📅 連続参拝：" + loginStreakCount + "日目";
+                streakBox.classList.remove("hidden");
+            } else {
+                streakBox.classList.add("hidden");
+            }
+        }
+        if (loginStreakMilestoneResult) {
+            updateMoneyDisplay();
+            playSE("se-milestone");
+            alert("📅🎉【連続参拝ボーナス！】🎉📅\n" + loginStreakCount + "日連続の参拝、お疲れ様です！\nご祝儀として【" + loginStreakMilestoneResult.prize.toLocaleString() + "円】を授かりました！");
+        }
+
         updateFriendsUI(); // 👥 フレンド機能の表示を初期化
         setInterval(refreshFriendsFromServer, 30000); // 👥 他ユーザーからの申請・承認を定期的に反映
         updateBankUI();
@@ -44,6 +62,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         updateTanabataUI();
         updateNatsumatsuriUI();
         updateMissionsUI();
+        if (typeof updateWeeklyMissionsUI === "function") updateWeeklyMissionsUI();
         applyTimeTheme();
         setInterval(applyTimeTheme, 60000); // 1分ごとに時間帯を再チェック（長時間開いたままでも自動で切り替わる）
         setInterval(updateShopFeverUI, 30000); // 😲 神の気まぐれフィーバーの残り時間を定期的に更新

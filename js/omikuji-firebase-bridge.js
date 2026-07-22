@@ -13,6 +13,7 @@ import {
     addDoc,
     doc,
     getDoc,
+    getDocs,
     updateDoc,
     setDoc,
     increment,
@@ -43,6 +44,7 @@ window.omikujiCollectionRef = collection(db, "history");
 window.omikujiAddDoc = addDoc;
 window.omikujiDoc = doc;
 window.omikujiGetDoc = getDoc;
+window.omikujiGetDocs = getDocs;
 window.omikujiUpdateDoc = updateDoc;
 window.omikujiSetDoc = setDoc;
 window.omikujiIncrement = increment;
@@ -53,4 +55,4 @@ window.omikujiOnSnapshot = onSnapshot;
 window.omikujiQuery = query;
 window.omikujiOrderBy = orderBy;
 window.omikujiLimit = limit;
-window.omikujiServerTimestamp = serverTimestamp;
+window.omikujiServerTimestamp = serverTimestamp;

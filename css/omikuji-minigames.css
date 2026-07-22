@@ -205,3 +205,60 @@
     text-align: center;
     margin-top: 4px;
 }
+
+/* 🏆 ミニゲーム番付（top.htmlの長者番付ランキングと同じ見た目を再利用） */
+.ranking-section {
+    margin-top: 25px;
+    text-align: left;
+}
+
+.ranking-section h2 {
+    text-align: center;
+    color: #4a3728;
+    font-size: 1.3rem;
+    border-bottom: 2px solid #8b5a2b;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+}
+
+#minigame-ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    font-size: 0.9rem;
+}
+
+#minigame-ranking-table thead th {
+    background-color: #8b5a2b;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px 8px;
+    text-align: center;
+}
+
+#minigame-ranking-table tbody td {
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 1px solid #f0e6d8;
+}
+
+#minigame-ranking-table tbody tr:nth-child(even) {
+    background-color: #fbf8f3;
+}
+
+.rank-me {
+    background: linear-gradient(90deg, #fff2cc, #ffe08a, #fff2cc) !important;
+    font-weight: bold;
+    color: #d8860b;
+}
+
+.rank-medal {
+    font-size: 1.1rem;
+}
+
+.my-rank-note {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #777;
+    margin-top: 8px;
+}

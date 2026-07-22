@@ -137,6 +137,7 @@ function updateShopUI() {
 
     // 🎐🌠🏮🗻 季節限定アイテム（七夕・夏祭り・お月見・紅葉狩り・お正月）の表示
     updateSeasonalItemsUI();
+    updateExchangeUI();
 
     updateActiveItemsUI();
     updateUrnUI();
@@ -404,4 +405,27 @@ function updateBankUI() {
     if (bankDisplayTop) bankDisplayTop.textContent = bankMoney.toLocaleString();
     const bankDisplaySide = document.querySelector("#bank-money-display-side");
     if (bankDisplaySide) bankDisplaySide.textContent = bankMoney.toLocaleString();
+}
+
+// 🔄 アイテム交換所：交換可能（所持数がITEM_EXCHANGE_COST以上）な季節限定アイテムを選択肢に並べる
+function updateExchangeUI() {
+    const select = document.querySelector("#exchange-item-select");
+    const btn = document.querySelector("#exchange-btn");
+    if (!select) return;
+
+    const eligible = DROP_ITEMS.filter(i => i.seasonal && (ownedItems[i.key] || 0) >= ITEM_EXCHANGE_COST);
+    const previousValue = select.value;
+
+    if (eligible.length === 0) {
+        select.innerHTML = '<option value="">交換できるアイテムがありません（5個以上必要です）</option>';
+        if (btn) btn.disabled = true;
+        return;
+    }
+
+    select.innerHTML = eligible.map(i =>
+        '<option value="' + i.key + '">' + i.emoji + ' ' + i.name + '（所持：' + (ownedItems[i.key] || 0) + '個）</option>'
+    ).join("");
+
+    if (eligible.some(i => i.key === previousValue)) select.value = previousValue;
+    if (btn) btn.disabled = false;
 }
