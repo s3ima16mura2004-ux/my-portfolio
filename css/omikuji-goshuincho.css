@@ -56,3 +56,105 @@
     color: #8a7259;
     margin: 4px 0 0;
 }
+
+/* 📔 カードを開閉式（<details>）にして、達成条件の一覧を中に表示する */
+.goshuin-card {
+    display: block;
+    cursor: default;
+}
+
+.goshuin-card > summary {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    list-style: none;
+}
+
+.goshuin-card > summary::-webkit-details-marker {
+    display: none;
+}
+
+.goshuin-card > summary::before {
+    content: "▶";
+    display: inline-block;
+    flex-shrink: 0;
+    color: #8b5a2b;
+    font-size: 0.8rem;
+    transition: transform 0.15s ease;
+}
+
+.goshuin-card[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+.goshuin-detail-body {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed #e0d0c0;
+}
+
+.goshuin-detail-desc {
+    font-size: 0.82rem;
+    color: #7a5c3e;
+    margin: 0 0 10px;
+}
+
+.goshuin-sub-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 280px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.goshuin-sub-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.82rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: #fff;
+    border: 1px solid #f0e6d8;
+}
+
+.goshuin-sub-row .goshuin-sub-name {
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.goshuin-sub-row .goshuin-sub-cond {
+    color: #999;
+    text-align: right;
+}
+
+.goshuin-sub-row.goshuin-sub-done {
+    background: #fbf8f3;
+    border-color: #d8c8a8;
+}
+
+.goshuin-sub-row.goshuin-sub-done .goshuin-sub-name {
+    color: #2e7d32;
+}
+
+.goshuin-sub-row.goshuin-sub-done .goshuin-sub-cond {
+    color: #6b8e6f;
+}
+
+.goshuin-detail-link {
+    display: inline-block;
+    padding: 8px 14px;
+    font-size: 0.82rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #8b5a2b;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+.goshuin-detail-link:hover {
+    background-color: #6f4620;
+}
