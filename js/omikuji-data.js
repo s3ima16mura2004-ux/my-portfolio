@@ -1548,25 +1548,54 @@ const SLOT_SYMBOLS = [
 // 🎰 2つだけ揃った場合の配当倍率（絵柄を問わず一律。掛け金がそのまま戻ってくる＝実質おあいこ）
 const SLOT_TWO_MATCH_PAYOUT = 1;
 
-// 🎯 境内すごろく：ゴールまでのマス数と、マスの効果（掛け金に対する倍率）の一覧
-// SUGOROKU_TILE_LAYOUTで各マスにどの効果を固定で割り当てるかを決めるため、weightは目安（設計時の配分根拠）として残している
-const SUGOROKU_BOARD_SIZE = 20;
+// 🎯 境内すごろく：マスの効果の基本倍率一覧（各コースはこの倍率にeffectMultScaleを掛けて使う）
 const SUGOROKU_EFFECT_TABLE = [
-    { key: "none", emoji: "🌿", mult: 0, weight: 50, label: "🌿 何もなし" },
-    { key: "coin", emoji: "🪙", mult: 0.1, weight: 30, label: "🪙 小銭を拾った" },
-    { key: "dango", emoji: "🍡", mult: 0.3, weight: 12, label: "🍡 お団子をもらった" },
-    { key: "gift", emoji: "🎁", mult: 0.6, weight: 6, label: "🎁 授かりもの" },
-    { key: "big", emoji: "⭐", mult: 1.5, weight: 1.5, label: "⭐ 大きなご利益" },
-    { key: "jackpot", emoji: "🏆", mult: 5.0, weight: 0.5, label: "🏆 特大御利益！" }
+    { key: "none", emoji: "🌿", mult: 0, label: "🌿 何もなし" },
+    { key: "coin", emoji: "🪙", mult: 0.1, label: "🪙 小銭を拾った" },
+    { key: "dango", emoji: "🍡", mult: 0.3, label: "🍡 お団子をもらった" },
+    { key: "gift", emoji: "🎁", mult: 0.6, label: "🎁 授かりもの" },
+    { key: "big", emoji: "⭐", mult: 1.5, label: "⭐ 大きなご利益" },
+    { key: "jackpot", emoji: "🏆", mult: 5.0, label: "🏆 特大御利益！" }
 ];
-// 🎯 1〜19マス目それぞれに固定で割り当てる効果（SUGOROKU_EFFECT_TABLEのkeyを参照）。
-// 盤面を開いた時点でマスの形・色から効果の見当がつくよう、あらかじめ配置を決めている
-const SUGOROKU_TILE_LAYOUT = [
-    "none", "coin", "none", "dango", "none", "coin", "none", "gift", "none", "coin",
-    "dango", "none", "coin", "none", "big", "coin", "none", "jackpot", "coin"
+
+// 🎯 境内すごろくのコース一覧。マス数・最低賭け金・配当倍率のスケールがそれぞれ異なる
+// tileCounts：1〜(boardSize-1)マス目に配置する効果の内訳（合計はboardSize-1と一致させる）
+const SUGOROKU_COURSES = [
+    {
+        key: "light", emoji: "🌸", name: "お手軽コース",
+        desc: "マス数少なめ・すぐ遊べる入門コース",
+        boardSize: 12, minBet: 100, effectMultScale: 1.0, goalBonusMult: 0.1,
+        tileCounts: { none: 6, coin: 3, dango: 1, gift: 1, big: 0, jackpot: 0 }
+    },
+    {
+        key: "standard", emoji: "⛩️", name: "定番コース",
+        desc: "全20マスの標準的なコース",
+        boardSize: 20, minBet: 100, effectMultScale: 1.0, goalBonusMult: 0.1,
+        tileCounts: { none: 8, coin: 6, dango: 2, gift: 1, big: 1, jackpot: 1 }
+    },
+    {
+        key: "long", emoji: "🗾", name: "大冒険コース",
+        desc: "全32マスの長丁場。道中でご利益マスに出会うチャンスも多め",
+        boardSize: 32, minBet: 100, effectMultScale: 1.0, goalBonusMult: 0.15,
+        tileCounts: { none: 14, coin: 9, dango: 4, gift: 2, big: 1, jackpot: 1 }
+    },
+    {
+        key: "highstakes", emoji: "💴", name: "高額コース",
+        desc: "最低賭け金10,000円。その分マス効果の倍率が2倍！",
+        boardSize: 20, minBet: 10000, effectMultScale: 2.0, goalBonusMult: 0.2,
+        tileCounts: { none: 8, coin: 6, dango: 2, gift: 1, big: 1, jackpot: 1 }
+    }
 ];
-// 🎯 ゴール到達時にもらえる固定ボーナス（掛け金に対する倍率）
-const SUGOROKU_GOAL_BONUS_MULT = 0.1;
+
+// 🚶 境内すごろくで使える駒（プレイヤーが自由に選べる。効果には影響しない見た目のみの要素）
+const SUGOROKU_TOKENS = [
+    { key: "walk", emoji: "🚶", name: "参拝者" },
+    { key: "cat", emoji: "🐱", name: "招き猫" },
+    { key: "frog", emoji: "🐸", name: "金運蛙" },
+    { key: "torii", emoji: "⛩️", name: "鳥居" },
+    { key: "dragon", emoji: "🐉", name: "昇り龍" },
+    { key: "fox", emoji: "🦊", name: "お狐様" }
+];
 const SEASONAL_GACHA_BASE_TIERS = [
     { min: 0.99, name: "🎉大当たり", basePrize: 100000 },
     { min: 0.90, name: "✨当たり", basePrize: 20000 },

@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../css/omikuji-core.css?v=5">
     <link rel="stylesheet" href="../css/omikuji-shop.css?v=5">
     <link rel="stylesheet" href="../css/omikuji-widgets.css?v=5">
-    <link rel="stylesheet" href="../css/omikuji-minigames.css?v=6">
+    <link rel="stylesheet" href="../css/omikuji-minigames.css?v=7">
 </head>
 <body>
 
@@ -45,37 +45,30 @@
                     <p class="bank-desc">
                         参加料（賭け金）を払ってスタートし、サイコロを振って全<span id="sugoroku-board-size-text">20</span>マス先の「ゴール」を目指します。<br>
                         盤面のマスには、形と絵柄であらかじめご利益（参加料に対する倍率）が決まっています。止まったマスの効果はその場でもらえます。ゴールに到達すると精算され、獲得合計からゴールボーナスを引いた金額が最終収支になります。<br>
-                        ※ゲームの途中でページを離れると、道中の記録はリセットされます（支払った参加料は返却されません）。
+                        ※コースによってマス数・最低参加料・配当倍率が異なります。盤面のマス配置は毎回ランダムに変わります。ゲームの途中でページを離れても進行状況は保存され、また訪れた際に続きから再開できます。
                     </p>
+
+                    <p class="shop-item-name">🚶 駒を選ぶ</p>
+                    <div id="sugoroku-token-list" class="sugoroku-token-list"></div>
 
                     <div class="sugoroku-board-wrap">
                         <div id="sugoroku-board" class="sugoroku-board"></div>
                     </div>
 
-                    <div class="sugoroku-legend">
-                        <span class="sugoroku-legend-item"><span class="sugoroku-legend-shape" style="border-radius:50%/42%;"></span>🌿 何もなし</span>
-                        <span class="sugoroku-legend-item"><span class="sugoroku-legend-shape" style="clip-path:circle(46% at 50% 50%);background:#fff8e0;"></span>🪙 小銭 +0.1倍</span>
-                        <span class="sugoroku-legend-item"><span class="sugoroku-legend-shape" style="clip-path:polygon(50% 4%,96% 50%,50% 96%,4% 50%);background:#ffeef0;"></span>🍡 お団子 +0.3倍</span>
-                        <span class="sugoroku-legend-item"><span class="sugoroku-legend-shape" style="clip-path:polygon(25% 4%,75% 4%,98% 50%,75% 96%,25% 96%,2% 50%);background:#eafbe8;"></span>🎁 授かりもの +0.6倍</span>
-                        <span class="sugoroku-legend-item"><span class="sugoroku-legend-shape" style="clip-path:polygon(50% 0%,63% 33%,98% 36%,71% 58%,80% 92%,50% 72%,20% 92%,29% 58%,2% 36%,37% 33%);background:linear-gradient(135deg,#ffe0b3,#ffb84d);"></span>⭐ 大きなご利益 +1.5倍</span>
-                        <span class="sugoroku-legend-item"><span class="sugoroku-legend-shape" style="clip-path:polygon(50% 0%,63% 33%,98% 36%,71% 58%,80% 92%,50% 72%,20% 92%,29% 58%,2% 36%,37% 33%);background:linear-gradient(135deg,#fff2cc,#ffd700);"></span>🏆 特大御利益 +5.0倍</span>
-                    </div>
+                    <div id="sugoroku-legend" class="sugoroku-legend"></div>
 
                     <div id="sugoroku-dice" class="sugoroku-dice hidden">🎲</div>
 
                     <div id="sugoroku-log" class="sugoroku-log"></div>
 
                     <div id="sugoroku-entry-panel">
+                        <p class="shop-item-name">🗺️ コースを選ぶ</p>
+                        <div id="sugoroku-course-list" class="sugoroku-course-list"></div>
+
                         <div class="bet-amount-row">
                             <input type="number" id="sugoroku-bet-input" min="100" step="100" value="1000">
                         </div>
-                        <div class="bet-preset-row">
-                            <button type="button" class="bet-preset-btn" onclick="setSugorokuBet(1000)">1,000円</button>
-                            <button type="button" class="bet-preset-btn" onclick="setSugorokuBet(5000)">5,000円</button>
-                            <button type="button" class="bet-preset-btn" onclick="setSugorokuBet(10000)">10,000円</button>
-                            <button type="button" class="bet-preset-btn" onclick="setSugorokuBet(50000)">50,000円</button>
-                            <button type="button" class="bet-preset-btn" id="sugoroku-bet-all-btn" onclick="setSugorokuBetAll()">全額</button>
-                        </div>
+                        <div id="sugoroku-bet-preset-row" class="bet-preset-row"></div>
                         <button type="button" id="sugoroku-start-btn" class="chohan-choice-btn chohan-choice-han" style="width:100%;" onclick="startSugorokuRound()">🎫 参加料を払って出発する</button>
                     </div>
 
@@ -95,11 +88,11 @@
 
     <script type="module" src="../js/omikuji-firebase-bridge.js?v=2"></script>
 
-    <script src="../js/omikuji-data.js?v=16"></script>
-    <script src="../js/omikuji-state.js?v=14"></script>
+    <script src="../js/omikuji-data.js?v=18"></script>
+    <script src="../js/omikuji-state.js?v=16"></script>
     <script src="../js/omikuji-ui-effects.js?v=4"></script>
     <script src="../js/omikuji-weekly-missions.js?v=1"></script>
-    <script src="../js/sugoroku.js?v=3"></script>
+    <script src="../js/sugoroku.js?v=5"></script>
     <script>
         function logout() {
             if (confirm("ログアウトしますか？")) {

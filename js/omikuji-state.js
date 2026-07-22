@@ -68,6 +68,17 @@ let minigamePlayCount = 0;   // ミニゲームの累計プレイ回数（全ゲ
 let minigameTotalWon = 0;    // ミニゲームで勝って得た賞金の累計（掛け金の払い戻し分は含まない、純粋な勝利分のみ）
 
 // ============================================================
+// 🎯 境内すごろく：ラウンド途中の状態（ページを離れても再開できるよう保存する）
+// ============================================================
+let sugorokuInProgress = false; // 現在参加中のラウンドがあるかどうか
+let sugorokuPosition = 0;       // 現在のマス目
+let sugorokuBet = 0;            // このラウンドの参加料
+let sugorokuWinnings = 0;       // このラウンドで積み上がった獲得額の合計（参加料は含まない）
+let sugorokuLayout = [];        // このラウンドの盤面（1〜19マス目の効果キーの並び）
+let sugorokuCourseKey = "standard"; // 現在（または最後に）遊んでいるコースのkey
+let sugorokuTokenKey = "walk";      // プレイヤーが選んでいる駒（見た目のみ。効果には影響しない）
+
+// ============================================================
 // 📅 連続参拝ボーナス
 // ============================================================
 let loginStreakCount = 0;      // 現在の連続参拝日数
@@ -244,7 +255,14 @@ async function saveUserState() {
             weekStartDate: weekStartDate,
             weeklyMissionKeysThisWeek: weeklyMissionKeysThisWeek,
             weeklyMissionProgress: weeklyMissionProgress,
-            weeklyMissionClaimed: weeklyMissionClaimed
+            weeklyMissionClaimed: weeklyMissionClaimed,
+            sugorokuInProgress: sugorokuInProgress,
+            sugorokuPosition: sugorokuPosition,
+            sugorokuBet: sugorokuBet,
+            sugorokuWinnings: sugorokuWinnings,
+            sugorokuLayout: sugorokuLayout,
+            sugorokuCourseKey: sugorokuCourseKey,
+            sugorokuTokenKey: sugorokuTokenKey
         });
     } catch (e) {
         console.error("ユーザーデータの保存に失敗しました: ", e);
@@ -935,6 +953,13 @@ async function loadUserState() {
         weeklyMissionKeysThisWeek = Array.isArray(data.weeklyMissionKeysThisWeek) ? data.weeklyMissionKeysThisWeek : [];
         weeklyMissionProgress = (data.weeklyMissionProgress && typeof data.weeklyMissionProgress === "object") ? data.weeklyMissionProgress : {};
         weeklyMissionClaimed = (data.weeklyMissionClaimed && typeof data.weeklyMissionClaimed === "object") ? data.weeklyMissionClaimed : {};
+        sugorokuInProgress = data.sugorokuInProgress === true;
+        sugorokuPosition = typeof data.sugorokuPosition === "number" ? data.sugorokuPosition : 0;
+        sugorokuBet = typeof data.sugorokuBet === "number" ? data.sugorokuBet : 0;
+        sugorokuWinnings = typeof data.sugorokuWinnings === "number" ? data.sugorokuWinnings : 0;
+        sugorokuLayout = Array.isArray(data.sugorokuLayout) ? data.sugorokuLayout : [];
+        sugorokuCourseKey = data.sugorokuCourseKey || "standard";
+        sugorokuTokenKey = data.sugorokuTokenKey || "walk";
         if (data.japanShrinesOwned && typeof data.japanShrinesOwned === "object") {
             JAPAN_PREFECTURES.forEach(pref => {
                 pref.shrines.forEach(shrine => {
