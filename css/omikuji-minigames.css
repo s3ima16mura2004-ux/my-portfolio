@@ -262,3 +262,252 @@
     color: #777;
     margin-top: 8px;
 }
+
+/* 🎰 神社スロット：リール表示 */
+.slot-machine {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 16px 0;
+}
+
+.slot-reel {
+    width: 84px;
+    height: 84px;
+    background: #fff;
+    border: 3px solid #8b5a2b;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.6rem;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.slot-reel.slot-reel-spinning {
+    animation: slot-reel-blur 0.1s infinite;
+}
+
+@keyframes slot-reel-blur {
+    0% { transform: translateY(0); opacity: 1; }
+    50% { transform: translateY(4px); opacity: 0.7; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.slot-reel.slot-reel-win {
+    border-color: #ffd700;
+    box-shadow: 0 0 16px 4px rgba(255, 215, 0, 0.7);
+}
+
+/* 🎰 配当表 */
+.slot-paytable {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    font-size: 0.85rem;
+    margin-top: 10px;
+}
+
+.slot-paytable th, .slot-paytable td {
+    padding: 6px 8px;
+    border: 1px solid #e0d0c0;
+    text-align: center;
+}
+
+.slot-paytable th {
+    background-color: #8b5a2b;
+    color: #fff;
+}
+
+/* 🎯 境内すごろく：蛇行する盤面（楕円形のマス） */
+.sugoroku-board-wrap {
+    overflow-x: auto;
+    margin: 20px 0;
+    padding: 10px 4px 16px;
+    background: repeating-linear-gradient(135deg, #fbf6ec, #fbf6ec 12px, #f5eddb 12px, #f5eddb 24px);
+    border: 1px solid #e8dcc8;
+    border-radius: 12px;
+}
+
+.sugoroku-board {
+    display: grid;
+    grid-template-columns: repeat(5, 72px);
+    grid-auto-rows: 58px;
+    gap: 14px 10px;
+    justify-content: center;
+    width: max-content;
+    margin: 0 auto;
+}
+
+.sugoroku-tile {
+    width: 72px;
+    height: 50px;
+    border: 2px solid #cfa96a;
+    border-radius: 50% / 42%;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: bold;
+    color: #b39a6e;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    transition: transform 0.15s ease;
+}
+
+.sugoroku-tile.sugoroku-tile-start,
+.sugoroku-tile.sugoroku-tile-goal {
+    background: linear-gradient(135deg, #fff2cc, #ffd700);
+    border-color: #d8860b;
+    color: #6b4a00;
+    font-size: 0.78rem;
+}
+
+.sugoroku-tile.sugoroku-tile-current {
+    transform: scale(1.12);
+    border-color: #e53935;
+    box-shadow: 0 0 14px 3px rgba(229, 57, 53, 0.5);
+    z-index: 2;
+}
+
+.sugoroku-tile.sugoroku-tile-current::after {
+    content: "🚶";
+    position: absolute;
+    top: -26px;
+    font-size: 1.4rem;
+    animation: sugoroku-walker-bob 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes sugoroku-walker-bob {
+    from { transform: translateY(0); }
+    to { transform: translateY(-5px); }
+}
+
+.sugoroku-tile.sugoroku-tile-passed {
+    background: #fff2cc;
+    border-color: #e8c878;
+    color: #8b6f2f;
+}
+
+/* 🎯 マスの効果ごとに形・色を変える（盤面を見ただけで効果の見当がつくように） */
+.sugoroku-tile-main {
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.sugoroku-tile-num {
+    font-size: 0.55rem;
+    color: #b39a6e;
+    margin-top: 2px;
+}
+
+/* 🌿 何もなし：素の楕円形（デフォルトの見た目のまま） */
+
+/* 🪙 小銭を拾った：円形 */
+.sugoroku-tile.sugoroku-tile-effect-coin {
+    clip-path: circle(46% at 50% 50%);
+    background: #fff8e0;
+    border-color: #e0c060;
+}
+
+/* 🍡 お団子：ひし形 */
+.sugoroku-tile.sugoroku-tile-effect-dango {
+    clip-path: polygon(50% 4%, 96% 50%, 50% 96%, 4% 50%);
+    background: #ffeef0;
+    border-color: #e0a0ac;
+}
+
+/* 🎁 授かりもの：六角形 */
+.sugoroku-tile.sugoroku-tile-effect-gift {
+    clip-path: polygon(25% 4%, 75% 4%, 98% 50%, 75% 96%, 25% 96%, 2% 50%);
+    background: #eafbe8;
+    border-color: #7fb56a;
+}
+
+/* ⭐ 大きなご利益：星形 */
+.sugoroku-tile.sugoroku-tile-effect-big {
+    clip-path: polygon(50% 0%, 63% 33%, 98% 36%, 71% 58%, 80% 92%, 50% 72%, 20% 92%, 29% 58%, 2% 36%, 37% 33%);
+    background: linear-gradient(135deg, #ffe0b3, #ffb84d);
+    border-color: #e08a1f;
+}
+
+/* 🏆 特大御利益：大きめの星形＋常時グロー */
+.sugoroku-tile.sugoroku-tile-effect-jackpot {
+    clip-path: polygon(50% 0%, 63% 33%, 98% 36%, 71% 58%, 80% 92%, 50% 72%, 20% 92%, 29% 58%, 2% 36%, 37% 33%);
+    background: linear-gradient(135deg, #fff2cc, #ffd700);
+    border-color: #d8860b;
+    filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.85));
+    transform: scale(1.08);
+}
+
+.sugoroku-tile.sugoroku-tile-effect-jackpot.sugoroku-tile-current {
+    transform: scale(1.2);
+}
+
+/* 📋 マス効果の凡例 */
+.sugoroku-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    justify-content: center;
+    margin: 0 0 6px;
+    font-size: 0.75rem;
+    color: #7a5c3e;
+}
+
+.sugoroku-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.sugoroku-legend-shape {
+    display: inline-block;
+    width: 20px;
+    height: 16px;
+    border: 1.5px solid #cfa96a;
+    background: #fff;
+    flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+    .sugoroku-board {
+        grid-template-columns: repeat(4, 62px);
+        grid-auto-rows: 50px;
+        gap: 12px 8px;
+    }
+    .sugoroku-tile {
+        width: 62px;
+        height: 44px;
+        font-size: 0.65rem;
+    }
+}
+
+/* 🎯 出発・すごろく操作パネル */
+.sugoroku-log {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    background: #fbf8f3;
+    border: 1px solid #e8dcc8;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 12px;
+    font-size: 0.82rem;
+    color: #4a3728;
+}
+
+.sugoroku-log p {
+    margin: 0;
+}
+
+.sugoroku-dice {
+    font-size: 3rem;
+    text-align: center;
+    margin: 6px 0 14px;
+}

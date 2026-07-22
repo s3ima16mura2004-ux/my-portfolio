@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>丁半博打 - 豪華おみくじ神社</title>
+    <title>神社スロット - 豪華おみくじ神社</title>
     <link rel="stylesheet" href="../css/omikuji-core.css?v=5">
     <link rel="stylesheet" href="../css/omikuji-shop.css?v=5">
     <link rel="stylesheet" href="../css/omikuji-widgets.css?v=5">
@@ -19,7 +19,7 @@
             <button type="button" class="logout-btn" onclick="logout()">ログアウト</button>
         </div>
 
-        <h1>🎲 丁半博打</h1>
+        <h1>🎰 神社スロット</h1>
 
         <div class="page-columns">
             <div class="col-side">
@@ -34,41 +34,46 @@
                 </div>
 
                 <div class="minigame-stats-box">
-                    このゲームでのプレイ回数：<span id="chohan-session-count">0</span>回<br>
-                    直近の結果：<span id="chohan-session-streak">-</span>
+                    このゲームでのプレイ回数：<span id="slot-session-count">0</span>回<br>
+                    直近の結果：<span id="slot-session-streak">-</span>
                 </div>
             </div>
 
             <div class="col-main">
                 <div class="shop-section">
-                    <h3 class="shop-section-title">🎲 丁半博打のルール</h3>
+                    <h3 class="shop-section-title">🎰 神社スロットのルール</h3>
                     <p class="bank-desc">
-                        サイコロ2つの目の合計が偶数なら「丁（ちょう）」、奇数なら「半（はん）」です。<br>
-                        賭け金を決めて「丁」か「半」を選んでください。的中すれば賭け金と同額が払い戻され、実質倍額になります。外れると賭け金は没収されます。
+                        賭け金を決めてレバーを回すと、3つのリールが絵柄を出します。<br>
+                        3つ同じ絵柄が揃えば、絵柄ごとの配当倍率で賭け金が増えて戻ります。2つだけ揃った場合は賭け金がそのまま戻り（おあいこ）、揃わなければ賭け金は没収されます。
                     </p>
 
-                    <div class="dice-stage">
-                        <span id="dice-1" class="dice-face">🎲</span>
-                        <span id="dice-2" class="dice-face">🎲</span>
+                    <div class="slot-machine">
+                        <div id="slot-reel-1" class="slot-reel">🍡</div>
+                        <div id="slot-reel-2" class="slot-reel">🍡</div>
+                        <div id="slot-reel-3" class="slot-reel">🍡</div>
                     </div>
 
-                    <p id="chohan-result-box" class="chohan-result-box">賭け金を決めて、「丁」か「半」を選んでください</p>
+                    <p id="slot-result-box" class="chohan-result-box">賭け金を決めて、レバーを回してください</p>
 
                     <div class="bet-amount-row">
-                        <input type="number" id="chohan-bet-input" min="100" step="100" value="1000">
+                        <input type="number" id="slot-bet-input" min="100" step="100" value="1000">
                     </div>
                     <div class="bet-preset-row">
-                        <button type="button" class="bet-preset-btn" onclick="setChohanBet(1000)">1,000円</button>
-                        <button type="button" class="bet-preset-btn" onclick="setChohanBet(5000)">5,000円</button>
-                        <button type="button" class="bet-preset-btn" onclick="setChohanBet(10000)">10,000円</button>
-                        <button type="button" class="bet-preset-btn" onclick="setChohanBet(50000)">50,000円</button>
-                        <button type="button" class="bet-preset-btn" id="chohan-bet-all-btn" onclick="setChohanBetAll()">全額</button>
+                        <button type="button" class="bet-preset-btn" onclick="setSlotBet(1000)">1,000円</button>
+                        <button type="button" class="bet-preset-btn" onclick="setSlotBet(5000)">5,000円</button>
+                        <button type="button" class="bet-preset-btn" onclick="setSlotBet(10000)">10,000円</button>
+                        <button type="button" class="bet-preset-btn" onclick="setSlotBet(50000)">50,000円</button>
+                        <button type="button" class="bet-preset-btn" id="slot-bet-all-btn" onclick="setSlotBetAll()">全額</button>
                     </div>
 
-                    <div class="chohan-choice-row">
-                        <button type="button" id="chohan-cho-btn" class="chohan-choice-btn chohan-choice-cho" onclick="playChohan('cho')">丁（偶数）</button>
-                        <button type="button" id="chohan-han-btn" class="chohan-choice-btn chohan-choice-han" onclick="playChohan('han')">半（奇数）</button>
-                    </div>
+                    <button type="button" id="slot-spin-btn" class="chohan-choice-btn chohan-choice-han" style="width:100%;" onclick="playSlot()">🎰 レバーを回す</button>
+
+                    <table class="slot-paytable">
+                        <thead>
+                            <tr><th>絵柄</th><th>3つ揃い配当</th></tr>
+                        </thead>
+                        <tbody id="slot-paytable-body"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -77,6 +82,8 @@
     <audio id="se-shuffle" src="../sounds/shuffle.mp3" preload="auto"></audio>
     <audio id="se-win" src="../sounds/win.mp3" preload="auto"></audio>
     <audio id="se-lose" src="../sounds/lose.mp3" preload="auto"></audio>
+    <audio id="se-found" src="../sounds/coin.mp3" preload="auto"></audio>
+    <div id="confetti-overlay"></div>
 
     <script type="module" src="../js/omikuji-firebase-bridge.js?v=2"></script>
 
@@ -84,7 +91,7 @@
     <script src="../js/omikuji-state.js?v=14"></script>
     <script src="../js/omikuji-ui-effects.js?v=4"></script>
     <script src="../js/omikuji-weekly-missions.js?v=1"></script>
-    <script src="../js/chohan.js?v=2"></script>
+    <script src="../js/slot.js?v=3"></script>
     <script>
         function logout() {
             if (confirm("ログアウトしますか？")) {
