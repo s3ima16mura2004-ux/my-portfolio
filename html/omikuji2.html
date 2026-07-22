@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>豪華おみくじ神社</title>
     <link rel="stylesheet" href="../css/omikuji-core.css?v=4">
-    <link rel="stylesheet" href="../css/omikuji-shop.css?v=4">
+    <link rel="stylesheet" href="../css/omikuji-shop.css?v=5">
     <link rel="stylesheet" href="../css/omikuji-map.css?v=4">
     <link rel="stylesheet" href="../css/omikuji-missions.css?v=4">
     <link rel="stylesheet" href="../css/omikuji-seasonal-effects.css?v=4">
@@ -59,6 +59,7 @@
 
                 <div id="season-badge-row" class="season-badge-row hidden"></div>
                 <p id="seasonal-missions-bell" class="seasonal-missions-bell hidden" onclick="jumpToSeasonalMissions()">-</p>
+                <p id="friend-requests-bell" class="seasonal-missions-bell hidden" onclick="jumpToFriendsTab()">-</p>
 
                 <details id="sidebar-daily-notices" class="daily-notices" open>
                     <summary>📢 本日のお知らせ</summary>
@@ -132,6 +133,7 @@
                     <button id="tabBtn-collect" class="tab-btn" onclick="showTab('collect')" type="button">🎒 収集品・貯金</button>
                     <button id="tabBtn-dex" class="tab-btn" onclick="showTab('dex')" type="button">📖 図鑑</button>
                     <button id="tabBtn-map" class="tab-btn" onclick="showTab('map')" type="button">🗺️ 境内マップ</button>
+                    <button id="tabBtn-friends" class="tab-btn" onclick="showTab('friends')" type="button">👥 フレンド<span id="tabBtn-friends-badge" class="hidden" style="margin-left:4px;background:#d9534f;color:#fff;border-radius:999px;padding:1px 6px;font-size:0.75rem;"></span></button>
                     <button id="tabBtn-more" class="tab-btn tab-btn-more" onclick="toggleMoreMenu()" type="button">☰ もっと（図鑑・マップ）</button>
                 </div>
 
@@ -766,6 +768,44 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="tab-friends" class="hidden">
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">🔍 フレンドを探す</h3>
+                        <p class="bank-desc">参拝者名（ログイン時のユーザー名）を入力して検索してください。完全一致のみです。</p>
+                        <div class="bank-btn-row" style="margin-bottom:10px;">
+                            <input type="text" id="friend-search-input" class="bank-amount-input" placeholder="参拝者名を入力" style="margin-bottom:0;">
+                            <button class="btn-shop-buy" onclick="searchFriendCandidate()" type="button" style="flex:0 0 auto;">検索</button>
+                        </div>
+                        <div id="friend-search-result"></div>
+                    </div>
+
+                    <details id="friend-requests-section" class="daily-notices">
+                        <summary>📨 フレンド申請</summary>
+                        <div class="daily-notices-body">
+                            <p class="shop-section-title" style="border:none;margin-bottom:4px;">届いている申請</p>
+                            <div id="friend-requests-incoming-list"></div>
+                            <p class="shop-section-title" style="border:none;margin:12px 0 4px;">送っている申請</p>
+                            <div id="friend-requests-outgoing-list"></div>
+                        </div>
+                    </details>
+
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">👥 フレンド一覧</h3>
+                        <p class="bank-desc">1回の送金は最大15万円まで、1日3回までです。</p>
+                        <div id="friend-list"></div>
+                    </div>
+
+                    <div id="friend-chat-box" class="shop-section hidden">
+                        <h3 class="shop-section-title" id="friend-chat-title">💬 チャット</h3>
+                        <div id="friend-chat-messages" class="chat-messages"></div>
+                        <div class="bank-btn-row" style="margin-top:8px;">
+                            <input type="text" id="friend-chat-input" class="bank-amount-input" placeholder="メッセージを入力（200文字まで）" style="margin-bottom:0;" maxlength="200">
+                            <button class="btn-shop-buy" onclick="sendChatMessage()" type="button" style="flex:0 0 auto;">送信</button>
+                        </div>
+                        <button class="btn-equip-none" onclick="closeChat()" type="button" style="margin-top:8px;">チャットを閉じる</button>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -798,6 +838,7 @@
         </div>
         <button id="moreBtn-dex" class="more-menu-item" onclick="selectMoreTab('dex')" type="button">📖 図鑑</button>
         <button id="moreBtn-map" class="more-menu-item" onclick="selectMoreTab('map')" type="button">🗺️ 境内マップ</button>
+        <button id="moreBtn-friends" class="more-menu-item" onclick="selectMoreTab('friends')" type="button">👥 フレンド</button>
     </div>
 
     <div id="confetti-overlay"></div>
@@ -816,7 +857,13 @@
             getDoc,
             updateDoc,
             setDoc,
-            increment
+            increment,
+            deleteField,
+            onSnapshot,
+            query,
+            orderBy,
+            limit,
+            serverTimestamp
         } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -842,13 +889,20 @@
         window.omikujiSetDoc = setDoc;
         window.omikujiIncrement = increment;
         window.omikujiCommunityRef = doc(db, "global", "community");
+        window.omikujiDeleteField = deleteField;
+        window.omikujiCollection = collection;
+        window.omikujiOnSnapshot = onSnapshot;
+        window.omikujiQuery = query;
+        window.omikujiOrderBy = orderBy;
+        window.omikujiLimit = limit;
+        window.omikujiServerTimestamp = serverTimestamp;
     </script>
 
     <script src="../js/omikuji-seasonal.js?v=4"></script>
     <script src="../js/omikuji-countdown.js?v=2"></script>
-    <script src="../js/omikuji-data.js?v=10"></script>
-    <script src="../js/omikuji-state.js?v=9"></script>
-    <script src="../js/omikuji-ui-core.js?v=3"></script>
+    <script src="../js/omikuji-data.js?v=11"></script>
+    <script src="../js/omikuji-state.js?v=10"></script>
+    <script src="../js/omikuji-ui-core.js?v=4"></script>
     <script src="../js/omikuji-ui-shop.js?v=9"></script>
     <script src="../js/omikuji-ui-effects.js?v=4"></script>
     <script src="../js/omikuji-ui-seasonal1.js?v=3"></script>
@@ -860,8 +914,9 @@
     <script src="../js/omikuji-draw-helpers.js?v=3"></script>
     <script src="../js/omikuji-draw-single.js?v=9"></script>
     <script src="../js/omikuji-draw-multi.js?v=9"></script>
-    <script src="../js/omikuji-main.js?v=10"></script>
+    <script src="../js/omikuji-main.js?v=11"></script>
     <script src="../js/omikuji-phantom.js?v=2"></script>
+    <script src="../js/omikuji-friends.js?v=1"></script>
     <script>
         // 🚪 ログアウト処理：ログイン情報を消してログインページへ戻る
         function logout() {

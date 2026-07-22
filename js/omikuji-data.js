@@ -1531,3 +1531,12 @@ const SEASONAL_GACHA_BASE_TIERS = [
     { min: 0.60, name: "😊小当たり", basePrize: 5000 },
     { min: 0, name: "🍀ご縁の恵み", basePrize: 1500 }
 ];
+
+// ============================================================
+// 👥 フレンド機能：申請・承認、送金、チャットに関する設定値
+// ============================================================
+const SEND_MONEY_MAX_PER_TRANSACTION = 150000; // 💰 1回の送金上限
+const SEND_MONEY_MAX_PER_DAY = 3;              // 💰 1日に送金できる回数の上限
+const CHAT_MESSAGE_MAX_LENGTH = 200;           // 💬 チャット1件あたりの最大文字数
+const CHAT_MESSAGE_MIN_INTERVAL_MS = 3000;     // 💬 連投防止：前回の送信から最低これだけ間隔を空ける
+const CHAT_HISTORY_LIMIT = 50;                 // 💬 画面に表示するメッセージの件数

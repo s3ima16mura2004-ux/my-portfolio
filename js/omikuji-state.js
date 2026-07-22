@@ -186,7 +186,12 @@ async function saveUserState() {
             tutorialMissionClaimed: tutorialMissionClaimed,
             equippedTitleKey: equippedTitleKey,
             equippedTitleEmoji: equippedTitleEmoji,
-            equippedTitleName: equippedTitleName
+            equippedTitleName: equippedTitleName,
+            friends: friends,
+            friendRequestsIncoming: friendRequestsIncoming,
+            friendRequestsOutgoing: friendRequestsOutgoing,
+            sendMoneyDate: sendMoneyDate,
+            sendMoneyCountToday: sendMoneyCountToday
         });
     } catch (e) {
         console.error("ユーザーデータの保存に失敗しました: ", e);
@@ -242,6 +247,15 @@ let boostTicketCount = 0;      // 🎟️「所持金1.1倍ブースト券」の
 // 🔰 はじめてガイド（一度きりのチュートリアルミッション）関連の状態。デイリーミッションとは別に、日付が変わってもリセットされない
 let tutorialMissionProgress = {};
 let tutorialMissionClaimed = {};
+
+// 👥 フレンド機能関連の状態
+let friends = {};                  // 承認済みのフレンド一覧（{ "相手の名前": true, ... }）
+let friendRequestsIncoming = {};   // 自分宛に届いている申請（{ "申請してきた人の名前": true, ... }）
+let friendRequestsOutgoing = {};   // 自分が送った申請（{ "申請した相手の名前": true, ... }）
+let sendMoneyDate = "";            // 最後に送金した日付（1日の回数制限用）
+let sendMoneyCountToday = 0;       // 本日すでに送金した回数
+let currentChatFriend = "";        // 現在チャット画面を開いているフレンドの名前（""なら未オープン。セッション内のみで保存はしない）
+let chatUnsubscribe = null;        // 現在のチャットのリアルタイム購読解除関数（セッション内のみ）
 
 // 🌫️ 神無月（10月）関連の状態
 let kannazukiDeposits = 0;      // 神無月期間中に賽銭箱へ預けた金額の累計（11月に倍返しされる）

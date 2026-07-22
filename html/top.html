@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>豪華おみくじ神社 - トップ</title>
     <link rel="stylesheet" href="../css/omikuji-core.css?v=4">
-    <link rel="stylesheet" href="../css/omikuji-shop.css?v=4">
+    <link rel="stylesheet" href="../css/omikuji-shop.css?v=5">
     <link rel="stylesheet" href="../css/omikuji-map.css?v=4">
     <link rel="stylesheet" href="../css/omikuji-missions.css?v=4">
     <link rel="stylesheet" href="../css/omikuji-seasonal-effects.css?v=4">
@@ -45,6 +45,8 @@
                     <p id="rank-name-display" class="rank-name-display">⛩️ 参拝ランク：平参拝者</p>
                     <p id="rank-progress-display" class="rank-progress-display">累計獲得賞金：0円</p>
                 </div>
+
+                <a id="friend-notification-link" href="omikuji2.html" class="seasonal-missions-bell hidden" style="display:block;text-decoration:none;">-</a>
 
                 <details id="titles-box" class="daily-notices titles-box hidden">
                     <summary>🎖️ 称号を選ぶ <span id="titles-count-badge">-</span></summary>
@@ -121,11 +123,11 @@
         </div>
 
 <script src="../js/omikuji-seasonal.js?v=4"></script>
-        <script src="../js/omikuji-data.js?v=10"></script>
-        <script src="../js/omikuji-state.js?v=9"></script>
-        <script src="../js/omikuji-ui-core.js?v=3"></script>
+        <script src="../js/omikuji-data.js?v=11"></script>
+        <script src="../js/omikuji-state.js?v=10"></script>
+        <script src="../js/omikuji-ui-core.js?v=4"></script>
         <script src="../js/omikuji-countdown.js?v=2"></script>
-        <script type="module" src="../js/top.js?v=7"></script>
+        <script type="module" src="../js/top.js?v=8"></script>
         <script>
             // 🚪 ログアウト処理：ログイン情報を消してログインページへ戻る
             function logout() {

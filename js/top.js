@@ -63,6 +63,19 @@ async function loadUserInfo() {
                 }
             }
 
+            // 👥 フレンド申請の通知（承認・チャット・送金はomikuji2.html側で行う。ここは通知の表示のみ）
+            const friendLink = document.querySelector("#friend-notification-link");
+            if (friendLink) {
+                const incoming = data.friendRequestsIncoming || {};
+                const incomingCount = Object.keys(incoming).filter(n => incoming[n]).length;
+                if (incomingCount > 0) {
+                    friendLink.textContent = "👥 フレンド申請が" + incomingCount + "件届いています（タップで確認）";
+                    friendLink.classList.remove("hidden");
+                } else {
+                    friendLink.classList.add("hidden");
+                }
+            }
+
             const bankMoney = typeof data.bankMoney === "number" ? data.bankMoney : 0;
             const bankDisplayTop = document.querySelector("#bank-money-display-top");
             if (bankDisplayTop) bankDisplayTop.textContent = bankMoney.toLocaleString();

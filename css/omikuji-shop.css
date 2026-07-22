@@ -247,3 +247,76 @@
         grid-template-columns: 1fr;
     }
 }
+/* ============================================================
+   👥 フレンド機能：フレンドカード・送金欄・チャット吹き出し
+   ============================================================ */
+
+.friend-card {
+    margin-bottom: 12px;
+}
+
+.friend-card .shop-item-card {
+    margin-bottom: 6px;
+}
+
+.friend-money-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.friend-money-row .friend-money-input {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+/* 💬 チャットのメッセージ一覧（スクロール可能） */
+.chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 320px;
+    overflow-y: auto;
+    background: #fbf8f3;
+    border: 1px solid #e8dcc8;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.chat-bubble-row {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.chat-bubble-row-mine {
+    justify-content: flex-end;
+}
+
+.chat-bubble {
+    max-width: 75%;
+    background: #fff;
+    border: 1px solid #e0d0c0;
+    border-radius: 12px;
+    padding: 6px 10px;
+}
+
+.chat-bubble-mine {
+    background: linear-gradient(135deg, #fff2cc, #ffe08a);
+    border-color: #d8860b;
+}
+
+.chat-bubble-name {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #8b5a2b;
+    margin-bottom: 2px;
+}
+
+.chat-bubble-text {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #4a3728;
+    white-space: pre-wrap;
+    word-break: break-word;
+}

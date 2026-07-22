@@ -46,12 +46,14 @@ function showTab(tabName) {
     const collectTab = document.querySelector("#tab-collect");
     const dexTab = document.querySelector("#tab-dex");
     const mapTab = document.querySelector("#tab-map");
+    const friendsTab = document.querySelector("#tab-friends");
     const missionsBtn = document.querySelector("#tabBtn-missions");
     const prizeBtn = document.querySelector("#tabBtn-prizes");
     const shopBtn = document.querySelector("#tabBtn-shop");
     const collectBtn = document.querySelector("#tabBtn-collect");
     const dexBtn = document.querySelector("#tabBtn-dex");
     const mapBtn = document.querySelector("#tabBtn-map");
+    const friendsBtn = document.querySelector("#tabBtn-friends");
 
     const tabs = [
         { name: "missions", el: missionsTab, btn: missionsBtn },
@@ -59,7 +61,8 @@ function showTab(tabName) {
         { name: "shop", el: shopTab, btn: shopBtn },
         { name: "collect", el: collectTab, btn: collectBtn },
         { name: "dex", el: dexTab, btn: dexBtn },
-        { name: "map", el: mapTab, btn: mapBtn }
+        { name: "map", el: mapTab, btn: mapBtn },
+        { name: "friends", el: friendsTab, btn: friendsBtn }
     ];
 
     tabs.forEach(t => {
@@ -78,11 +81,13 @@ function showTab(tabName) {
     const moreBtn = document.querySelector("#tabBtn-more");
     const moreDexBtn = document.querySelector("#moreBtn-dex");
     const moreMapBtn = document.querySelector("#moreBtn-map");
-    const isMoreTab = (tabName === "dex" || tabName === "map");
+    const moreFriendsBtn = document.querySelector("#moreBtn-friends");
+    const isMoreTab = (tabName === "dex" || tabName === "map" || tabName === "friends");
 
     if (moreBtn) moreBtn.classList.toggle("tab-active", isMoreTab);
     if (moreDexBtn) moreDexBtn.classList.toggle("more-menu-item-active", tabName === "dex");
     if (moreMapBtn) moreMapBtn.classList.toggle("more-menu-item-active", tabName === "map");
+    if (moreFriendsBtn) moreFriendsBtn.classList.toggle("more-menu-item-active", tabName === "friends");
 
     // 🔰 はじめてガイド：ショップ・図鑑・マップのタブを初めて開いた記録を取る
     if (typeof trackTutorialMission === "function") {
@@ -125,4 +130,15 @@ function jumpToSeasonalMissions() {
     closeMoreMenu();
     const section = document.querySelector("#seasonal-missions-section");
     if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// 👥 フレンド申請の通知ベルをタップした時、フレンドタブまで移動する
+function jumpToFriendsTab() {
+    showTab("friends");
+    closeMoreMenu();
+    const section = document.querySelector("#friend-requests-section");
+    if (section) {
+        section.open = true;
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
 }

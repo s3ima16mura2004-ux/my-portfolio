@@ -156,6 +156,11 @@ window.addEventListener("DOMContentLoaded", async () => {
             equippedTitleKey = data.equippedTitleKey || "";
             equippedTitleEmoji = data.equippedTitleEmoji || "";
             equippedTitleName = data.equippedTitleName || "";
+            friends = (data.friends && typeof data.friends === "object") ? data.friends : {};
+            friendRequestsIncoming = (data.friendRequestsIncoming && typeof data.friendRequestsIncoming === "object") ? data.friendRequestsIncoming : {};
+            friendRequestsOutgoing = (data.friendRequestsOutgoing && typeof data.friendRequestsOutgoing === "object") ? data.friendRequestsOutgoing : {};
+            sendMoneyDate = data.sendMoneyDate || "";
+            sendMoneyCountToday = typeof data.sendMoneyCountToday === "number" ? data.sendMoneyCountToday : 0;
             if (data.japanShrinesOwned && typeof data.japanShrinesOwned === "object") {
                 JAPAN_PREFECTURES.forEach(pref => {
                     pref.shrines.forEach(shrine => {
@@ -175,6 +180,8 @@ window.addEventListener("DOMContentLoaded", async () => {
         updateTitlesUI();
         updateDexUI();
         updateYearlyAlbumUI(); // 📖 年間アルバムの表示を初期化
+        updateFriendsUI(); // 👥 フレンド機能の表示を初期化
+        setInterval(refreshFriendsFromServer, 30000); // 👥 他ユーザーからの申請・承認を定期的に反映
         updateBankUI();
         updateCompanionUI(); // 🐱 相棒「招き猫」の成長状況を表示
         updateBirthdayTicketUI();
