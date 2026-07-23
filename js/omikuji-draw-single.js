@@ -157,6 +157,35 @@ function omikuji() {
             prizeMoney = DAIDAIKICHI_PRIZE;
             gotDaidaikichi = true;
             if (kodomonohiActive) gotKodomonohiExtreme = true; // 🎏 こどもの日の称号判定
+        } else if (rawOkj < daidaikyouThreshold) {
+            // 💀 激レア「大大凶」：免除なしで所持金の80%を没収する代わりに、大きなフィーバーで挽回のチャンスを与える
+            // 🛡️ 大大吉・神吉と同じ理由で、ここも生の乱数(rawOkj)で判定する。
+            // 大吉運ボーナスは上限0.11まで積み上がるため、もしokj（ボーナス適用後）で判定してしまうと、
+            // ボーナスが0.1を超えた時点でこの分岐に絶対到達できなくなり、大大凶が二度と出せなくなってしまう。
+            isExtremeTier = true;
+            imgSrc = "../images/omikuji_daidaikyou.jpg";
+            resultName = "大大凶";
+            const tax = Math.floor(currentMoney * 0.8);
+            prizeMoney = -tax;
+            gotDaidaikyou = true;
+
+            feverCount = 5;
+            feverTier = 2; // 大大凶後は大吉確率20倍のフィーバーになる
+            if (hasEffect("fever_extra")) feverCount++;
+            if (hasShopEffect("chitose_ame")) feverCount += CHITOSE_AME_FEVER_BONUS; // 👘 七五三限定「千歳飴」でフィーバー延長
+            if (equippedCollectible === "shinboku") {
+                feverCount++;
+                consumeCollectible("shinboku");
+            }
+        } else if (rawOkj < 0.1) {
+            // ⚔️「大凶」の代わりに「神の試練」が発生（挑戦するか選べる）
+            // 🛡️ こちらも同じ理由で生の乱数(rawOkj)で判定する（大吉運ボーナスに侵食されないようにするため）
+            isTrial = true;
+            const trialOutcome = resolveTrial();
+            resultName = trialOutcome.resultName;
+            imgSrc = trialOutcome.imgSrc;
+            prizeMoney = trialOutcome.prizeMoney;
+            trialExtraMsg = trialOutcome.extraMsg;
         } else if (okj >= 0.99) {
             imgSrc = "../images/omikuji_daikichi.png";
             resultName = "大吉";
@@ -177,35 +206,11 @@ function omikuji() {
             imgSrc = "../images/omikuji_suekichi.png";
             resultName = "末吉";
             prizeMoney = 500;
-        } else if (okj >= 0.1) {
+        } else {
+            // 🍀 ここに来る時点でrawOkj>=0.1が確定している（神の試練・大大凶ではない）ので、そのまま「凶」になる
             imgSrc = "../images/omikuji_kyou.png";
             resultName = "凶";
             prizeMoney = 0;
-        } else if (okj >= daidaikyouThreshold) {
-            // ⚔️「大凶」の代わりに「神の試練」が発生（挑戦するか選べる）
-            isTrial = true;
-            const trialOutcome = resolveTrial();
-            resultName = trialOutcome.resultName;
-            imgSrc = trialOutcome.imgSrc;
-            prizeMoney = trialOutcome.prizeMoney;
-            trialExtraMsg = trialOutcome.extraMsg;
-        } else {
-            // 💀 激レア「大大凶」：免除なしで所持金の80%を没収する代わりに、大きなフィーバーで挽回のチャンスを与える
-            isExtremeTier = true;
-            imgSrc = "../images/omikuji_daidaikyou.jpg";
-            resultName = "大大凶";
-            const tax = Math.floor(currentMoney * 0.8);
-            prizeMoney = -tax;
-            gotDaidaikyou = true;
-
-            feverCount = 5;
-            feverTier = 2; // 大大凶後は大吉確率20倍のフィーバーになる
-            if (hasEffect("fever_extra")) feverCount++;
-            if (hasShopEffect("chitose_ame")) feverCount += CHITOSE_AME_FEVER_BONUS; // 👘 七五三限定「千歳飴」でフィーバー延長
-            if (equippedCollectible === "shinboku") {
-                feverCount++;
-                consumeCollectible("shinboku");
-            }
         }
 
         // 🐟📜 獲得賞金アップ効果（ラッキーアイテム＋ショップの護符は掛け算で重複可。神の試練・超激レア枠の結果には適用しない）

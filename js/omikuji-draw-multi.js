@@ -133,31 +133,20 @@ function omikuji10() {
                     isExtremeTier10 = true;
                     gotDaidaikichi = true;
                     if (kodomonohiActive10) gotKodomonohiExtreme = true; // 🎏 こどもの日の称号判定
-                } else if (okj >= 0.99) {
-                    resultsCount["大吉"]++;
-                    resultName10 = "大吉";
-                    prize = 100000;
-                } else if (okj >= 0.95) {
-                    resultsCount["吉"]++;
-                    resultName10 = "吉";
-                    prize = 10000;
-                } else if (okj >= 0.85) {
-                    resultsCount["中吉"]++;
-                    resultName10 = "中吉";
-                    prize = 2000;
-                } else if (okj >= 0.7) {
-                    resultsCount["小吉"]++;
-                    resultName10 = "小吉";
-                    prize = 1000;
-                } else if (okj >= 0.6) {
-                    resultsCount["末吉"]++;
-                    resultName10 = "末吉";
-                    prize = 500;
-                } else if (okj >= 0.1) {
-                    resultsCount["凶"]++;
-                    resultName10 = "凶";
-                    prize = 0;
-                } else if (okj >= daidaikyouThreshold10) {
+                } else if (rawOkj10 < daidaikyouThreshold10) {
+                    // 💀 激レア「大大凶」：免除なしで、その時点の残高の80%を没収
+                    // 🛡️ 大大吉・神吉と同じ理由で、ここも生の乱数(rawOkj10)で判定する（大吉運ボーナスに侵食されないようにするため）
+                    resultsCount["大大凶"]++;
+                    resultName10 = "大大凶";
+                    isExtremeTier10 = true;
+                    gotDaidaikyou = true;
+                    gotDaidaikyouIn10 = true;
+
+                    const tax = Math.floor((currentMoney + totalPrize) * 0.8);
+                    totalDoomTax += tax;
+                    prize = -tax;
+                } else if (rawOkj10 < 0.1) {
+                    // 🛡️ こちらも同じ理由で生の乱数(rawOkj10)で判定する
                     resultsCount["大凶"]++;
                     resultName10 = "大凶";
                     gotDaikyouIn10 = true;
@@ -183,17 +172,31 @@ function omikuji10() {
                         totalDoomTax += tax;
                         prize = -tax;
                     }
+                } else if (okj >= 0.99) {
+                    resultsCount["大吉"]++;
+                    resultName10 = "大吉";
+                    prize = 100000;
+                } else if (okj >= 0.95) {
+                    resultsCount["吉"]++;
+                    resultName10 = "吉";
+                    prize = 10000;
+                } else if (okj >= 0.85) {
+                    resultsCount["中吉"]++;
+                    resultName10 = "中吉";
+                    prize = 2000;
+                } else if (okj >= 0.7) {
+                    resultsCount["小吉"]++;
+                    resultName10 = "小吉";
+                    prize = 1000;
+                } else if (okj >= 0.6) {
+                    resultsCount["末吉"]++;
+                    resultName10 = "末吉";
+                    prize = 500;
                 } else {
-                    // 💀 激レア「大大凶」：免除なしで、その時点の残高の80%を没収
-                    resultsCount["大大凶"]++;
-                    resultName10 = "大大凶";
-                    isExtremeTier10 = true;
-                    gotDaidaikyou = true;
-                    gotDaidaikyouIn10 = true;
-
-                    const tax = Math.floor((currentMoney + totalPrize) * 0.8);
-                    totalDoomTax += tax;
-                    prize = -tax;
+                    // 🍀 ここに来る時点でrawOkj10>=0.1が確定している（大凶・大大凶ではない）ので、そのまま「凶」になる
+                    resultsCount["凶"]++;
+                    resultName10 = "凶";
+                    prize = 0;
                 }
 
                 // 🐟📜 獲得賞金アップ効果
@@ -222,14 +225,14 @@ function omikuji10() {
                 // 📖 図鑑に記録
                 if (rawOkj10 >= kamikichiThreshold10) markDex("神吉");
                 else if (rawOkj10 >= daidaikichiThreshold10) markDex("大大吉");
+                else if (rawOkj10 < daidaikyouThreshold10) markDex("大大凶");
+                else if (rawOkj10 < 0.1) markDex("大凶");
                 else if (okj >= 0.99) markDex("大吉");
                 else if (okj >= 0.95) markDex("吉");
                 else if (okj >= 0.85) markDex("中吉");
                 else if (okj >= 0.7) markDex("小吉");
                 else if (okj >= 0.6) markDex("末吉");
-                else if (okj >= 0.1) markDex("凶");
-                else if (okj >= daidaikyouThreshold10) markDex("大凶");
-                else markDex("大大凶");
+                else markDex("凶");
 
                 // 🏘️ みんなの参拝合計を更新（神社改築コミュニティ目標）
                 incrementCommunityDraws();
