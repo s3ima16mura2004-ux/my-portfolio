@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../css/omikuji-core.css?v=5">
     <link rel="stylesheet" href="../css/omikuji-shop.css?v=5">
     <link rel="stylesheet" href="../css/omikuji-widgets.css?v=5">
-    <link rel="stylesheet" href="../css/omikuji-minigames.css?v=7">
+    <link rel="stylesheet" href="../css/omikuji-minigames.css?v=9">
 </head>
 <body>
 
@@ -45,7 +45,7 @@
                     <p class="bank-desc">
                         参加料（賭け金）を払ってスタートし、サイコロを振って全<span id="sugoroku-board-size-text">20</span>マス先の「ゴール」を目指します。<br>
                         盤面のマスには、形と絵柄であらかじめご利益（参加料に対する倍率）が決まっています。止まったマスの効果はその場でもらえます。ゴールに到達すると精算され、獲得合計からゴールボーナスを引いた金額が最終収支になります。<br>
-                        ※コースによってマス数・最低参加料・配当倍率が異なります。盤面のマス配置は毎回ランダムに変わります。ゲームの途中でページを離れても進行状況は保存され、また訪れた際に続きから再開できます。
+                        ※コースによってマス数・最低参加料・配当倍率・専用マスが異なります。一部のコースは累計獲得賞金額が一定額に達すると解放されます。盤面のマス配置は毎回ランダムに変わります。ゲームの途中でページを離れても進行状況は保存され、また訪れた際に続きから再開できます。
                     </p>
 
                     <p class="shop-item-name">🚶 駒を選ぶ</p>
@@ -88,11 +88,11 @@
 
     <script type="module" src="../js/omikuji-firebase-bridge.js?v=2"></script>
 
-    <script src="../js/omikuji-data.js?v=18"></script>
-    <script src="../js/omikuji-state.js?v=16"></script>
+    <script src="../js/omikuji-data.js?v=19"></script>
+    <script src="../js/omikuji-state.js?v=17"></script>
     <script src="../js/omikuji-ui-effects.js?v=4"></script>
     <script src="../js/omikuji-weekly-missions.js?v=1"></script>
-    <script src="../js/sugoroku.js?v=5"></script>
+    <script src="../js/sugoroku.js?v=6"></script>
     <script>
         function logout() {
             if (confirm("ログアウトしますか？")) {

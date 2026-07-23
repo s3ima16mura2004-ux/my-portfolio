@@ -1558,32 +1558,41 @@ const SUGOROKU_EFFECT_TABLE = [
     { key: "jackpot", emoji: "🏆", mult: 5.0, label: "🏆 特大御利益！" }
 ];
 
-// 🎯 境内すごろくのコース一覧。マス数・最低賭け金・配当倍率のスケールがそれぞれ異なる
-// tileCounts：1〜(boardSize-1)マス目に配置する効果の内訳（合計はboardSize-1と一致させる）
+// 🎯 境内すごろくのコース一覧。マス数・最低賭け金・配当倍率・専用マスがそれぞれ異なる
+// tileCounts：1〜(boardSize-1)マス目に配置する効果の内訳（合計はboardSize-1と一致させる。専用マスのkeyも含む）
+// risk：1〜3の★の数（表示用のリスク目安）／recommended：初心者向けおすすめタグ／unlockThreshold：解放に必要な累計収支
 const SUGOROKU_COURSES = [
     {
         key: "light", emoji: "🌸", name: "お手軽コース",
         desc: "マス数少なめ・すぐ遊べる入門コース",
         boardSize: 12, minBet: 100, effectMultScale: 1.0, goalBonusMult: 0.1,
-        tileCounts: { none: 6, coin: 3, dango: 1, gift: 1, big: 0, jackpot: 0 }
+        risk: 1, recommended: false, unlockThreshold: 0,
+        tileCounts: { none: 5, coin: 3, dango: 1, gift: 1, big: 0, jackpot: 0, hoken: 1 },
+        specialTile: { key: "hoken", emoji: "🎗️", mult: 0.15, label: "🎗️ お守り（その場で少しもらえる上、負け越した場合は損失の半分が戻る）" }
     },
     {
         key: "standard", emoji: "⛩️", name: "定番コース",
         desc: "全20マスの標準的なコース",
         boardSize: 20, minBet: 100, effectMultScale: 1.0, goalBonusMult: 0.1,
-        tileCounts: { none: 8, coin: 6, dango: 2, gift: 1, big: 1, jackpot: 1 }
+        risk: 2, recommended: true, unlockThreshold: 0,
+        tileCounts: { none: 7, coin: 6, dango: 2, gift: 1, big: 1, jackpot: 1, wchance: 1 },
+        specialTile: { key: "wchance", emoji: "🔀", mult: 0, label: "🔀 ダブルチャンス（2つの効果をまとめてもらえる）" }
     },
     {
         key: "long", emoji: "🗾", name: "大冒険コース",
         desc: "全32マスの長丁場。道中でご利益マスに出会うチャンスも多め",
         boardSize: 32, minBet: 100, effectMultScale: 1.0, goalBonusMult: 0.15,
-        tileCounts: { none: 14, coin: 9, dango: 4, gift: 2, big: 1, jackpot: 1 }
+        risk: 2, recommended: false, unlockThreshold: 100000,
+        tileCounts: { none: 13, coin: 9, dango: 4, gift: 2, big: 1, jackpot: 1, dragon: 1 },
+        specialTile: { key: "dragon", emoji: "🐉", mult: 10.0, label: "🐉 幻の龍（激レア・超高配当）" }
     },
     {
         key: "highstakes", emoji: "💴", name: "高額コース",
-        desc: "最低賭け金10,000円。その分マス効果の倍率が2倍！",
-        boardSize: 20, minBet: 10000, effectMultScale: 2.0, goalBonusMult: 0.2,
-        tileCounts: { none: 8, coin: 6, dango: 2, gift: 1, big: 1, jackpot: 1 }
+        desc: "最低賭け金10,000円。その分マス効果の倍率が1.4倍！",
+        boardSize: 20, minBet: 10000, effectMultScale: 1.4, goalBonusMult: 0.15,
+        risk: 3, recommended: false, unlockThreshold: 500000,
+        tileCounts: { none: 7, coin: 6, dango: 2, gift: 1, big: 1, jackpot: 1, gem: 1 },
+        specialTile: { key: "gem", emoji: "💎", mult: 1.0, label: "💎 特別ボーナス" }
     }
 ];
 

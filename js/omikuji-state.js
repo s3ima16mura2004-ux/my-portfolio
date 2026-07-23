@@ -77,6 +77,9 @@ let sugorokuWinnings = 0;       // このラウンドで積み上がった獲得
 let sugorokuLayout = [];        // このラウンドの盤面（1〜19マス目の効果キーの並び）
 let sugorokuCourseKey = "standard"; // 現在（または最後に）遊んでいるコースのkey
 let sugorokuTokenKey = "walk";      // プレイヤーが選んでいる駒（見た目のみ。効果には影響しない）
+let sugorokuInsuranceActive = false; // 🎗️お手軽コースの「お守り」マスを踏んだかどうか（負け越し時の半額返還に使う）
+let sugorokuRollCount = 0;           // 現在のラウンドで振ったサイコロの回数（自己ベスト「最速クリア」判定用）
+let sugorokuBestRecords = {};        // コースごとの自己ベスト（{ [courseKey]: { fastestRolls, bestNet } }）
 
 // ============================================================
 // 📅 連続参拝ボーナス
@@ -262,7 +265,10 @@ async function saveUserState() {
             sugorokuWinnings: sugorokuWinnings,
             sugorokuLayout: sugorokuLayout,
             sugorokuCourseKey: sugorokuCourseKey,
-            sugorokuTokenKey: sugorokuTokenKey
+            sugorokuTokenKey: sugorokuTokenKey,
+            sugorokuInsuranceActive: sugorokuInsuranceActive,
+            sugorokuRollCount: sugorokuRollCount,
+            sugorokuBestRecords: sugorokuBestRecords
         });
     } catch (e) {
         console.error("ユーザーデータの保存に失敗しました: ", e);
@@ -960,6 +966,9 @@ async function loadUserState() {
         sugorokuLayout = Array.isArray(data.sugorokuLayout) ? data.sugorokuLayout : [];
         sugorokuCourseKey = data.sugorokuCourseKey || "standard";
         sugorokuTokenKey = data.sugorokuTokenKey || "walk";
+        sugorokuInsuranceActive = data.sugorokuInsuranceActive === true;
+        sugorokuRollCount = typeof data.sugorokuRollCount === "number" ? data.sugorokuRollCount : 0;
+        sugorokuBestRecords = (data.sugorokuBestRecords && typeof data.sugorokuBestRecords === "object") ? data.sugorokuBestRecords : {};
         if (data.japanShrinesOwned && typeof data.japanShrinesOwned === "object") {
             JAPAN_PREFECTURES.forEach(pref => {
                 pref.shrines.forEach(shrine => {

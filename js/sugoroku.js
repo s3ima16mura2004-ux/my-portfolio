@@ -27,7 +27,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         updateSugorokuMoneyDisplay();
         updateSugorokuSessionUI();
 
-        sugorokuSelectedCourseKey = sugorokuCourseKey || "standard";
+        sugorokuSelectedCourseKey = isSugorokuCourseUnlocked(sugorokuCourseKey) ? sugorokuCourseKey : "standard";
         sugorokuSelectedTokenKey = sugorokuTokenKey || "walk";
 
         renderTokenOptions();
@@ -70,25 +70,56 @@ function getCourseByKey(key) {
     return SUGOROKU_COURSES.find(c => c.key === key) || SUGOROKU_COURSES[0];
 }
 
+// 🔓 指定したコースが、現在の累計収支で解放されているかどうか
+function isSugorokuCourseUnlocked(key) {
+    const course = getCourseByKey(key);
+    return (typeof totalWinnings === "number" ? totalWinnings : 0) >= course.unlockThreshold;
+}
+
 // 🗺️ 現在有効なコース（進行中ならそのコース、そうでなければ参加パネルで選択中のコース）を返す
 function getActiveSugorokuCourse() {
     if (sugorokuInProgress) return getCourseByKey(sugorokuCourseKey);
     return getCourseByKey(sugorokuSelectedCourseKey);
 }
 
-// 🗺️ コース選択ボタンの一覧を描画する
+// 🗺️ コース選択ボタンの一覧を描画する（未解放コースはロック表示、自己ベストがあれば表示する）
 function renderCourseOptions() {
     const list = document.querySelector("#sugoroku-course-list");
     if (!list) return;
 
     list.innerHTML = SUGOROKU_COURSES.map(course => {
-        const active = course.key === sugorokuSelectedCourseKey;
+        const unlocked = isSugorokuCourseUnlocked(course.key);
+        const active = unlocked && course.key === sugorokuSelectedCourseKey;
+        const stars = "★".repeat(course.risk) + "☆".repeat(3 - course.risk);
+        const record = sugorokuBestRecords[course.key];
+
+        let extraHtml = "";
+        if (course.recommended) extraHtml += '<span class="sugoroku-badge sugoroku-badge-recommend">🔰 はじめての方はこちら</span>';
+        if (record) {
+            const parts = [];
+            if (typeof record.fastestRolls === "number") parts.push("最速" + record.fastestRolls + "回");
+            if (typeof record.bestNet === "number") parts.push("最高収支" + (record.bestNet >= 0 ? "+" : "") + record.bestNet.toLocaleString() + "円");
+            if (parts.length) extraHtml += '<span class="sugoroku-option-record">🏅自己ベスト：' + parts.join("／") + '</span>';
+        }
+
+        if (!unlocked) {
+            return (
+                '<div class="sugoroku-option-btn sugoroku-option-locked">' +
+                    '<span class="sugoroku-option-emoji">🔒</span>' +
+                    '<span class="sugoroku-option-name">' + course.name + '</span>' +
+                    '<span class="sugoroku-option-desc">累計収支' + course.unlockThreshold.toLocaleString() + '円で解放</span>' +
+                '</div>'
+            );
+        }
+
         return (
             '<button type="button" class="sugoroku-option-btn' + (active ? " sugoroku-option-active" : "") + '" onclick="selectSugorokuCourse(\'' + course.key + '\')">' +
+                extraHtml +
                 '<span class="sugoroku-option-emoji">' + course.emoji + '</span>' +
                 '<span class="sugoroku-option-name">' + course.name + '</span>' +
                 '<span class="sugoroku-option-desc">' + course.desc + '</span>' +
-                '<span class="sugoroku-option-desc">全' + course.boardSize + 'マス・最低' + course.minBet.toLocaleString() + '円〜</span>' +
+                '<span class="sugoroku-option-desc">全' + course.boardSize + 'マス・最低' + course.minBet.toLocaleString() + '円〜　リスク：' + stars + '</span>' +
+                '<span class="sugoroku-option-desc">専用マス：' + course.specialTile.emoji + course.specialTile.label.slice(2) + '</span>' +
             '</button>'
         );
     }).join("");
@@ -111,7 +142,7 @@ function renderTokenOptions() {
 
 // 🗺️ コースを選び直した時の処理（賭け金入力欄・プリセット・盤面プレビューを選んだコースに合わせる）
 function selectSugorokuCourse(key) {
-    if (sugorokuInProgress) return;
+    if (sugorokuInProgress || !isSugorokuCourseUnlocked(key)) return;
     sugorokuSelectedCourseKey = key;
     renderCourseOptions();
     applySugorokuCourseToEntryPanel();
@@ -163,29 +194,37 @@ function renderSugorokuBetPresets(course) {
     row.innerHTML = html;
 }
 
-// 📋 選択中のコースの配当倍率で、マス効果の凡例を描画する
+// 🎨 マス効果の形・色スタイルの一覧（凡例・盤面共通）
+const SUGOROKU_SHAPE_STYLES = {
+    none: "border-radius:50%/42%;",
+    coin: "clip-path:circle(46% at 50% 50%);background:#fff8e0;",
+    dango: "clip-path:polygon(50% 4%,96% 50%,50% 96%,4% 50%);background:#ffeef0;",
+    gift: "clip-path:polygon(25% 4%,75% 4%,98% 50%,75% 96%,25% 96%,2% 50%);background:#eafbe8;",
+    big: "clip-path:polygon(50% 0%,63% 33%,98% 36%,71% 58%,80% 92%,50% 72%,20% 92%,29% 58%,2% 36%,37% 33%);background:linear-gradient(135deg,#ffe0b3,#ffb84d);",
+    jackpot: "clip-path:polygon(50% 0%,63% 33%,98% 36%,71% 58%,80% 92%,50% 72%,20% 92%,29% 58%,2% 36%,37% 33%);background:linear-gradient(135deg,#fff2cc,#ffd700);",
+    hoken: "border-radius:8px;background:#e0f0ff;",
+    wchance: "clip-path:polygon(20% 0%,80% 0%,100% 50%,80% 100%,20% 100%,0% 50%);background:#f3e5ff;",
+    dragon: "clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);background:linear-gradient(135deg,#c8f7dc,#4caf50);",
+    gem: "clip-path:polygon(50% 0%,90% 25%,90% 75%,50% 100%,10% 75%,10% 25%);background:linear-gradient(135deg,#d0e8ff,#4fa8ff);"
+};
+
+// 📋 選択中のコースの配当倍率で、マス効果の凡例（基本6種＋そのコースの専用マス）を描画する
 function renderSugorokuLegend(course) {
     const legend = document.querySelector("#sugoroku-legend");
     if (!legend) return;
 
-    const shapeStyles = {
-        none: "border-radius:50%/42%;",
-        coin: "clip-path:circle(46% at 50% 50%);background:#fff8e0;",
-        dango: "clip-path:polygon(50% 4%,96% 50%,50% 96%,4% 50%);background:#ffeef0;",
-        gift: "clip-path:polygon(25% 4%,75% 4%,98% 50%,75% 96%,25% 96%,2% 50%);background:#eafbe8;",
-        big: "clip-path:polygon(50% 0%,63% 33%,98% 36%,71% 58%,80% 92%,50% 72%,20% 92%,29% 58%,2% 36%,37% 33%);background:linear-gradient(135deg,#ffe0b3,#ffb84d);",
-        jackpot: "clip-path:polygon(50% 0%,63% 33%,98% 36%,71% 58%,80% 92%,50% 72%,20% 92%,29% 58%,2% 36%,37% 33%);background:linear-gradient(135deg,#fff2cc,#ffd700);"
-    };
-
-    legend.innerHTML = SUGOROKU_EFFECT_TABLE.map(effect => {
+    const rows = SUGOROKU_EFFECT_TABLE.map(effect => {
         const scaledMult = effect.mult * course.effectMultScale;
-        return (
-            '<span class="sugoroku-legend-item">' +
-                '<span class="sugoroku-legend-shape" style="' + (shapeStyles[effect.key] || "") + '"></span>' +
-                effect.emoji + ' ' + effect.label.slice(2) + ' +' + scaledMult.toFixed(1) + '倍' +
-            '</span>'
-        );
-    }).join("");
+        return { emoji: effect.emoji, text: effect.label.slice(2), mult: "+" + scaledMult.toFixed(1) + "倍", key: effect.key };
+    });
+    rows.push({ emoji: course.specialTile.emoji, text: course.specialTile.label.slice(2), mult: "(専用マス)", key: course.specialTile.key });
+
+    legend.innerHTML = rows.map(r =>
+        '<span class="sugoroku-legend-item">' +
+            '<span class="sugoroku-legend-shape" style="' + (SUGOROKU_SHAPE_STYLES[r.key] || "") + '"></span>' +
+            r.emoji + ' ' + r.text + ' ' + r.mult +
+        '</span>'
+    ).join("");
 }
 
 // 💰 賭け金入力欄にプリセット金額を反映する
@@ -253,7 +292,7 @@ function renderSugorokuBoard() {
         } else if (i === boardSize) {
             inner = '<span class="sugoroku-tile-main">🏁</span>';
         } else {
-            const effect = getSugorokuTileEffect(i);
+            const effect = getSugorokuTileEffect(i, course);
             classes.push("sugoroku-tile-effect-" + effect.key);
             inner =
                 '<span class="sugoroku-tile-main">' + effect.emoji + '</span>' +
@@ -271,9 +310,11 @@ function renderSugorokuBoard() {
     board.innerHTML = html;
 }
 
-// 🎯 指定したマス目に、現在のラウンドで割り当てられている効果を返す
-function getSugorokuTileEffect(position) {
+// 🎯 指定したマス目に、現在のラウンドで割り当てられている効果を返す（基本6種 or そのコースの専用マス）
+function getSugorokuTileEffect(position, course) {
     const key = sugorokuLayout[position - 1];
+    const activeCourse = course || getActiveSugorokuCourse();
+    if (activeCourse.specialTile && activeCourse.specialTile.key === key) return activeCourse.specialTile;
     return SUGOROKU_EFFECT_TABLE.find(e => e.key === key) || SUGOROKU_EFFECT_TABLE[0];
 }
 
@@ -306,6 +347,11 @@ async function startSugorokuRound() {
     if (sugorokuInProgress) return;
 
     const course = getCourseByKey(sugorokuSelectedCourseKey);
+    if (!isSugorokuCourseUnlocked(course.key)) {
+        alert("🔒 このコースはまだ解放されていません。");
+        return;
+    }
+
     const betInput = document.querySelector("#sugoroku-bet-input");
     const bet = betInput ? parseInt(betInput.value, 10) : NaN;
 
@@ -328,6 +374,8 @@ async function startSugorokuRound() {
     sugorokuBet = bet;
     sugorokuWinnings = 0;
     sugorokuPosition = 0;
+    sugorokuRollCount = 0;
+    sugorokuInsuranceActive = false;
     sugorokuLayout = generateSugorokuLayout(course); // 🎲 このラウンド専用の盤面をシャッフルして生成
 
     currentMoney -= bet;
@@ -376,6 +424,7 @@ async function rollSugoroku() {
     const steps = 1 + Math.floor(Math.random() * 6);
     if (diceEl) diceEl.textContent = DICE_FACES[steps];
 
+    sugorokuRollCount++;
     sugorokuPosition = Math.min(course.boardSize, sugorokuPosition + steps);
     renderSugorokuBoard();
 
@@ -390,15 +439,33 @@ async function rollSugoroku() {
         if (typeof startConfetti === "function") startConfetti();
         await finishSugorokuRound();
     } else {
-        const effect = getSugorokuTileEffect(sugorokuPosition);
-        const amount = Math.round(sugorokuBet * effect.mult * course.effectMultScale);
+        const effect = getSugorokuTileEffect(sugorokuPosition, course);
+        let amount;
+        let logSuffix = "";
+
+        if (effect.key === "wchance") {
+            // 🔀 ダブルチャンス：ベース効果表から2つ抽選して合計をもらう
+            const pick1 = SUGOROKU_EFFECT_TABLE[Math.floor(Math.random() * SUGOROKU_EFFECT_TABLE.length)];
+            const pick2 = SUGOROKU_EFFECT_TABLE[Math.floor(Math.random() * SUGOROKU_EFFECT_TABLE.length)];
+            const amount1 = Math.round(sugorokuBet * pick1.mult * course.effectMultScale);
+            const amount2 = Math.round(sugorokuBet * pick2.mult * course.effectMultScale);
+            amount = amount1 + amount2;
+            logSuffix = "（" + pick1.emoji + pick1.label.slice(2) + " ＋ " + pick2.emoji + pick2.label.slice(2) + "）";
+        } else {
+            amount = Math.round(sugorokuBet * effect.mult * course.effectMultScale);
+            if (effect.key === "hoken") {
+                sugorokuInsuranceActive = true;
+                logSuffix = "（負け越した場合、決算時に損失の半分が戻ります）";
+            }
+        }
+
         sugorokuWinnings += amount;
         currentMoney += amount;
         updateSugorokuMoneyDisplay();
 
         logSugoroku(
-            "🎲 " + steps + "マス進んで" + sugorokuPosition + "マス目「" + effect.label + "」" +
-            (amount > 0 ? "　+" + amount.toLocaleString() + "円" : "")
+            "🎲 " + steps + "マス進んで" + sugorokuPosition + "マス目「" + effect.label + "」" + logSuffix +
+            (amount !== 0 ? "　" + (amount > 0 ? "+" : "") + amount.toLocaleString() + "円" : "")
         );
 
         if (amount > 0 && typeof playSE === "function") playSE("se-win");
@@ -412,17 +479,41 @@ async function rollSugoroku() {
 
 // 📊 ゴール到達後の精算処理
 async function finishSugorokuRound() {
-    const net = sugorokuWinnings - sugorokuBet;
+    let net = sugorokuWinnings - sugorokuBet;
+
+    // 🎗️ お守りマスを踏んでいた場合、負け越し分の半分を払い戻す
+    if (sugorokuInsuranceActive && net < 0) {
+        const refund = Math.round(Math.abs(net) * 0.5);
+        currentMoney += refund;
+        net += refund;
+        updateSugorokuMoneyDisplay();
+        logSugoroku("🎗️ お守りの効果で、負けた分の半分（+" + refund.toLocaleString() + "円）が戻ってきました！");
+    }
 
     sugorokuSessionCount++;
     minigamePlayCount++;
     if (typeof trackWeeklyMinigamePlay === "function") trackWeeklyMinigamePlay(); // 📅 週間ミッション「週間ミニゲーム挑戦」の進捗を更新
     if (net > 0) minigameTotalWon += net;
 
+    // 🏅 このコースの自己ベストを更新する
+    const courseKey = sugorokuCourseKey;
+    if (!sugorokuBestRecords[courseKey]) sugorokuBestRecords[courseKey] = {};
+    const rec = sugorokuBestRecords[courseKey];
+    let newRecordText = "";
+    if (typeof rec.fastestRolls !== "number" || sugorokuRollCount < rec.fastestRolls) {
+        rec.fastestRolls = sugorokuRollCount;
+        newRecordText += "🏅最速クリア記録更新（" + sugorokuRollCount + "回）！";
+    }
+    if (typeof rec.bestNet !== "number" || net > rec.bestNet) {
+        rec.bestNet = net;
+        newRecordText += "🏅最高収支記録更新！";
+    }
+
     logSugoroku(
         "📊 今回の収支：" + (net >= 0 ? "+" : "") + net.toLocaleString() + "円" +
         "（獲得合計" + sugorokuWinnings.toLocaleString() + "円 － 参加料" + sugorokuBet.toLocaleString() + "円）"
     );
+    if (newRecordText) logSugoroku(newRecordText);
 
     updateSugorokuSessionUI((net >= 0 ? "+" : "") + net.toLocaleString() + "円");
 
@@ -432,6 +523,7 @@ async function finishSugorokuRound() {
     }
 
     sugorokuInProgress = false;
+    sugorokuInsuranceActive = false;
     if (typeof saveUserState === "function") await saveUserState();
 
     const rollBtn = document.querySelector("#sugoroku-roll-btn");
