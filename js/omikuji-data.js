@@ -1593,6 +1593,54 @@ const SUGOROKU_COURSES = [
         risk: 3, recommended: false, unlockThreshold: 500000,
         tileCounts: { none: 7, coin: 6, dango: 2, gift: 1, big: 1, jackpot: 1, gem: 1 },
         specialTile: { key: "gem", emoji: "💎", mult: 1.0, label: "💎 特別ボーナス" }
+    },
+    {
+        key: "ushimitsu", emoji: "🌙", name: "丑三つ時コース",
+        desc: "深夜2時〜4時の間だけ遊べる特別コース。夜更かしのご褒美に",
+        boardSize: 20, minBet: 100, effectMultScale: 1.2, goalBonusMult: 0.15,
+        risk: 2, recommended: false, unlockThreshold: 0, timeGate: "ushimitsu",
+        tileCounts: { none: 7, coin: 6, dango: 2, gift: 1, big: 1, jackpot: 1, tsukiyo: 1 },
+        specialTile: { key: "tsukiyo", emoji: "🌕", mult: 3.0, label: "🌕 満月のご利益" }
+    },
+    {
+        key: "shinken", emoji: "👹", name: "真剣勝負コース",
+        desc: "凶マスありの本格ギャンブル仕様。当たれば大きいが、本当に負け越すこともある",
+        boardSize: 16, minBet: 100, effectMultScale: 1.0, goalBonusMult: 0.2,
+        risk: 3, recommended: false, unlockThreshold: 50000, riskWarning: true,
+        tileCounts: { none: 4, coin: 3, kyo: 3, daikyo: 2, gift: 1, jackpot: 1, daigyakuten: 1 },
+        specialTile: { key: "daigyakuten", emoji: "💥", mult: 6.0, label: "💥 大逆転（激レア）" },
+        customEffects: [
+            { key: "none", emoji: "🌿", mult: 0, label: "🌿 何もなし" },
+            { key: "coin", emoji: "🪙", mult: 0.2, label: "🪙 小銭を拾った" },
+            { key: "kyo", emoji: "💢", mult: -0.3, label: "💢 小凶（没収）" },
+            { key: "daikyo", emoji: "👺", mult: -0.6, label: "👺 大凶（没収）" },
+            { key: "gift", emoji: "🎁", mult: 0.8, label: "🎁 授かりもの" },
+            { key: "jackpot", emoji: "🏆", mult: 4.0, label: "🏆 大当たり！" }
+        ]
+    },
+    {
+        key: "seasonal", emoji: "🎋", name: "季節限定コース",
+        desc: "季節のイベント開催期間中だけ遊べる特別コース",
+        boardSize: 20, minBet: 100, effectMultScale: 1.0, goalBonusMult: 0.15,
+        risk: 2, recommended: false, unlockThreshold: 0, timeGate: "seasonal",
+        tileCounts: { none: 7, coin: 6, dango: 2, gift: 1, big: 1, jackpot: 1, kisetsu: 1 },
+        specialTile: { key: "kisetsu", emoji: "🎏", mult: 2.5, label: "🎏 季節のご利益" }
+    },
+    {
+        key: "renshu", emoji: "🐌", name: "練習コース",
+        desc: "最低賭け金10円。ルールを試したい方・少額で遊びたい方向け",
+        boardSize: 10, minBet: 10, effectMultScale: 1.0, goalBonusMult: 0.05,
+        risk: 1, recommended: false, unlockThreshold: 0,
+        tileCounts: { none: 5, coin: 2, dango: 1, shoshinsha: 1 },
+        specialTile: { key: "shoshinsha", emoji: "🔰", mult: 0.2, label: "🔰 初心者ボーナス" }
+    },
+    {
+        key: "ikkaku", emoji: "🎯", name: "一攫千金コース",
+        desc: "全8マスの宝くじ型。ほとんど何も起きないが、超高配当マスが1つだけ潜む",
+        boardSize: 8, minBet: 100, effectMultScale: 1.0, goalBonusMult: 0.05,
+        risk: 2, recommended: false, unlockThreshold: 0,
+        tileCounts: { none: 6, chodaitokusen: 1 },
+        specialTile: { key: "chodaitokusen", emoji: "💰", mult: 30.0, label: "💰 超大当たり！" }
     }
 ];
 

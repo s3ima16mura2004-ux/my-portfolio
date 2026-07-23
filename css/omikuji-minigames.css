@@ -480,11 +480,148 @@
     border-color: #1e6fbf;
 }
 
-/* 🔒 未解放コースのカード */
-.sugoroku-option-btn.sugoroku-option-locked {
-    opacity: 0.6;
+/* 🌕 丑三つ時コース専用「満月のご利益」：円形＋夜空カラー */
+.sugoroku-tile.sugoroku-tile-effect-tsukiyo {
+    clip-path: circle(46% at 50% 50%);
+    background: linear-gradient(135deg, #2c3e6b, #f4f0d8);
+    border-color: #1a2550;
+}
+
+/* 💢👺 真剣勝負コース専用の凶マス：とげとげした形で危険な印象に */
+.sugoroku-tile.sugoroku-tile-effect-kyo {
+    clip-path: polygon(50% 0%, 61% 20%, 82% 10%, 80% 33%, 100% 44%, 82% 60%, 88% 82%, 65% 76%, 50% 96%, 35% 76%, 12% 82%, 18% 60%, 0% 44%, 20% 33%, 18% 10%, 39% 20%);
+    background: #ffe3e0;
+    border-color: #d97a70;
+}
+
+.sugoroku-tile.sugoroku-tile-effect-daikyo {
+    clip-path: polygon(50% 0%, 61% 20%, 82% 10%, 80% 33%, 100% 44%, 82% 60%, 88% 82%, 65% 76%, 50% 96%, 35% 76%, 12% 82%, 18% 60%, 0% 44%, 20% 33%, 18% 10%, 39% 20%);
+    background: #ffc2ba;
+    border-color: #b0413a;
+}
+
+/* 💥 真剣勝負コース専用「大逆転」：ジグザグの爆発マーク風 */
+.sugoroku-tile.sugoroku-tile-effect-daigyakuten {
+    clip-path: polygon(50% 0%, 61% 20%, 82% 10%, 80% 33%, 100% 44%, 82% 60%, 88% 82%, 65% 76%, 50% 96%, 35% 76%, 12% 82%, 18% 60%, 0% 44%, 20% 33%, 18% 10%, 39% 20%);
+    background: linear-gradient(135deg, #ffe0b3, #ff6b3d);
+    border-color: #c0392b;
+    filter: drop-shadow(0 0 6px rgba(255, 87, 34, 0.85));
+    transform: scale(1.08);
+}
+
+/* 🎏 季節限定コース専用「季節のご利益」：吹き流し風の三角旗形 */
+.sugoroku-tile.sugoroku-tile-effect-kisetsu {
+    clip-path: polygon(0% 0%, 100% 0%, 85% 50%, 100% 100%, 0% 100%);
+    background: linear-gradient(135deg, #ffd9ec, #b3e0ff);
+    border-color: #e07fc0;
+}
+
+/* 🔰 練習コース専用「初心者ボーナス」：シンプルな丸 */
+.sugoroku-tile.sugoroku-tile-effect-shoshinsha {
+    clip-path: circle(46% at 50% 50%);
+    background: #eafbe8;
+    border-color: #7fb56a;
+}
+
+/* 💰 一攫千金コース専用「超大当たり」：大きめの星形＋強いグロー */
+.sugoroku-tile.sugoroku-tile-effect-chodaitokusen {
+    clip-path: polygon(50% 0%, 63% 33%, 98% 36%, 71% 58%, 80% 92%, 50% 72%, 20% 92%, 29% 58%, 2% 36%, 37% 33%);
+    background: linear-gradient(135deg, #fff2cc, #ffd700);
+    border-color: #d8860b;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 1));
+    transform: scale(1.15);
+}
+
+/* 🗺️ 境内すごろく：コース選択（横スクロールの小さなチップ＋選んだコースだけの詳細パネル） */
+.sugoroku-course-picker {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+}
+
+.sugoroku-chip {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: 68px;
+    padding: 8px 4px;
+    background: #fbf8f3;
+    border: 2px solid #e8dcc8;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.1s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.sugoroku-chip:hover {
+    transform: scale(1.04);
+}
+
+.sugoroku-chip.sugoroku-chip-active {
+    border-color: #d8860b;
+    background: linear-gradient(135deg, #fff8e0, #fff2cc);
+}
+
+.sugoroku-chip.sugoroku-chip-locked {
+    opacity: 0.55;
     cursor: not-allowed;
-    background: #ececec;
+}
+
+.sugoroku-chip-emoji {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.sugoroku-chip-name {
+    font-size: 0.62rem;
+    font-weight: bold;
+    color: #4a3728;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.sugoroku-chip-stars {
+    font-size: 0.6rem;
+    color: #d8860b;
+}
+
+.sugoroku-course-detail {
+    background: #fbf8f3;
+    border: 1px solid #e8dcc8;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    font-size: 0.8rem;
+    color: #4a3728;
+}
+
+.sugoroku-course-detail-title {
+    font-weight: bold;
+    font-size: 0.95rem;
+    margin: 0 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.sugoroku-course-detail-desc {
+    color: #7a5c3e;
+    margin: 0 0 6px;
+}
+
+.sugoroku-course-detail-row {
+    font-size: 0.75rem;
+    color: #8a7259;
+    margin: 2px 0;
+}
+
+.sugoroku-course-detail-locked {
+    color: #b0413a;
+    font-weight: bold;
 }
 
 /* 🔰 おすすめ・自己ベストのバッジ */
@@ -494,7 +631,6 @@
     font-weight: bold;
     padding: 2px 8px;
     border-radius: 999px;
-    margin-bottom: 2px;
 }
 
 .sugoroku-badge-recommend {
@@ -503,9 +639,11 @@
 }
 
 .sugoroku-option-record {
-    font-size: 0.68rem;
+    font-size: 0.72rem;
     color: #b8860b;
     font-weight: bold;
+    display: block;
+    margin-top: 4px;
 }
 
 /* 📋 マス効果の凡例 */
@@ -599,56 +737,4 @@
 .sugoroku-token-btn.sugoroku-option-active {
     border-color: #e53935;
     box-shadow: 0 0 8px rgba(229, 57, 53, 0.5);
-}
-
-/* 🗺️ 境内すごろく：コース選択 */
-.sugoroku-course-list {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-bottom: 14px;
-}
-
-@media (max-width: 600px) {
-    .sugoroku-course-list {
-        grid-template-columns: 1fr;
-    }
-}
-
-.sugoroku-option-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 2px;
-    padding: 12px 10px;
-    background: #fbf8f3;
-    border: 2px solid #e8dcc8;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: transform 0.1s ease, border-color 0.15s ease, background-color 0.15s ease;
-}
-
-.sugoroku-option-btn:hover {
-    transform: scale(1.02);
-}
-
-.sugoroku-option-btn.sugoroku-option-active {
-    border-color: #d8860b;
-    background: linear-gradient(135deg, #fff8e0, #fff2cc);
-}
-
-.sugoroku-option-emoji {
-    font-size: 1.6rem;
-}
-
-.sugoroku-option-name {
-    font-weight: bold;
-    color: #4a3728;
-    font-size: 0.92rem;
-}
-
-.sugoroku-option-desc {
-    font-size: 0.72rem;
-    color: #8a7259;
 }
