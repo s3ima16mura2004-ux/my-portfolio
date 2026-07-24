@@ -10,12 +10,12 @@
     <link rel="stylesheet" href="../css/omikuji-missions.css?v=4">
     <link rel="stylesheet" href="../css/omikuji-seasonal-effects.css?v=4">
     <link rel="stylesheet" href="../css/omikuji-status-effects.css?v=4">
-    <link rel="stylesheet" href="../css/omikuji-widgets.css?v=5">
+    <link rel="stylesheet" href="../css/omikuji-widgets.css?v=6">
     <link rel="stylesheet" href="../css/omikuji-top.css?v=4">
 </head>
 <body>
 
-    <a href="top.html" class="back-to-top-btn">🏠 トップに戻る</a>
+    <a href="top.html" class="back-to-top-btn" onclick="return handleNavClick(event, 'top.html')">🏠 トップに戻る</a>
 
     <div class="container container-wide">
         <div class="user-info">
@@ -33,10 +33,10 @@
                 </div>
 
                 <div class="page-nav-links">
-                    <a href="dex.html" class="page-nav-link">📖 おみくじ図鑑</a>
-                    <a href="map.html" class="page-nav-link">🗺️ 境内マップ</a>
-                    <a href="minigames.html" class="page-nav-link">🎲 ミニゲーム広場</a>
-                    <a href="goshuincho.html" class="page-nav-link">📔 御朱印帳</a>
+                    <a href="dex.html" class="page-nav-link" onclick="return handleNavClick(event, 'dex.html')">📖 おみくじ図鑑</a>
+                    <a href="map.html" class="page-nav-link" onclick="return handleNavClick(event, 'map.html')">🗺️ 境内マップ</a>
+                    <a href="minigames.html" class="page-nav-link" onclick="return handleNavClick(event, 'minigames.html')">🎲 ミニゲーム広場</a>
+                    <a href="goshuincho.html" class="page-nav-link" onclick="return handleNavClick(event, 'goshuincho.html')">📔 御朱印帳</a>
                 </div>
 
                 <details id="titles-box" class="daily-notices titles-box hidden">
@@ -107,7 +107,7 @@
                         😱 資金がピンチです…！神様にお祈りしますか？
                     </p>
                     <button id="bonusBtn" class="btn-bonus" onclick="getBonusMoney()">🙏 神様にお祈りして3,000円貰う</button>
-                    <a href="top.html" class="btn-bonus-back">🏠 トップページに戻る</a>
+                    <a href="top.html" class="btn-bonus-back" onclick="return handleNavClick(event, 'top.html')">🏠 トップページに戻る</a>
                 </div>
             </div>
 
@@ -161,6 +161,11 @@
                         <h3 class="shop-section-title">📅 週間目標ミッション（ランダム3個・毎週月曜リセット）</h3>
                         <p id="weekly-missions-summary" class="missions-summary">-</p>
                         <div id="weekly-missions-list" class="missions-list"></div>
+                    </div>
+
+                    <div class="shop-section">
+                        <h3 class="shop-section-title">📆 今月の特別チャレンジ（毎月1個・大きな目標）</h3>
+                        <div id="monthly-challenge-box" class="missions-list"></div>
                     </div>
 
                     <div class="shop-section">
@@ -418,6 +423,12 @@
 
                 <div id="tab-shop" class="hidden">
                     <div class="shop-section">
+                        <h3 class="shop-section-title">👒 アバターアクセサリー（買い切り・見た目のみ）</h3>
+                        <p class="bank-desc">購入すると永続的に所持できます。装備すると参拝者名の横に表示されます（もう一度タップで解除）。</p>
+                        <div id="avatar-shop-list"></div>
+                    </div>
+
+                    <div class="shop-section">
                         <h3 class="shop-section-title">🛍️ 購入アイテム（一定回数だけ効果）</h3>
 
                         <div class="shop-item-card" data-key="manekineko">
@@ -625,6 +636,17 @@
                         </div>
                     </details>
 
+                    <details id="duel-requests-section" class="daily-notices">
+                        <summary>🎲 サイコロ対決の挑戦状 <span id="duel-requests-badge" class="hidden" style="margin-left:4px;background:#d9534f;color:#fff;border-radius:999px;padding:1px 6px;font-size:0.75rem;"></span></summary>
+                        <div class="daily-notices-body">
+                            <p class="collect-item-desc">出目が高い方が両者の賭け金を総取りします（同じ出目なら引き分けで返金）。フレンド一覧から挑戦できます。</p>
+                            <p class="shop-section-title" style="border:none;margin-bottom:4px;">届いている挑戦状</p>
+                            <div id="duel-requests-incoming-list"></div>
+                            <p class="shop-section-title" style="border:none;margin:12px 0 4px;">送っている挑戦状</p>
+                            <div id="duel-requests-outgoing-list"></div>
+                        </div>
+                    </details>
+
                     <div class="shop-section">
                         <h3 class="shop-section-title">👥 フレンド一覧</h3>
                         <p class="bank-desc">1回の送金は最大15万円まで、1日3回までです。</p>
@@ -675,30 +697,37 @@
 
     <script src="../js/omikuji-seasonal.js?v=4"></script>
     <script src="../js/omikuji-countdown.js?v=2"></script>
-    <script src="../js/omikuji-data.js?v=22"></script>
-    <script src="../js/omikuji-state.js?v=17"></script>
+    <script src="../js/omikuji-data.js?v=23"></script>
+    <script src="../js/omikuji-state.js?v=20"></script>
     <script src="../js/omikuji-ui-core.js?v=5"></script>
-    <script src="../js/omikuji-ui-shop.js?v=10"></script>
-    <script src="../js/omikuji-ui-effects.js?v=4"></script>
+    <script src="../js/omikuji-ui-shop.js?v=12"></script>
+    <script src="../js/omikuji-ui-effects.js?v=5"></script>
     <script src="../js/omikuji-ui-seasonal1.js?v=3"></script>
     <script src="../js/omikuji-ui-seasonal2.js?v=3"></script>
     <script src="../js/omikuji-ui-seasonal3.js?v=3"></script>
     <script src="../js/omikuji-ui-map.js?v=9"></script>
-    <script src="../js/omikuji-shop.js?v=11"></script>
-    <script src="../js/omikuji-missions.js?v=3"></script>
-    <script src="../js/omikuji-weekly-missions.js?v=1"></script>
+    <script src="../js/omikuji-shop.js?v=12"></script>
+    <script src="../js/omikuji-missions.js?v=5"></script>
+    <script src="../js/omikuji-weekly-missions.js?v=2"></script>
+    <script src="../js/omikuji-monthly-challenge.js?v=1"></script>
     <script src="../js/omikuji-draw-helpers.js?v=3"></script>
     <script src="../js/omikuji-draw-single.js?v=10"></script>
     <script src="../js/omikuji-draw-multi.js?v=10"></script>
-    <script src="../js/omikuji-main.js?v=14"></script>
+    <script src="../js/omikuji-main.js?v=16"></script>
     <script src="../js/omikuji-phantom.js?v=2"></script>
-    <script src="../js/omikuji-friends.js?v=1"></script>
+    <script src="../js/omikuji-friends.js?v=2"></script>
     <script>
         // 🚪 ログアウト処理：ログイン情報を消してログインページへ戻る
         function logout() {
             if (confirm("ログアウトしますか？")) {
-                localStorage.removeItem("logged_in_user");
-                window.location.href = "../index.html"; // index.htmlはルートフォルダに移動したため
+                (async () => {
+                    if (typeof historyBuffer !== "undefined" && historyBuffer.length > 0 && typeof flushHistoryBuffer === "function") {
+                        const ok = await flushHistoryBuffer();
+                        if (ok && typeof saveUserState === "function") await saveUserState();
+                    }
+                    localStorage.removeItem("logged_in_user");
+                    window.location.href = "../index.html"; // index.htmlはルートフォルダに移動したため
+                })();
             }
         }
     </script>

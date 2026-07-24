@@ -251,6 +251,42 @@ function openDailyNotices() {
     details.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+// ============================================================
+// 🍞 トースト通知：達成系のお知らせ（ミッション達成・連続参拝ボーナス等）を
+// alert()の代わりに画面右上にスッと表示して自動で消えるようにする
+// ============================================================
+
+// トーストを1件表示する。type: "gold"(達成・報酬系) / "success"(成功) / 省略(通常)
+function showToast(message, type, duration) {
+    const container = getOrCreateToastContainer();
+
+    const toast = document.createElement("div");
+    toast.className = "omikuji-toast" + (type ? " omikuji-toast-" + type : "");
+    toast.innerHTML = message;
+    container.appendChild(toast);
+
+    // 描画が確定してからshowクラスを付けて、フェードインのtransitionを発火させる
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => toast.classList.add("omikuji-toast-show"));
+    });
+
+    const lifespan = duration || 4500;
+    setTimeout(() => {
+        toast.classList.remove("omikuji-toast-show");
+        setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 350);
+    }, lifespan);
+}
+
+function getOrCreateToastContainer() {
+    let el = document.querySelector("#omikuji-toast-container");
+    if (!el) {
+        el = document.createElement("div");
+        el.id = "omikuji-toast-container";
+        document.body.appendChild(el);
+    }
+    return el;
+}
+
 function unlockAllAudio() {
     const ids = ["se-coin", "se-found", "se-purchase", "se-shuffle", "se-win", "se-kamikichi", "se-daidaikichi", "se-levelup", "se-milestone", "se-complete", "se-lose", "se-doom"];
     ids.forEach(id => {

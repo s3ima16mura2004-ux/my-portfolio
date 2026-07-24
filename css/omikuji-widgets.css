@@ -221,3 +221,57 @@ a.tab-btn {
     text-decoration: none;
     box-sizing: border-box;
 }
+
+/* ============================================================
+   🍞 トースト通知（達成系のお知らせを画面右上にスッと表示）
+   ============================================================ */
+#omikuji-toast-container {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 320px;
+    pointer-events: none;
+}
+
+.omikuji-toast {
+    background: #fff8eb;
+    border: 2px solid #d8860b;
+    border-radius: 10px;
+    padding: 12px 16px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: #4a3728;
+    opacity: 0;
+    transform: translateX(30px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.omikuji-toast.omikuji-toast-show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.omikuji-toast-gold {
+    background: linear-gradient(135deg, #fff2cc, #ffe08a);
+    border-color: #d8860b;
+    font-weight: bold;
+}
+
+.omikuji-toast-success {
+    background: #eafbe8;
+    border-color: #7cb342;
+}
+
+@media (max-width: 600px) {
+    #omikuji-toast-container {
+        left: 8px;
+        right: 8px;
+        top: 8px;
+        max-width: none;
+    }
+}

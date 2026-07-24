@@ -1232,6 +1232,18 @@ const KIMAGURE_BONUS_PRIZE = 10000;
 const KIMAGURE_TIMES = ["01:01", "03:33", "04:44", "05:55", "11:11", "12:12", "22:22", "23:23"];
 const LUCKY_MONEY_PATTERNS = [777, 7777, 77777, 777777, 888, 8888, 88888, 888888, 1234, 12345, 123456, 111111, 222222, 333333, 555555, 999999];
 // 🎖️ 称号（達成条件を満たすと自動的に付与される。プレイヤーの各種累計値で判定）
+// 👒 アバターアクセサリー：購入して装備すると、参拝者名の横に称号と並んで表示される見た目だけの収集要素
+const AVATAR_ITEMS = [
+    { key: "party_hat", emoji: "🎉", name: "パーティー帽", price: 1000 },
+    { key: "hachimaki", emoji: "🎌", name: "必勝はちまき", price: 2000 },
+    { key: "kanzashi", emoji: "🌸", name: "桜のかんざし", price: 5000 },
+    { key: "sunglasses", emoji: "🕶️", name: "サングラス", price: 8000 },
+    { key: "tengu_mask", emoji: "👺", name: "天狗のお面", price: 15000 },
+    { key: "crown", emoji: "👑", name: "黄金の冠", price: 100000 },
+    { key: "halo", emoji: "😇", name: "後光", price: 300000 },
+    { key: "wings", emoji: "🪽", name: "天使の羽", price: 1000000 }
+];
+
 const TITLES = [
     { key: "hyakuman", emoji: "💰", name: "百万長者", desc: "累計収支+1,000,000円を達成", condition: s => s.totalProfit >= 1000000 },
     { key: "juman", emoji: "💴", name: "実は儲かってる人", desc: "累計収支+100,000円を達成", condition: s => s.totalProfit >= 100000 },

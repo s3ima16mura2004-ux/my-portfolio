@@ -24,6 +24,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     try {
         await loadUserState();
+        updateEquippedBadgesDisplay();
         updateSugorokuMoneyDisplay();
         updateSugorokuSessionUI();
 
@@ -561,6 +562,7 @@ async function finishSugorokuRound() {
     sugorokuSessionCount++;
     minigamePlayCount++;
     if (typeof trackWeeklyMinigamePlay === "function") trackWeeklyMinigamePlay(); // 📅 週間ミッション「週間ミニゲーム挑戦」の進捗を更新
+        if (typeof trackMonthlyMinigamePlay === "function") trackMonthlyMinigamePlay(); // 📆 月替わりチャレンジ「今月のミニゲーム挑戦」の進捗も合わせて更新
     if (net > 0) minigameTotalWon += net;
 
     // 🏅 このコースの自己ベストを更新する

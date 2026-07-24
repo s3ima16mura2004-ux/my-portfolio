@@ -18,6 +18,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     try {
         await loadUserState();
+        updateEquippedBadgesDisplay();
 
         updateMoneyDisplay(); // 所持金表示＋ショップ関連の付随更新（内部でupdateShrineMapUIも呼ばれる）
         updateTitlesUI();

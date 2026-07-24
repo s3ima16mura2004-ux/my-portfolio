@@ -134,7 +134,7 @@ async function claimWeeklyMission(key) {
     updateWeeklyMissionsUI();
     await saveUserState();
 
-    alert("📅🎯【週間ミッション達成】🎯📅\n「" + mission.emoji + " " + mission.name + "」の報酬を受け取りました！\n🎁 " + mission.rewardText);
+    showToast("📅🎯 <strong>週間ミッション達成</strong><br>「" + mission.emoji + " " + mission.name + "」の報酬を受け取りました！<br>🎁 " + mission.rewardText, "gold");
 }
 
 // 📅 週間ミッションタブの表示を更新する

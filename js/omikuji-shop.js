@@ -300,7 +300,18 @@ async function depositBank() {
     trackMissionDeposit(amount); // 🎯「貯蓄家」ミッションの進捗を更新
     trackKannazukiDeposit(amount); // 🌫️ 神無月期間中なら「倍返し」対象として記録
     trackTutorialMission("chokin_shite_miru"); // 🔰 はじめてガイド：賽銭箱に預けてみようの進捗を記録
-    await saveUserState();
+
+    const saved = await saveUserState();
+    if (!saved) {
+        // 💾 保存に失敗した場合は、見た目上の変更も元に戻して二重に不整合が起きないようにする
+        currentMoney += amount;
+        bankMoney -= amount;
+        updateMoneyDisplay();
+        updateBankUI();
+        alert("❌ 通信環境が不安定なため、預け入れの保存に失敗しました。\nもう一度お試しください。");
+        return;
+    }
+
     alert("🏦 " + amount.toLocaleString() + "円を賽銭箱に預けました。\n（このお金はおみくじには使えませんが、大凶や神の試練で失うこともありません）" + (isSeasonalEventActive("kannazuki") ? "\n🌫️ 今は神無月…この預け入れは11月の「倍返し」の対象です！" : ""));
 }
 
@@ -324,7 +335,18 @@ async function withdrawBank() {
     updateBankUI();
     if (input) input.value = "";
     playSE("se-coin");
-    await saveUserState();
+
+    const saved = await saveUserState();
+    if (!saved) {
+        // 💾 保存に失敗した場合は、見た目上の変更も元に戻して二重に不整合が起きないようにする
+        bankMoney += amount;
+        currentMoney -= amount;
+        updateMoneyDisplay();
+        updateBankUI();
+        alert("❌ 通信環境が不安定なため、引き出しの保存に失敗しました。\nもう一度お試しください。");
+        return;
+    }
+
     alert("🏦 賽銭箱から" + amount.toLocaleString() + "円を引き出しました。");
 }
 function getCommunityTier(draws) {

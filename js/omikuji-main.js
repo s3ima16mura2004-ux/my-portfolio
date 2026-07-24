@@ -5,6 +5,16 @@
 // 画面を起動するエントリーポイント。
 // ============================================================
 
+// 🚪 タブを閉じる・更新するなど、リンク以外の方法でページを離れようとした時の保険。
+// 未送信のおみくじ結果が残っている場合はブラウザ標準の確認ダイアログを出す
+// （Firestoreへの非同期書き込みはこのタイミングでは実行できないため、ユーザー自身に「送信する」を選んでもらう形にする）
+window.addEventListener("beforeunload", (event) => {
+    if (typeof historyBuffer !== "undefined" && historyBuffer.length > 0) {
+        event.preventDefault();
+        event.returnValue = "";
+    }
+});
+
 // 画面が開いた瞬間に、ログイン確認とユーザーごとのデータ読み込みを行う
 window.addEventListener("DOMContentLoaded", async () => {
     currentUser = localStorage.getItem("logged_in_user");
@@ -33,6 +43,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
         refreshDailyMissions(); // 🎯 日付が変わっていればデイリーミッションをリセット（前日分の「お財布の達人」判定も含む）
         if (typeof refreshWeeklyMissions === "function") refreshWeeklyMissions(); // 📅 週が変わっていれば週間ミッションをリセット
+        if (typeof refreshMonthlyChallenge === "function") refreshMonthlyChallenge(); // 📆 月が変わっていれば月替わりチャレンジをリセット
 
         updateMoneyDisplay();
         updateTitlesUI();
@@ -50,7 +61,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         if (loginStreakMilestoneResult) {
             updateMoneyDisplay();
             playSE("se-milestone");
-            alert("📅🎉【連続参拝ボーナス！】🎉📅\n" + loginStreakCount + "日連続の参拝、お疲れ様です！\nご祝儀として【" + loginStreakMilestoneResult.prize.toLocaleString() + "円】を授かりました！");
+            showToast("📅🎉 <strong>連続参拝ボーナス！</strong><br>" + loginStreakCount + "日連続の参拝、お疲れ様です！<br>ご祝儀として【" + loginStreakMilestoneResult.prize.toLocaleString() + "円】を授かりました！", "gold");
         }
 
         updateFriendsUI(); // 👥 フレンド機能の表示を初期化
@@ -63,6 +74,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         updateNatsumatsuriUI();
         updateMissionsUI();
         if (typeof updateWeeklyMissionsUI === "function") updateWeeklyMissionsUI();
+        if (typeof updateMonthlyChallengeUI === "function") updateMonthlyChallengeUI();
         applyTimeTheme();
         setInterval(applyTimeTheme, 60000); // 1分ごとに時間帯を再チェック（長時間開いたままでも自動で切り替わる）
         setInterval(updateShopFeverUI, 30000); // 😲 神の気まぐれフィーバーの残り時間を定期的に更新
@@ -153,10 +165,51 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
 });
 // 「結果を送信する」ボタンから呼ばれる関数
+// 🔄 たまった履歴(historyBuffer)をFirebaseに書き込む（結果送信ボタン・ページ移動時の自動送信の両方から使う共通処理）
+// 戻り値：書き込みが成功した（またはそもそも送るものがなかった）ならtrue、失敗したらfalse
+async function flushHistoryBuffer() {
+    if (historyBuffer.length === 0) return true;
+    if (!window.omikujiDB || !window.omikujiAddDoc || !window.omikujiCollectionRef) return false;
+
+    const userName = currentUser || localStorage.getItem("logged_in_user") || "名無しの参拝者";
+
+    try {
+        for (const entry of historyBuffer) {
+            await window.omikujiAddDoc(window.omikujiCollectionRef, {
+                name: userName,
+                date: entry.date,
+                result: entry.result,
+                prize: entry.prize,
+                balance: entry.balance,
+                timestamp: entry.timestamp
+            });
+        }
+        historyBuffer = [];
+        trackMissionSubmit(); // 🎯「大吉を目指せ」ミッションの進捗を更新
+        return true;
+    } catch (e) {
+        console.error("Firebaseへの送信に失敗しました: ", e);
+        return false;
+    }
+}
+
+// 🚪 ページを離れる前に、未送信のおみくじ結果が残っていれば自動で送信してから移動する
+// （「🏠トップに戻る」やサイドバーの各リンクから使う。送るものがなければ即座に通常のリンク遷移に任せる）
+function handleNavClick(event, url) {
+    if (historyBuffer.length === 0) return true; // 送るものがなければ、普通のリンクとしてそのまま遷移させる
+
+    event.preventDefault();
+    (async () => {
+        const ok = await flushHistoryBuffer();
+        if (ok) await saveUserState();
+        window.location.href = url;
+    })();
+    return false;
+}
+
 // たまった履歴（historyBuffer）をFirebaseに書き込んでからtop.htmlへ移動する
 async function submitResults() {
     const submitBtn = document.querySelector("#submitBtn");
-    const userName = currentUser || localStorage.getItem("logged_in_user") || "名無しの参拝者";
 
     if (historyBuffer.length === 0) {
         alert("🙅 まだおみくじを引いていません！\nまずはおみくじを引いてから送信してください。");
@@ -173,24 +226,11 @@ async function submitResults() {
         submitBtn.innerHTML = "送信中…";
     }
 
-    try {
-        for (const entry of historyBuffer) {
-            await window.omikujiAddDoc(window.omikujiCollectionRef, {
-                name: userName,
-                date: entry.date,
-                result: entry.result,
-                prize: entry.prize,
-                balance: entry.balance,
-                timestamp: entry.timestamp
-            });
-        }
-
-        historyBuffer = [];
-        trackMissionSubmit(); // 🎯「大吉を目指せ」ミッションの進捗を更新
+    const ok = await flushHistoryBuffer();
+    if (ok) {
         await saveUserState();
         window.location.href = "top.html";
-    } catch (e) {
-        console.error("Firebaseへの送信に失敗しました: ", e);
+    } else {
         alert("❌ 結果の送信に失敗しました。通信環境をご確認の上、もう一度お試しください。");
         if (submitBtn) {
             submitBtn.disabled = false;

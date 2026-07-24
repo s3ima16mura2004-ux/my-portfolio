@@ -17,6 +17,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     try {
         await loadUserState();
+        updateEquippedBadgesDisplay();
 
         const moneySpan = document.querySelector("#money");
         if (moneySpan) moneySpan.textContent = currentMoney.toLocaleString();

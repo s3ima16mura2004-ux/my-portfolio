@@ -311,8 +311,197 @@ async function sendMoneyToFriend(btn) {
 }
 
 // ============================================================
-// 💬 リアルタイムチャット
+// 🎲 サイコロ対決（フレンド対戦）
 // ============================================================
+const DUEL_BET_MAX = 100000; // 1回の対戦で賭けられる上限額
+
+// 🎫 フレンドに対戦を挑む（賭け金は即座に自分の所持金から差し引かれる＝供託金）
+async function sendDuelChallenge(btn) {
+    const card = btn.closest(".friend-card");
+    const name = card ? card.dataset.name : "";
+    const input = card ? card.querySelector(".friend-duel-input") : null;
+    if (!name || !friends[name]) return;
+
+    const bet = input ? parseInt(input.value, 10) : NaN;
+
+    if (!Number.isFinite(bet) || bet <= 0) {
+        alert("🙅 賭け金を正しく入力してください。");
+        return;
+    }
+    if (bet > DUEL_BET_MAX) {
+        alert("🙅 1回の対戦で賭けられるのは" + DUEL_BET_MAX.toLocaleString() + "円までです。");
+        return;
+    }
+    if (bet > currentMoney) {
+        alert("🙅 所持金が足りません！");
+        return;
+    }
+    if (duelChallengesOutgoing[name]) {
+        alert("🙅 「" + name + "」さんへはすでに挑戦状を送っています。相手の返答をお待ちください。");
+        return;
+    }
+    if (duelChallengesIncoming[name]) {
+        alert("🙅 「" + name + "」さんから届いている挑戦状に先に返答してください。");
+        return;
+    }
+
+    if (!confirm("🎲「" + name + "」さんに、" + bet.toLocaleString() + "円を賭けたサイコロ対決を挑みますか？\n（出目が高い方が両者の賭け金を総取りします）")) return;
+
+    try {
+        const targetRef = window.omikujiDoc(window.omikujiDB, "users", name);
+
+        currentMoney -= bet; // 🎫 供託金として先に差し引く
+        duelChallengesOutgoing[name] = { bet: bet };
+
+        await window.omikujiUpdateDoc(targetRef, {
+            ["duelChallengesIncoming." + currentUser]: { bet: bet }
+        });
+
+        updateMoneyDisplay();
+        playSE("se-found");
+        await saveUserState();
+
+        if (input) input.value = "";
+        updateFriendsUI();
+        alert("🎲 「" + name + "」さんにサイコロ対決を挑みました！（賭け金" + bet.toLocaleString() + "円は供託されました）");
+    } catch (e) {
+        console.error("対戦の挑戦に失敗しました: ", e);
+        currentMoney += bet; // 送信失敗時は供託金を戻す
+        delete duelChallengesOutgoing[name];
+        updateMoneyDisplay();
+        alert("❌ 対戦の挑戦に失敗しました。通信環境をご確認の上、もう一度お試しください。");
+    }
+}
+
+// 🎲 届いている対戦の挑戦状を承認し、その場でサイコロを振って決着させる
+async function acceptDuelChallenge(name) {
+    const challenge = duelChallengesIncoming[name];
+    if (!challenge) return;
+
+    const bet = challenge.bet;
+    if (bet > currentMoney) {
+        alert("🙅 所持金が足りず、この対戦を受けることができません（必要な賭け金：" + bet.toLocaleString() + "円）。断ることもできます。");
+        return;
+    }
+
+    try {
+        const myRoll = 1 + Math.floor(Math.random() * 6);
+        const theirRoll = 1 + Math.floor(Math.random() * 6);
+        const pot = bet * 2;
+        const iWon = myRoll > theirRoll;
+        const isDraw = myRoll === theirRoll;
+
+        const otherRef = window.omikujiDoc(window.omikujiDB, "users", name);
+
+        currentMoney -= bet; // 自分の供託金
+        delete duelChallengesIncoming[name];
+
+        if (isDraw) {
+            // 🤝 引き分け：それぞれの賭け金をそのまま返す
+            currentMoney += bet;
+        } else if (iWon) {
+            currentMoney += pot;
+        }
+        // iWonでない場合（負け）は、供託金を失ったまま＝何もしない
+
+        minigamePlayCount++;
+        if (iWon) minigameTotalWon += (pot - bet);
+
+        // 🎲 相手側のドキュメントを正しいフィールド名で更新する（挑戦状の削除＋精算）
+        const otherUpdate = { ["duelChallengesOutgoing." + currentUser]: window.omikujiDeleteField() };
+        if (isDraw) {
+            otherUpdate.money = window.omikujiIncrement(bet);
+        } else if (!iWon) {
+            otherUpdate.money = window.omikujiIncrement(pot);
+        }
+        otherUpdate.minigamePlayCount = window.omikujiIncrement(1);
+        if (!iWon && !isDraw) otherUpdate.minigameTotalWon = window.omikujiIncrement(pot - bet);
+        await window.omikujiUpdateDoc(otherRef, otherUpdate);
+
+        updateMoneyDisplay();
+        playSE(iWon ? "se-win" : isDraw ? "se-found" : "se-lose");
+        await saveUserState();
+        updateFriendsUI();
+
+        // 💬 結果をチャットにも残しておく（相手が後から確認できるように）
+        try {
+            const chatId = getChatId(currentUser, name);
+            const messagesRef = window.omikujiCollection(window.omikujiDB, "chats", chatId, "messages");
+            const resultText = isDraw
+                ? "🎲 サイコロ対決は引き分け（" + myRoll + "対" + theirRoll + "）でした。賭け金はそれぞれ返金されました。"
+                : "🎲 サイコロ対決の結果：" + currentUser + "（" + myRoll + "）対 " + name + "（" + theirRoll + "）→ " + (iWon ? currentUser : name) + "さんの勝ち！【" + pot.toLocaleString() + "円】獲得";
+            await window.omikujiAddDoc(messagesRef, {
+                from: currentUser,
+                text: resultText,
+                createdAt: window.omikujiServerTimestamp()
+            });
+        } catch (chatErr) {
+            console.error("対戦結果の通知メッセージ送信に失敗しました: ", chatErr);
+        }
+
+        if (isDraw) {
+            alert("🤝【サイコロ対決・引き分け】🤝\nあなた：" + myRoll + "　" + name + "さん：" + theirRoll + "\n賭け金はそれぞれ返金されました。");
+        } else if (iWon) {
+            alert("🎉【サイコロ対決・勝利！】🎉\nあなた：" + myRoll + "　" + name + "さん：" + theirRoll + "\n【" + pot.toLocaleString() + "円】を獲得しました！");
+        } else {
+            alert("😢【サイコロ対決・敗北】😢\nあなた：" + myRoll + "　" + name + "さん：" + theirRoll + "\n賭け金【" + bet.toLocaleString() + "円】を失いました…");
+        }
+    } catch (e) {
+        console.error("対戦の承認に失敗しました: ", e);
+        alert("❌ 対戦の処理に失敗しました。通信環境をご確認の上、もう一度お試しください。");
+    }
+}
+
+// 🙅 届いている挑戦状を断る（相手の供託金を返金する）
+async function declineDuelChallenge(name) {
+    const challenge = duelChallengesIncoming[name];
+    if (!challenge) return;
+    if (!confirm("「" + name + "」さんからのサイコロ対決を断りますか？（相手の賭け金は返金されます）")) return;
+
+    try {
+        const otherRef = window.omikujiDoc(window.omikujiDB, "users", name);
+        delete duelChallengesIncoming[name];
+
+        await window.omikujiUpdateDoc(otherRef, {
+            ["duelChallengesOutgoing." + currentUser]: window.omikujiDeleteField(),
+            money: window.omikujiIncrement(challenge.bet)
+        });
+
+        await saveUserState();
+        updateFriendsUI();
+        alert("🙅 「" + name + "」さんからの対戦を断りました。");
+    } catch (e) {
+        console.error("対戦の辞退に失敗しました: ", e);
+        alert("❌ 処理に失敗しました。通信環境をご確認の上、もう一度お試しください。");
+    }
+}
+
+// 🔙 自分が送った挑戦状を取り消す（自分の供託金を取り戻す）
+async function cancelDuelChallenge(name) {
+    const challenge = duelChallengesOutgoing[name];
+    if (!challenge) return;
+    if (!confirm("「" + name + "」さんへの挑戦状を取り消しますか？（賭け金は戻ります）")) return;
+
+    try {
+        const otherRef = window.omikujiDoc(window.omikujiDB, "users", name);
+        delete duelChallengesOutgoing[name];
+        currentMoney += challenge.bet;
+
+        await window.omikujiUpdateDoc(otherRef, {
+            ["duelChallengesIncoming." + currentUser]: window.omikujiDeleteField()
+        });
+
+        updateMoneyDisplay();
+        await saveUserState();
+        updateFriendsUI();
+        alert("🔙 「" + name + "」さんへの挑戦状を取り消し、賭け金を取り戻しました。");
+    } catch (e) {
+        console.error("挑戦状の取り消しに失敗しました: ", e);
+        alert("❌ 処理に失敗しました。通信環境をご確認の上、もう一度お試しください。");
+    }
+}
+
+
 
 // 💬 指定したフレンドとのチャット画面を開く（リアルタイム購読を開始する）
 function openChat(name) {
@@ -426,11 +615,15 @@ function updateFriendsUI() {
     const incomingList = document.querySelector("#friend-requests-incoming-list");
     const outgoingList = document.querySelector("#friend-requests-outgoing-list");
     const friendsList = document.querySelector("#friend-list");
-    if (!incomingList && !friendsList) return; // フレンドタブがまだ描画されていないページでは何もしない
+    const duelIncomingList = document.querySelector("#duel-requests-incoming-list");
+    const duelOutgoingList = document.querySelector("#duel-requests-outgoing-list");
+    if (!incomingList && !friendsList && !duelIncomingList) return; // フレンドタブがまだ描画されていないページでは何もしない
 
     const incomingNames = Object.keys(friendRequestsIncoming).filter(n => friendRequestsIncoming[n]);
     const outgoingNames = Object.keys(friendRequestsOutgoing).filter(n => friendRequestsOutgoing[n]);
     const friendNames = Object.keys(friends).filter(n => friends[n]);
+    const duelIncomingNames = Object.keys(duelChallengesIncoming).filter(n => duelChallengesIncoming[n]);
+    const duelOutgoingNames = Object.keys(duelChallengesOutgoing).filter(n => duelChallengesOutgoing[n]);
 
     if (incomingList) {
         incomingList.innerHTML = incomingNames.length > 0
@@ -455,10 +648,34 @@ function updateFriendsUI() {
             : '<p class="collect-item-note">送っている申請はありません。</p>';
     }
 
+    if (duelIncomingList) {
+        duelIncomingList.innerHTML = duelIncomingNames.length > 0
+            ? duelIncomingNames.map(name =>
+                '<div class="shop-item-card">' +
+                    '<div class="shop-item-info"><p class="shop-item-name">🎲 ' + escapeHtml(name) + '</p><p class="shop-item-desc">賭け金：' + duelChallengesIncoming[name].bet.toLocaleString() + '円</p></div>' +
+                    '<button class="btn-shop-buy" onclick="acceptDuelChallenge(' + jsStringForAttr(name) + ')" type="button">受けて立つ</button>' +
+                    '<button class="btn-equip-none" onclick="declineDuelChallenge(' + jsStringForAttr(name) + ')" type="button">断る</button>' +
+                '</div>'
+            ).join("")
+            : '<p class="collect-item-note">届いている挑戦状はありません。</p>';
+    }
+
+    if (duelOutgoingList) {
+        duelOutgoingList.innerHTML = duelOutgoingNames.length > 0
+            ? duelOutgoingNames.map(name =>
+                '<div class="shop-item-card">' +
+                    '<div class="shop-item-info"><p class="shop-item-name">🎲 ' + escapeHtml(name) + '</p><p class="shop-item-desc">賭け金：' + duelChallengesOutgoing[name].bet.toLocaleString() + '円（返答待ち）</p></div>' +
+                    '<button class="btn-equip-none" onclick="cancelDuelChallenge(' + jsStringForAttr(name) + ')" type="button">取り消す</button>' +
+                '</div>'
+            ).join("")
+            : '<p class="collect-item-note">送っている挑戦状はありません。</p>';
+    }
+
     if (friendsList) {
         friendsList.innerHTML = friendNames.length > 0
             ? friendNames.map(name => {
                 const isOpenChat = currentChatFriend === name;
+                const hasPendingDuel = !!(duelChallengesIncoming[name] || duelChallengesOutgoing[name]);
                 return (
                     '<div class="friend-card" data-name="' + escapeHtml(name) + '">' +
                         '<div class="shop-item-card">' +
@@ -470,6 +687,11 @@ function updateFriendsUI() {
                             '<input type="number" class="friend-money-input bank-amount-input" placeholder="送る金額（1回' + SEND_MONEY_MAX_PER_TRANSACTION.toLocaleString() + '円まで）" min="1" max="' + SEND_MONEY_MAX_PER_TRANSACTION + '">' +
                             '<button class="btn-shop-buy" onclick="sendMoneyToFriend(this)" type="button">💰 送金</button>' +
                         '</div>' +
+                        '<div class="friend-money-row">' +
+                            '<input type="number" class="friend-duel-input bank-amount-input" placeholder="賭け金（1回' + DUEL_BET_MAX.toLocaleString() + '円まで）" min="1" max="' + DUEL_BET_MAX + '"' + (hasPendingDuel ? " disabled" : "") + '>' +
+                            '<button class="btn-shop-buy" onclick="sendDuelChallenge(this)" type="button"' + (hasPendingDuel ? " disabled" : "") + '>🎲 対戦を挑む</button>' +
+                        '</div>' +
+                        (hasPendingDuel ? '<p class="collect-item-note">この方との対戦が進行中です（上の「サイコロ対決の挑戦状」欄をご確認ください）</p>' : '') +
                     '</div>'
                 );
             }).join("")
@@ -482,15 +704,28 @@ function updateFriendsUI() {
 // 🔔 ミッションタブと同じ考え方で、フレンドタブのボタン自体に届いている申請数のバッジを出す
 function updateFriendNotificationBadge() {
     const badge = document.querySelector("#tabBtn-friends-badge");
-    if (!badge) return;
+    const duelBadge = document.querySelector("#duel-requests-badge");
 
     const incomingCount = Object.keys(friendRequestsIncoming).filter(n => friendRequestsIncoming[n]).length;
+    const duelIncomingCount = Object.keys(duelChallengesIncoming).filter(n => duelChallengesIncoming[n]).length;
 
-    if (incomingCount > 0) {
-        badge.textContent = incomingCount;
-        badge.classList.remove("hidden");
-    } else {
-        badge.classList.add("hidden");
+    if (badge) {
+        const totalCount = incomingCount + duelIncomingCount;
+        if (totalCount > 0) {
+            badge.textContent = totalCount;
+            badge.classList.remove("hidden");
+        } else {
+            badge.classList.add("hidden");
+        }
+    }
+
+    if (duelBadge) {
+        if (duelIncomingCount > 0) {
+            duelBadge.textContent = duelIncomingCount;
+            duelBadge.classList.remove("hidden");
+        } else {
+            duelBadge.classList.add("hidden");
+        }
     }
 }
 

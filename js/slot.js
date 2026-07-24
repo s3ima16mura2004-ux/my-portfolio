@@ -20,6 +20,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     try {
         await loadUserState();
+        updateEquippedBadgesDisplay();
         updateSlotMoneyDisplay();
         updateSlotSessionUI();
         renderSlotPaytable();
@@ -173,6 +174,7 @@ async function playSlot() {
     slotSessionCount++;
     minigamePlayCount++;
     if (typeof trackWeeklyMinigamePlay === "function") trackWeeklyMinigamePlay(); // 📅 週間ミッション「週間ミニゲーム挑戦」の進捗を更新
+        if (typeof trackMonthlyMinigamePlay === "function") trackMonthlyMinigamePlay(); // 📆 月替わりチャレンジ「今月のミニゲーム挑戦」の進捗も合わせて更新
 
     currentMoney += netChange;
     if (netChange > 0) minigameTotalWon += netChange;

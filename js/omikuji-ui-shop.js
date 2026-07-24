@@ -4,6 +4,7 @@
 // ============================================================
 
 function updateShopUI() {
+    updateAvatarShopUI();
     const rank = getVisitorRank(totalWinnings);
 
     SHOP_ITEMS.forEach(item => {
@@ -307,18 +308,39 @@ function updateTitlesUI() {
     updateEquippedTitleDisplay();
 }
 
-// 🎖️ 装備中の称号を、参拝者名の横（user-info欄）に反映する
+// 🎖️👒 装備中の称号・アバターアクセサリーを、参拝者名の横（user-info欄）に反映する
 function updateEquippedTitleDisplay() {
-    const display = document.querySelector("#equipped-title-display");
-    if (!display) return;
+    updateEquippedBadgesDisplay();
+}
 
-    if (equippedTitleKey && equippedTitleEmoji) {
-        display.textContent = equippedTitleEmoji + " " + equippedTitleName + " ";
-        display.classList.remove("hidden");
-    } else {
-        display.textContent = "";
-        display.classList.add("hidden");
-    }
+// 👒 アバターアクセサリーショップの一覧を描画する
+function updateAvatarShopUI() {
+    const list = document.querySelector("#avatar-shop-list");
+    if (!list) return;
+
+    list.innerHTML = AVATAR_ITEMS.map(item => {
+        const owned = !!ownedAvatarItems[item.key];
+        const equipped = equippedAvatarKey === item.key;
+
+        let actionHtml;
+        if (!owned) {
+            actionHtml = '<button class="btn-shop-buy" onclick="buyAvatarItem(\'' + item.key + '\')" type="button">購入する</button>';
+        } else if (equipped) {
+            actionHtml = '<button class="btn-equip" onclick="equipAvatarItem(\'' + item.key + '\')" type="button">装備を外す</button>';
+        } else {
+            actionHtml = '<button class="btn-equip" onclick="equipAvatarItem(\'' + item.key + '\')" type="button">装備する</button>';
+        }
+
+        return (
+            '<div class="shop-item-card' + (equipped ? " shop-item-active" : "") + '">' +
+                '<div class="shop-item-info">' +
+                    '<p class="shop-item-name">' + item.emoji + ' ' + item.name + (owned ? '' : ' <span class="shop-item-price">' + item.price.toLocaleString() + '円</span>') + '</p>' +
+                    (owned ? '<p class="shop-item-desc">所持済み' + (equipped ? '・装備中' : '') + '</p>' : '') +
+                '</div>' +
+                actionHtml +
+            '</div>'
+        );
+    }).join("");
 }
 
 // 📖 年間アルバム（年が変わるたびに自動記録される、過去の年の実績スナップショット）の表示を更新する
@@ -392,7 +414,7 @@ function markDex(resultName) {
         if (allDone && !dexRewardClaimed) {
             dexRewardClaimed = true;
             setTimeout(() => {
-                alert("📖🏆【図鑑コンプリート！】🏆📖\n大吉から大凶(神の試練)まで、すべての結果を集めました！\n神様から御神宝を授かり、大吉ボーナスが永続的に+1%になりました！");
+                showToast("📖🏆 <strong>図鑑コンプリート！</strong><br>大吉から大凶(神の試練)まで、すべての結果を集めました！<br>神様から御神宝を授かり、大吉ボーナスが永続的に+1%になりました！", "gold", 7000);
             }, 1000);
         }
     }

@@ -206,6 +206,7 @@ function trackMissionDraw(resultName, prizeMoney) {
     }
 
     if (typeof trackWeeklyDraw === "function") trackWeeklyDraw(resultName); // 📅 週間ミッションの進捗も合わせて更新
+    if (typeof trackMonthlyDraw === "function") trackMonthlyDraw(resultName); // 📆 月替わりチャレンジの進捗も合わせて更新
 
     updateMissionsUI();
 }
@@ -214,6 +215,7 @@ function trackMissionDraw(resultName, prizeMoney) {
 function trackMissionDraw10() {
     missionProgress.juuren_chousen = 1;
     if (typeof trackWeeklyDraw10 === "function") trackWeeklyDraw10(); // 📅 週間ミッションの進捗も合わせて更新
+    if (typeof trackMonthlyDraw10 === "function") trackMonthlyDraw10(); // 📆 月替わりチャレンジの進捗も合わせて更新
     updateMissionsUI();
 }
 
@@ -248,6 +250,7 @@ function trackMissionDeposit(amount) {
     if (!amount || amount <= 0) return;
     missionProgress.chochiku_ka = Math.min(1000, (missionProgress.chochiku_ka || 0) + amount);
     if (typeof trackWeeklyDeposit === "function") trackWeeklyDeposit(amount); // 📅 週間ミッションの進捗も合わせて更新
+    if (typeof trackMonthlyDeposit === "function") trackMonthlyDeposit(amount); // 📆 月替わりチャレンジの進捗も合わせて更新
     updateMissionsUI();
 }
 
@@ -283,7 +286,7 @@ async function claimMission(key) {
     updateShopUI();
     await saveUserState();
 
-    alert("🎯【デイリーミッション達成】🎯\n「" + mission.emoji + " " + mission.name + "」の報酬を受け取りました！\n🎁 " + rewardMsg);
+    showToast("🎯 <strong>デイリーミッション達成</strong><br>「" + mission.emoji + " " + mission.name + "」の報酬を受け取りました！<br>🎁 " + rewardMsg, "gold");
 }
 
 // 🔰 はじめてガイド：進捗を記録する（デイリーミッションとは別の専用の状態で管理し、日付が変わってもリセットされない）
@@ -311,7 +314,7 @@ async function claimTutorialMission(key) {
     updateMissionsUI();
     await saveUserState();
 
-    alert("🔰🎉【はじめてガイド達成】🎉🔰\n「" + mission.emoji + " " + mission.name + "」の報酬を受け取りました！\n🎁 " + mission.rewardText);
+    showToast("🔰🎉 <strong>はじめてガイド達成</strong><br>「" + mission.emoji + " " + mission.name + "」の報酬を受け取りました！<br>🎁 " + mission.rewardText, "gold");
 }
 
 // 🎟️ ブースト券を1枚使って所持金を1.1倍にする
